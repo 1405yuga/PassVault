@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel(private val supabase: SupabaseClient) : ViewModel() {
 
-    private val _screenState = MutableStateFlow<ScreenState<String>>(ScreenState.Loading())
+    private val _screenState = MutableStateFlow<ScreenState<String>>(ScreenState.PreLoad())
     val screenState: StateFlow<ScreenState<String>> = _screenState
 
     fun signUpWithEmail(email: String, password: String) {
@@ -34,6 +34,10 @@ class AuthViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 ScreenState.Error()
             }
         }
+    }
+
+    fun setScreenStateToPreLoad() {
+        _screenState.value = ScreenState.PreLoad()
     }
 
     fun loginWithEmail(email: String, password: String) {
