@@ -71,15 +71,12 @@ fun SignUp(
         )
         Text(text = "Please enter details to create an account!")
         Spacer(modifier = Modifier.height(20.dp))
-        OutlinedTextField(
+        TextFieldWithErrorText(
+            label = "Email",
             value = email,
-            onValueChange = { email = it },
-            label = { Text(text = "Email") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier.fillMaxWidth(),
-            isError = emailError.isNotBlank()
+            onTextChange = { email = it },
+            errorMsg = emailError
         )
-        ErrorText(errorMessage = emailError)
         ShowAndHidePasswordTextField(
             label = "Password",
             password = password,
@@ -99,26 +96,19 @@ fun SignUp(
         Spacer(modifier = Modifier.height(12.dp))
         Button(
             onClick = {
-                emailError = ""
-                passwordError = ""
-                confirmPasswordError = ""
+                validateEmail(email = email, setErrorMsg = { emailError = it })
+                validatePassword(
+                    password = password,
+                    setPasswordError = { passwordError = it })
+                validatePassword(
+                    password = confirmPassword,
+                    setPasswordError = { confirmPasswordError = it })
                 when {
-                    email.trim().isBlank() -> emailError = "Email cannot be empty"
-//todo:check valid email
-                    password.trim().isBlank() -> passwordError = "Password cannot be empty"
-                    password.trim().length < 6 -> passwordError =
-                        "Password must be at least of 6 characters!"
+                    password.trim() != confirmPassword.trim()
+                        -> confirmPasswordError = "Passwords don't match!"
 
-                    confirmPassword.trim().isBlank() -> confirmPasswordError =
-                        "Confirm password cannot be empty"
-
-                    confirmPassword.trim().length < 6 -> confirmPasswordError =
-                        "Confirm password must be at least of 6 characters!"
-
-                    password.trim() != confirmPassword.trim() -> confirmPasswordError =
-                        "Passwords don't match!"
-
-                    else -> authViewModel.signUpWithEmail(email, password)
+                    emailError.isBlank() and passwordError.isBlank() and confirmPasswordError.isBlank()
+                        -> authViewModel.signUpWithEmail(email, password)
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -174,6 +164,42 @@ fun ErrorText(errorMessage: String) {
         errorMessage, color = MaterialTheme.colorScheme.onErrorContainer,
         fontSize = 12.sp
     )
+}
+
+fun validateEmail(email: String, setErrorMsg: (String) -> Unit) {
+    setErrorMsg("")
+    when {
+        email.trim().isBlank() -> setErrorMsg("Email cannot be empty")
+        //todo:validate email
+    }
+}
+
+fun validatePassword(password: String, setPasswordError: (String) -> Unit) {
+    setPasswordError("")
+    when {
+        password.trim().isBlank() -> setPasswordError("Password cannot be empty")
+        password.trim().length < 6 -> setPasswordError(
+            "Password must be at least of 6 characters!"
+        )
+    }
+}
+
+@Composable
+fun TextFieldWithErrorText(
+    label: String,
+    value: String,
+    onTextChange: (String) -> Unit,
+    errorMsg: String
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onTextChange,
+        label = { Text(text = label) },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        modifier = Modifier.fillMaxWidth(),
+        isError = errorMsg.isNotBlank()
+    )
+    ErrorText(errorMessage = errorMsg)
 }
 
 @Composable
