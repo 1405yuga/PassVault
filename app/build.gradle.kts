@@ -20,6 +20,21 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    defaultConfig {
+        val properties = Properties()
+            .apply { load(rootProject.file("local.properties").inputStream()) }
+
+        fun addStringFields(name: String) {
+            buildConfigField(
+                type = String::class.simpleName!!,
+                name = name,
+                value = properties.getProperty(name)
+            )
+        }
+        addStringFields(name = "SUPABASE_URL")
+        addStringFields(name = "SUPABASE_KEY")
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -38,6 +53,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
