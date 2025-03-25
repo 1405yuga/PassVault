@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -52,6 +53,9 @@ fun SignUp(
     var showPassword by rememberSaveable { mutableStateOf(false) }
     var confirmPassword by rememberSaveable { mutableStateOf("") }
     var showConfirmPassword by rememberSaveable { mutableStateOf(false) }
+    var emailError by rememberSaveable { mutableStateOf("") }
+    var passwordError by rememberSaveable { mutableStateOf("") }
+    var confirmPasswordError by rememberSaveable { mutableStateOf("") }
     val currentContext = LocalContext.current
     val screenState by authViewModel.screenState.collectAsState()
 
@@ -72,32 +76,49 @@ fun SignUp(
             onValueChange = { email = it },
             label = { Text(text = "Email") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            isError = emailError.isNotBlank()
         )
+        ErrorText(errorMessage = emailError)
         ShowAndHidePasswordTextField(
             label = "Password",
             password = password,
             onTextChange = { password = it },
             showPassword = showPassword,
-            onShowPasswordClick = { showPassword = !showPassword }
+            onShowPasswordClick = { showPassword = !showPassword },
+            errorMsg = passwordError
         )
         ShowAndHidePasswordTextField(
             label = "Confirm Password",
             password = confirmPassword,
             onTextChange = { confirmPassword = it },
             showPassword = showConfirmPassword,
-            onShowPasswordClick = { showConfirmPassword = !showConfirmPassword }
+            onShowPasswordClick = { showConfirmPassword = !showConfirmPassword },
+            errorMsg = confirmPasswordError
         )
         Spacer(modifier = Modifier.height(12.dp))
         Button(
             onClick = {
-                if (email.trim().isNotBlank()
-                    and password.trim().isNotBlank()
-                    and confirmPassword.trim().isNotBlank()
-                    and (password.trim() == confirmPassword.trim()
-                            )
-                ) {
-                    authViewModel.signUpWithEmail(email, password)
+                emailError = ""
+                passwordError = ""
+                confirmPasswordError = ""
+                when {
+                    email.trim().isBlank() -> emailError = "Email cannot be empty"
+//todo:check valid email
+                    password.trim().isBlank() -> passwordError = "Password cannot be empty"
+                    password.trim().length < 6 -> passwordError =
+                        "Password must be at least of 6 characters!"
+
+                    confirmPassword.trim().isBlank() -> confirmPasswordError =
+                        "Confirm password cannot be empty"
+
+                    confirmPassword.trim().length < 6 -> confirmPasswordError =
+                        "Confirm password must be at least of 6 characters!"
+
+                    password.trim() != confirmPassword.trim() -> confirmPasswordError =
+                        "Passwords don't match!"
+
+                    else -> authViewModel.signUpWithEmail(email, password)
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -148,12 +169,21 @@ fun SignUp(
 }
 
 @Composable
+fun ErrorText(errorMessage: String) {
+    Text(
+        errorMessage, color = MaterialTheme.colorScheme.onErrorContainer,
+        fontSize = 12.sp
+    )
+}
+
+@Composable
 fun ShowAndHidePasswordTextField(
     label: String,
     password: String,
     onTextChange: (String) -> Unit,
     showPassword: Boolean,
-    onShowPasswordClick: () -> Unit
+    onShowPasswordClick: () -> Unit,
+    errorMsg: String
 ) {
     OutlinedTextField(
         value = password,
@@ -180,8 +210,10 @@ fun ShowAndHidePasswordTextField(
                     )
                 }
             }
-        }
+        },
+        isError = errorMsg.trim().isNotBlank()
     )
+    ErrorText(errorMessage = errorMsg)
 }
 
 @Composable
