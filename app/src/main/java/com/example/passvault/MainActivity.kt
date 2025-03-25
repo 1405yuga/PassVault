@@ -7,10 +7,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.passvault.ui.screens.SignUp
+import com.example.passvault.ui.screens.home.Home
+import com.example.passvault.ui.screens.login.Login
 import com.example.passvault.ui.theme.PassVaultTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,10 +26,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             PassVaultTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    PassVaultApp(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
@@ -31,17 +34,45 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun PassVaultApp(modifier: Modifier = Modifier) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = Screen.Login.name) {
+        composable(Screen.Login.name) {
+            Login(
+                onLoginClick = {
+                    navController.navigateAndClearPrevious(Screen.Home.name)
+                },
+                onSignUpClick = {
+                    navController.navigateAndClearPrevious(Screen.SignUp.name)
+                },
+                modifier = modifier
+            )
+        }
+        composable(Screen.Home.name) {
+            Home(modifier = modifier)
+        }
+        composable(Screen.SignUp.name) {
+            SignUp(
+                navToLogin = { navController.navigateAndClearPrevious(Screen.Login.name) }
+            )
+        }
+    }
+
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PassVaultTheme {
-        Greeting("Android")
+fun NavController.navigateAndClearPrevious(route: String) {
+    this.navigate(route) {
+        popUpTo(0) { inclusive = true }
+        launchSingleTop = true
     }
+}
+
+@Composable
+@Preview
+fun PassVaultAppPreview() {
+    PassVaultApp()
+}
+
+enum class Screen {
+    Home, Login, SignUp
 }

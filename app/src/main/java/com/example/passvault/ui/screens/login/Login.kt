@@ -27,7 +27,11 @@ import androidx.compose.ui.unit.sp
 import com.example.passvault.R
 
 @Composable
-fun Login(modifier: Modifier = Modifier) {
+fun Login(
+    onLoginClick: () -> Unit,
+    onSignUpClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -58,7 +62,10 @@ fun Login(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(12.dp))
         Button(
-            onClick = {},
+            onClick = {
+                //todo:check details
+                onLoginClick()
+            },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(4.dp)
         ) {
@@ -74,11 +81,10 @@ fun Login(modifier: Modifier = Modifier) {
                 text = "Create new account",
                 fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier.clickable {
-                    //Todo : navigate to signup
+                    onSignUpClick()
                 }
             )
         }
-
     }
 }
 
@@ -86,6 +92,6 @@ fun Login(modifier: Modifier = Modifier) {
 @Preview
 fun LoginPreview() {
     Surface {
-        Login()
+        Login(onLoginClick = {}, onSignUpClick = {})
     }
 }
