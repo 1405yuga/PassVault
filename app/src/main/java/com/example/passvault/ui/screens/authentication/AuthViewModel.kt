@@ -28,7 +28,7 @@ class AuthViewModel(private val supabase: SupabaseClient) : ViewModel() {
                     this.email = email
                     this.password = password
                 }
-                ScreenState.Loaded("SignUp successfully!")
+                ScreenState.Loaded("Account created! Check your email for confirmation.")
             } catch (e: Exception) {
                 e.printStackTrace()
                 ScreenState.Error()
@@ -48,7 +48,7 @@ class AuthViewModel(private val supabase: SupabaseClient) : ViewModel() {
                     this.email = email
                     this.password = password
                 }
-                ScreenState.Loaded("Login successfull")
+                ScreenState.Loaded("Login successfully")
             } catch (e: Exception) {
                 e.printStackTrace()
                 ScreenState.Error()
