@@ -1,4 +1,4 @@
-package com.example.passvault.ui.screens.home
+package com.example.passvault.ui.screens.main_screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,9 +19,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.passvault.ui.screens.add.Add
-import com.example.passvault.ui.screens.list.VaultList
-import com.example.passvault.ui.screens.profile.Profile
 
 
 @Composable
