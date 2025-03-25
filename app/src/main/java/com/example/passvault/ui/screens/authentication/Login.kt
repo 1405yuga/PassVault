@@ -1,4 +1,4 @@
-package com.example.passvault.ui.screens.login
+package com.example.passvault.ui.screens.authentication
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
