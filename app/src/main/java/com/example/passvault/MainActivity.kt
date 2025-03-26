@@ -1,6 +1,7 @@
 package com.example.passvault
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -60,7 +61,7 @@ fun PassVaultApp(
         composable(Screen.Login.name) {
             Login(
                 onLoginClick = {
-                    navController.navigateAndClearPrevious(Screen.Home.name)
+//                    navController.navigateAndClearPrevious(Screen.Home.name)
                 },
                 onSignUpClick = {
                     navController.navigateAndClearPrevious(Screen.SignUp.name)
@@ -82,7 +83,6 @@ fun PassVaultApp(
             )
         }
     }
-
 }
 
 fun NavController.navigateAndClearPrevious(route: String) {

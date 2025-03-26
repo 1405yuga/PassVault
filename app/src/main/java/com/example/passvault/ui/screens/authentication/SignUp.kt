@@ -46,7 +46,7 @@ import com.example.passvault.ui.screens.state.ScreenState
 fun SignUp(
     navToLogin: () -> Unit,
     modifier: Modifier = Modifier,
-    authViewModel: AuthViewModel = viewModel(factory = AuthViewModel.Factory)
+    authViewModel: AuthViewModel
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -141,7 +141,6 @@ fun SignUp(
                     currentContext, (screenState as ScreenState.Loaded<String>).result,
                     Toast.LENGTH_SHORT
                 ).show()
-                navToLogin()
             }
 
             is ScreenState.Error -> {
@@ -247,6 +246,7 @@ fun ShowAndHidePasswordTextField(
 fun SignUpPreview() {
     Surface {
         SignUp(
-            navToLogin = {})
+            navToLogin = {}, authViewModel = viewModel()
+        )
     }
 }

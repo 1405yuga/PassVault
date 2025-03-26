@@ -36,7 +36,7 @@ fun Login(
     onLoginClick: () -> Unit,
     onSignUpClick: () -> Unit,
     modifier: Modifier = Modifier,
-    authViewModel: AuthViewModel = viewModel(factory = AuthViewModel.Factory)
+    authViewModel: AuthViewModel
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var emailError by rememberSaveable { mutableStateOf("") }
@@ -132,6 +132,6 @@ fun Login(
 @Preview
 fun LoginPreview() {
     Surface {
-        Login(onLoginClick = {}, onSignUpClick = {})
+        Login(onLoginClick = {}, onSignUpClick = {}, authViewModel = viewModel())
     }
 }

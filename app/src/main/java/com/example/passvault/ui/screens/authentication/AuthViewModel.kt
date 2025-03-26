@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.passvault.PassVaultApplication
 import com.example.passvault.ui.screens.state.ScreenState
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserInfo
@@ -47,6 +48,7 @@ class AuthViewModel(private val supabase: SupabaseClient) : ViewModel() {
                     this.email = email
                     this.password = password
                 }
+                checkUserSessions()
                 ScreenState.Loaded("Account created! Check your email for confirmation.")
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -78,6 +80,7 @@ class AuthViewModel(private val supabase: SupabaseClient) : ViewModel() {
                     this.email = email
                     this.password = password
                 }
+                checkUserSessions()
                 ScreenState.Loaded("Login successfully")
             } catch (e: Exception) {
                 e.printStackTrace()
