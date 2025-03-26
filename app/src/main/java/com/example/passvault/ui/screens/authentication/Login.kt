@@ -111,6 +111,7 @@ fun Login(
                     currentContext, (screenState as ScreenState.Loaded<String>).result,
                     Toast.LENGTH_SHORT
                 ).show()
+                authViewModel.setScreenStateToPreLoad()
                 onLoginClick()
             }
 
