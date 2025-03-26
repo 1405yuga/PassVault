@@ -11,6 +11,7 @@ import com.example.passvault.ui.screens.state.ScreenState
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.user.UserInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -19,6 +20,24 @@ class AuthViewModel(private val supabase: SupabaseClient) : ViewModel() {
 
     private val _screenState = MutableStateFlow<ScreenState<String>>(ScreenState.PreLoad())
     val screenState: StateFlow<ScreenState<String>> = _screenState
+
+    private val _userInfo = MutableStateFlow<UserInfo?>(null)
+    val userInfo: StateFlow<UserInfo?> = _userInfo
+
+    private fun checkUserSessions() {
+        viewModelScope.launch {
+            _userInfo.value = try {
+                supabase.auth.retrieveUserForCurrentSession(updateSession = true)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
+    init {
+        checkUserSessions()
+    }
 
     fun signUpWithEmail(email: String, password: String) {
         _screenState.value = ScreenState.Loading()
