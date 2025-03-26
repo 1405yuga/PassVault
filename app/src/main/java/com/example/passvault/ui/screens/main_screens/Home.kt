@@ -22,7 +22,10 @@ import androidx.compose.ui.tooling.preview.Preview
 
 
 @Composable
-fun Home(modifier: Modifier = Modifier) {
+fun Home(
+    onLogoutClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     var selectedItem by rememberSaveable { mutableIntStateOf(0) }
     val items = listOf("List", "Add", "Profile")
     val iconsList = listOf(
@@ -41,7 +44,7 @@ fun Home(modifier: Modifier = Modifier) {
             when (selectedItem) {
                 0 -> VaultList()
                 1 -> Add()
-                2 -> Profile()
+                2 -> Profile(onLogoutClick = onLogoutClick)
             }
         }
         NavigationBar(modifier = Modifier.fillMaxWidth()) {
@@ -60,6 +63,6 @@ fun Home(modifier: Modifier = Modifier) {
 @Preview
 fun HomePreview() {
     Surface {
-        Home()
+        Home(onLogoutClick = {})
     }
 }

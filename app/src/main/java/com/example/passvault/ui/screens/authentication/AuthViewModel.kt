@@ -59,6 +59,17 @@ class AuthViewModel(private val supabase: SupabaseClient) : ViewModel() {
         _screenState.value = ScreenState.PreLoad()
     }
 
+    fun logoutAllSessions() {
+        viewModelScope.launch {
+            try {
+                supabase.auth.signOut(SignOutScope.GLOBAL)
+                _userInfo.value = null
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     fun loginWithEmail(email: String, password: String) {
         _screenState.value = ScreenState.Loading()
         viewModelScope.launch {

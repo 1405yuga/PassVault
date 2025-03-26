@@ -47,7 +47,10 @@ fun PassVaultApp(
     val userDetails by authViewModel.userInfo.collectAsState()
 
     LaunchedEffect(userDetails) {
+        //todo: provide quick animation
+        Log.d("UserDetails","Updated : $userDetails")
         if (userDetails != null) navController.navigateAndClearPrevious(Screen.Home.name)
+        else navController.navigateAndClearPrevious(Screen.Login.name)
     }
 
     NavHost(
@@ -67,7 +70,10 @@ fun PassVaultApp(
             )
         }
         composable(Screen.Home.name) {
-            Home(modifier = modifier)
+            Home(
+                onLogoutClick = { authViewModel.logoutAllSessions() },
+                modifier = modifier
+            )
         }
         composable(Screen.SignUp.name) {
             SignUp(
