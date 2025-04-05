@@ -113,7 +113,8 @@ fun SignUp(
                 }
             },
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(4.dp)
+            shape = RoundedCornerShape(4.dp),
+            enabled = screenState !is ScreenState.Loading
         ) {
             when (screenState) {
                 is ScreenState.Loading -> {
@@ -155,7 +156,6 @@ fun SignUp(
 
                 else -> {}
             }
-
         }
     }
 }

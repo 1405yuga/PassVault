@@ -25,7 +25,7 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
                 ScreenState.Loaded("Login successfully")
             } catch (e: Exception) {
                 e.printStackTrace()
-                ScreenState.Error("Something went wrong!")
+                ScreenState.Error("Unable to Login. Something went wrong!")
             }
         }
     }
