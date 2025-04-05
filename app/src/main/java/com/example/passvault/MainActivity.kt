@@ -14,7 +14,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.passvault.ui.screens.authentication.SignUp
+import com.example.passvault.ui.screens.signup.SignUp
 import com.example.passvault.ui.screens.login.Login
 import com.example.passvault.ui.screens.main_screens.Home
 import com.example.passvault.ui.theme.PassVaultTheme
@@ -52,7 +52,7 @@ fun PassVaultApp(
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Login.name
+        startDestination = Screen.SignUp.name
     ) {
         composable(Screen.Login.name) {
             Login(

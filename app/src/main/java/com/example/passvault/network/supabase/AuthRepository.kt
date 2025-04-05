@@ -16,7 +16,7 @@ class AuthRepository @Inject constructor(private val supabaseClient: SupabaseCli
 
     suspend fun emailSignUp(email: String, password: String) =
         supabaseClient.auth.signUpWith(Email) {
-            this.email
-            this.password
+            this.email = email
+            this.password = password
         }
 }

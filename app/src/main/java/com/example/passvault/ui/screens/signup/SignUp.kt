@@ -1,4 +1,4 @@
-package com.example.passvault.ui.screens.authentication
+package com.example.passvault.ui.screens.signup
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -23,6 +23,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,7 +39,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.passvault.R
 import com.example.passvault.ui.screens.state.ScreenState
 
@@ -46,7 +47,7 @@ import com.example.passvault.ui.screens.state.ScreenState
 fun SignUp(
     navToLogin: () -> Unit,
     modifier: Modifier = Modifier,
-    authViewModel: AuthViewModel
+    viewModel: SignUpViewModel = hiltViewModel()
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -57,7 +58,7 @@ fun SignUp(
     var passwordError by rememberSaveable { mutableStateOf("") }
     var confirmPasswordError by rememberSaveable { mutableStateOf("") }
     val currentContext = LocalContext.current
-    val screenState by authViewModel.screenState.collectAsState()
+    val screenState by viewModel.screenState.collectAsState()
 
     Column(
         modifier = modifier
@@ -108,17 +109,20 @@ fun SignUp(
                         -> confirmPasswordError = "Passwords don't match!"
 
                     emailError.isBlank() and passwordError.isBlank() and confirmPasswordError.isBlank()
-                        -> authViewModel.signUpWithEmail(email, password)
+                        -> viewModel.emailSignUp(email, password)
                 }
             },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(4.dp)
         ) {
-            if (screenState is ScreenState.Loading) {
-                Text("Loading..")
-            } else {
-                Text("Create account")
+            when (screenState) {
+                is ScreenState.Loading -> {
+                    Text("Loading..")
+                }
 
+                else -> {
+                    Text("Get started")
+                }
             }
         }
         Spacer(modifier = Modifier.height(22.dp))
@@ -135,26 +139,23 @@ fun SignUp(
                 }
             )
         }
-        when (screenState) {
-            is ScreenState.Loaded -> {
-                Toast.makeText(
-                    currentContext, (screenState as ScreenState.Loaded<String>).result,
-                    Toast.LENGTH_SHORT
-                ).show()
-                authViewModel.setScreenStateToPreLoad()
-                navToLogin()
-            }
-
-            is ScreenState.Error -> {
-                Toast.makeText(
+        LaunchedEffect(screenState) {
+            when (val state = screenState) {
+                is ScreenState.Loaded -> Toast.makeText(
                     currentContext,
-                    "Something went wrong",
-                    Toast.LENGTH_SHORT
+                    state.result,
+                    Toast.LENGTH_LONG
                 ).show()
-                authViewModel.setScreenStateToPreLoad()
+
+                is ScreenState.Error -> Toast.makeText(
+                    currentContext,
+                    state.message,
+                    Toast.LENGTH_LONG
+                ).show()
+
+                else -> {}
             }
 
-            else -> {}
         }
     }
 }
@@ -198,7 +199,7 @@ fun TextFieldWithErrorText(
         label = { Text(text = label) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         modifier = Modifier.fillMaxWidth(),
-        isError = errorMsg.isNotBlank()
+        isError = errorMsg.isNotBlank(),
     )
     ErrorText(errorMessage = errorMsg)
 }
@@ -248,7 +249,7 @@ fun ShowAndHidePasswordTextField(
 fun SignUpPreview() {
     Surface {
         SignUp(
-            navToLogin = {}, authViewModel = viewModel()
+            navToLogin = {}
         )
     }
 }
