@@ -14,8 +14,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.passvault.ui.screens.signup.SignUp
-import com.example.passvault.ui.screens.login.Login
+import com.example.passvault.ui.screens.authentication.signup.SignUp
+import com.example.passvault.ui.screens.authentication.login.Login
 import com.example.passvault.ui.screens.main_screens.Home
 import com.example.passvault.ui.theme.PassVaultTheme
 import dagger.hilt.android.AndroidEntryPoint

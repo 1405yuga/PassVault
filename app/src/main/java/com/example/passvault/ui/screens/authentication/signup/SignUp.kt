@@ -1,4 +1,4 @@
-package com.example.passvault.ui.screens.signup
+package com.example.passvault.ui.screens.authentication.signup
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -41,7 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.passvault.R
-import com.example.passvault.ui.screens.state.ScreenState
+import com.example.passvault.ui.screens.authentication.signup.SignUpViewModel
+import com.example.passvault.ui.state.ScreenState
 
 @Composable
 fun SignUp(
