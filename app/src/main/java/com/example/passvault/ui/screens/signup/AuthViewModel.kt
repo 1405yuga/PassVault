@@ -1,12 +1,7 @@
-package com.example.passvault.ui.screens.authentication
+package com.example.passvault.ui.screens.signup
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.passvault.PassVaultApplication
 import com.example.passvault.ui.screens.state.ScreenState
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.SignOutScope
@@ -52,7 +47,7 @@ class AuthViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 ScreenState.Loaded("Account created! Check your email and verify it.")
             } catch (e: Exception) {
                 e.printStackTrace()
-                ScreenState.Error()
+                ScreenState.Error("")
             }
         }
     }
@@ -72,29 +67,29 @@ class AuthViewModel(private val supabase: SupabaseClient) : ViewModel() {
         }
     }
 
-    fun loginWithEmail(email: String, password: String) {
-        _screenState.value = ScreenState.Loading()
-        viewModelScope.launch {
-            _screenState.value = try {
-                supabase.auth.signInWith(Email) {
-                    this.email = email
-                    this.password = password
-                }
-                checkUserSessions()
-                ScreenState.Loaded("Login successfully")
-            } catch (e: Exception) {
-                e.printStackTrace()
-                ScreenState.Error()
-            }
-        }
-    }
+//    fun loginWithEmail(email: String, password: String) {
+//        _screenState.value = ScreenState.Loading()
+//        viewModelScope.launch {
+//            _screenState.value = try {
+//                supabase.auth.signInWith(Email) {
+//                    this.email = email
+//                    this.password = password
+//                }
+//                checkUserSessions()
+//                ScreenState.Loaded("Login successfully")
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//                ScreenState.Error()
+//            }
+//        }
+//    }
 
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = (this[APPLICATION_KEY] as PassVaultApplication)
-                AuthViewModel(supabase = application.supabaseClient)
-            }
-        }
-    }
+//    companion object {
+//        val Factory: ViewModelProvider.Factory = viewModelFactory {
+//            initializer {
+//                val application = (this[APPLICATION_KEY] as PassVaultApplication)
+//                AuthViewModel(supabase = application.supabaseClient)
+//            }
+//        }
+//    }
 }
