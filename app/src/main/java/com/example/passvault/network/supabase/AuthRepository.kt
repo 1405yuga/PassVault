@@ -19,4 +19,6 @@ class AuthRepository @Inject constructor(private val supabaseClient: SupabaseCli
             this.email = email
             this.password = password
         }
+
+    fun checkIfUserLoggedIn() = supabaseClient.auth.currentSessionOrNull() != null
 }
