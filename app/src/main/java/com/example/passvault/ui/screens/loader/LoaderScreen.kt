@@ -36,16 +36,17 @@ fun LoaderScreen(
 
     val context = LocalContext.current
     val state = loaderViewModel.screenState.collectAsState().value
-    LaunchedEffect(Unit) {
+    LaunchedEffect(true) {
         loaderViewModel.checkSession()
     }
     LaunchedEffect(state) {
         when (state) {
             is ScreenState.Loaded -> {
+                Log.d("LoaderScreen", "Screen state result : ${state.result}")
                 when (state.result) {
-                    UserState.HAVE_MASTER_KEY -> toHomeScreen()
-                    UserState.DONT_HAVE_MASTER_KEY -> toMasterKeyScreen()
                     UserState.NOT_LOGGED_IN -> toLoginScreen()
+                    UserState.DONT_HAVE_MASTER_KEY -> toMasterKeyScreen()
+                    UserState.HAVE_MASTER_KEY -> toHomeScreen()
                 }
             }
 

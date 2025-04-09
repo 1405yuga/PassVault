@@ -20,10 +20,10 @@ class LoaderViewModel @Inject constructor(private val authRepository: AuthReposi
     fun checkSession() {
         _screenState.value = ScreenState.Loading()
         viewModelScope.launch {
-            _screenState.value = try {
+            try {
                 val loggedIn = authRepository.checkIfUserLoggedIn()
                 Log.d(this.javaClass.name, "Logged in : $loggedIn")
-                if (loggedIn) {
+                _screenState.value = if (loggedIn) {
                     // TODO: check if have masterkey
                     ScreenState.Loaded(UserState.DONT_HAVE_MASTER_KEY)
                 } else {
@@ -31,7 +31,7 @@ class LoaderViewModel @Inject constructor(private val authRepository: AuthReposi
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                ScreenState.Error("Unable to load")
+                _screenState.value = ScreenState.Error("Unable to load")
             }
         }
     }
