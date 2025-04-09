@@ -13,12 +13,17 @@ class MasterKeyViewModel : ViewModel() {
         uiState = uiState.copy(password = newPassword)
     }
 
-    fun onPasswordError(error: String) {
-        uiState = uiState.copy(passwordError = error)
-    }
-
     fun togglePasswordVisibility() {
         uiState = uiState.copy(showPassword = !uiState.showPassword)
+    }
+
+    fun setPasswordError(errorMsg: String) {
+        uiState = uiState.copy(passwordError = errorMsg)
+    }
+
+    fun addMasterKey(){
+        // TODO:  add validations - uiState.password
+        // TODO: insert materkey in user table
     }
 }
 
