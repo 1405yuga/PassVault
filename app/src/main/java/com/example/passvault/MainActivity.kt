@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -73,7 +74,7 @@ fun PassVaultApp(
             )
         }
         composable(Screen.MasterKey.name) {
-            MasterKeyScreen()
+            MasterKeyScreen(viewModel = viewModel())
         }
     }
 }

@@ -10,22 +10,19 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.passvault.ui.screens.authentication.signup.ShowAndHidePasswordTextField
 
 @Composable
-fun MasterKeyScreen() {
-    var password by rememberSaveable { mutableStateOf("") }
-    val passwordError by rememberSaveable { mutableStateOf("") }
-    var showPassword by rememberSaveable { mutableStateOf(false) }
+fun MasterKeyScreen(
+    viewModel: MasterKeyViewModel
+) {
+    val uiState = viewModel.uiState
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -39,11 +36,11 @@ fun MasterKeyScreen() {
         Text(text = "Create master key for encryption")
         ShowAndHidePasswordTextField(
             label = "Master Key",
-            password = password,
-            onTextChange = { password = it },
-            showPassword = showPassword,
-            onShowPasswordClick = { showPassword = !showPassword },
-            errorMsg = passwordError,
+            password = uiState.password,
+            onTextChange = { viewModel.onPasswordChange(it) },
+            showPassword = uiState.showPassword,
+            onShowPasswordClick = { viewModel.togglePasswordVisibility() },
+            errorMsg = uiState.passwordError,
         )
         Button(
             onClick = {},
@@ -62,6 +59,8 @@ fun MasterKeyScreen() {
 @Composable
 fun MasterKeyScreenPreview() {
     Surface {
-        MasterKeyScreen()
+        MasterKeyScreen(
+            viewModel = viewModel()
+        )
     }
 }
