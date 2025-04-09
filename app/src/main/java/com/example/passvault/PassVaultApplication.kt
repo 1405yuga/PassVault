@@ -2,9 +2,6 @@ package com.example.passvault
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.createSupabaseClient
 
 @HiltAndroidApp
 class PassVaultApplication : Application() {
