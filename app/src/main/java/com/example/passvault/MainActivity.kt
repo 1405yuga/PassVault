@@ -14,8 +14,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.passvault.ui.screens.authentication.signup.SignUp
+import com.example.passvault.ui.screens.MasterKeyScreen
 import com.example.passvault.ui.screens.authentication.login.Login
+import com.example.passvault.ui.screens.authentication.signup.SignUp
+import com.example.passvault.ui.screens.loader.LoaderScreen
 import com.example.passvault.ui.screens.main_screens.Home
 import com.example.passvault.ui.theme.PassVaultTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -41,44 +43,37 @@ fun PassVaultApp(
 
     ) {
     val navController = rememberNavController()
-//    val userDetails by authViewModel.userInfo.collectAsState()
-
-//    LaunchedEffect(userDetails) {
-//        //todo: provide quick animation
-//        Log.d("UserDetails", "Updated : $userDetails")
-//        if (userDetails != null) navController.navigateAndClearPrevious(Screen.Home.name)
-//        else navController.navigateAndClearPrevious(Screen.Login.name)
-//    }
-
     NavHost(
         navController = navController,
-        startDestination = Screen.SignUp.name
+        startDestination = Screen.Loader.name
     ) {
-        composable(Screen.Login.name) {
-            Login(
-                onLoginClick = {
-//                    navController.navigateAndClearPrevious(Screen.Home.name)
-                },
-                onSignUpClick = {
-                    navController.navigateAndClearPrevious(Screen.SignUp.name)
-                },
-                modifier = modifier,
-//                authViewModel = authViewModel
+        composable(Screen.Loader.name) {
+            LoaderScreen(
+                toLoginScreen = { navController.navigateAndClearPrevious(Screen.Login.name) },
+                toMasterKeyScreen = { navController.navigateAndClearPrevious(Screen.MasterKey.name) },
+                toHomeScreen = { navController.navigateAndClearPrevious(Screen.Home.name) }
             )
         }
         composable(Screen.Home.name) {
             Home(
-                onLogoutClick = {
-                    //todo: logout
-                },
+                onLogoutClick = {},
+                modifier = modifier
+            )
+        }
+        composable(Screen.Login.name) {
+            Login(
+                onLoginClick = { navController.navigateAndClearPrevious(Screen.Loader.name) },
+                onSignUpClick = { navController.navigateAndClearPrevious(Screen.SignUp.name) },
                 modifier = modifier
             )
         }
         composable(Screen.SignUp.name) {
             SignUp(
-                navToLogin = { navController.navigateAndClearPrevious(Screen.Login.name) },
-//                authViewModel = authViewModel
+                navToLogin = { navController.navigateAndClearPrevious(Screen.Loader.name) },
             )
+        }
+        composable(Screen.MasterKey.name) {
+            MasterKeyScreen()
         }
     }
 }
@@ -97,5 +92,5 @@ fun PassVaultAppPreview() {
 }
 
 enum class Screen {
-    Home, Login, SignUp
+    Home, Login, SignUp, Loader, MasterKey
 }

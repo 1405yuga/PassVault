@@ -88,6 +88,7 @@ fun Login(
                         email = email.trim(),
                         password = password.trim()
                     )
+                    onLoginClick()
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -132,12 +133,6 @@ fun Login(
         }
         LaunchedEffect(screenState) {
             when (val state = screenState) {
-                is ScreenState.Loaded -> Toast.makeText(
-                    currentContext,
-                    state.result,
-                    Toast.LENGTH_LONG
-                ).show()
-
                 is ScreenState.Error -> Toast.makeText(
                     currentContext,
                     state.message,
