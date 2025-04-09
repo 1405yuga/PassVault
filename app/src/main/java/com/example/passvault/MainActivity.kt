@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -65,6 +66,7 @@ fun PassVaultApp(
             Login(
                 onLoginClick = { navController.navigateAndClearPrevious(Screen.Loader.name) },
                 onSignUpClick = { navController.navigateAndClearPrevious(Screen.SignUp.name) },
+                viewModel = hiltViewModel(),
                 modifier = modifier
             )
         }

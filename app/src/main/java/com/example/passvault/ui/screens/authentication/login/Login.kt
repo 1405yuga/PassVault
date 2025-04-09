@@ -20,9 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,7 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.passvault.di.supabase.SupabaseModule
+import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.ui.screens.authentication.signup.ShowAndHidePasswordTextField
 import com.example.passvault.ui.screens.authentication.signup.TextFieldWithErrorText
 import com.example.passvault.ui.screens.authentication.signup.validateEmail
@@ -42,13 +40,9 @@ fun Login(
     onLoginClick: () -> Unit,
     onSignUpClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel
 ) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var emailError by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var passwordError by rememberSaveable { mutableStateOf("") }
-    var showPassword by rememberSaveable { mutableStateOf(false) }
+    val uiState = viewModel.uiState
     val screenState by viewModel.screenState.collectAsState()
     val currentContext = LocalContext.current
 
@@ -66,30 +60,29 @@ fun Login(
         Spacer(modifier = Modifier.height(20.dp))
         TextFieldWithErrorText(
             label = "Email",
-            value = email,
-            onTextChange = { email = it },
-            errorMsg = emailError
+            value = uiState.email,
+            onTextChange = { viewModel.onEmailChange(it) },
+            errorMsg = uiState.emailError
         )
         ShowAndHidePasswordTextField(
             label = "Password",
-            password = password,
-            onTextChange = { password = it },
-            showPassword = showPassword,
-            onShowPasswordClick = { showPassword = !showPassword },
-            errorMsg = passwordError
+            password = uiState.password,
+            onTextChange = { viewModel.onPasswordChange(it) },
+            showPassword = uiState.showPassword,
+            onShowPasswordClick = { viewModel.togglePasswordVisibility() },
+            errorMsg = uiState.passwordError
         )
         Spacer(modifier = Modifier.height(12.dp))
         Button(
             onClick = {
-                validateEmail(email = email, setErrorMsg = { emailError = it })
-                validatePassword(password = password, setPasswordError = { passwordError = it })
-                if (emailError.isBlank() and passwordError.isBlank()) {
-                    viewModel.emailLogin(
-                        email = email.trim(),
-                        password = password.trim()
-                    )
-//                    onLoginClick()
-                }
+                validateEmail(email = uiState.email, setErrorMsg = { viewModel.setEmailError(it) })
+                validatePassword(
+                    password = uiState.password,
+                    setPasswordError = { viewModel.setPasswordError(it) })
+                viewModel.emailLogin(
+                    email = uiState.email.trim(),
+                    password = uiState.password.trim()
+                )
             },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(4.dp),
@@ -185,6 +178,12 @@ fun Login(
 @Preview
 fun LoginPreview() {
     Surface {
-        Login(onLoginClick = {}, onSignUpClick = {})
+        Login(
+            onLoginClick = {}, onSignUpClick = {}, viewModel = LoginViewModel(
+                AuthRepository(
+                    SupabaseModule.mockClient
+                )
+            )
+        )
     }
 }
