@@ -22,7 +22,7 @@ class LoaderViewModel @Inject constructor(private val authRepository: AuthReposi
         viewModelScope.launch {
             try {
                 val loggedIn = authRepository.checkIfUserLoggedIn()
-                Log.d(this.javaClass.name, "Logged in : $loggedIn")
+                Log.d("LoaderViewModel", "Logged in : $loggedIn")
                 _screenState.value = if (loggedIn) {
                     // TODO: check if have masterkey
                     ScreenState.Loaded(UserState.DONT_HAVE_MASTER_KEY)

@@ -88,7 +88,7 @@ fun Login(
                         email = email.trim(),
                         password = password.trim()
                     )
-                    onLoginClick()
+//                    onLoginClick()
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -138,6 +138,10 @@ fun Login(
                     state.message,
                     Toast.LENGTH_LONG
                 ).show()
+
+                is ScreenState.Loaded -> {
+                    onLoginClick()
+                }
 
                 else -> {}
             }
