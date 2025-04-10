@@ -26,9 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -49,17 +46,9 @@ fun SignUp(
     modifier: Modifier = Modifier,
     viewModel: SignUpViewModel = hiltViewModel()
 ) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var showPassword by rememberSaveable { mutableStateOf(false) }
-    var confirmPassword by rememberSaveable { mutableStateOf("") }
-    var showConfirmPassword by rememberSaveable { mutableStateOf(false) }
-    var emailError by rememberSaveable { mutableStateOf("") }
-    var passwordError by rememberSaveable { mutableStateOf("") }
-    var confirmPasswordError by rememberSaveable { mutableStateOf("") }
     val currentContext = LocalContext.current
     val screenState by viewModel.screenState.collectAsState()
-
+    val uiState = viewModel.uiState
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -74,42 +63,42 @@ fun SignUp(
         Spacer(modifier = Modifier.height(20.dp))
         TextFieldWithErrorText(
             label = "Email",
-            value = email,
-            onTextChange = { email = it },
-            errorMsg = emailError
+            value = uiState.email,
+            onTextChange = { viewModel.onEmailChange(it) },
+            errorMsg = uiState.emailError
         )
         ShowAndHidePasswordTextField(
             label = "Password",
-            password = password,
-            onTextChange = { password = it },
-            showPassword = showPassword,
-            onShowPasswordClick = { showPassword = !showPassword },
-            errorMsg = passwordError
+            password = uiState.password,
+            onTextChange = { viewModel.onPasswordChange(it) },
+            showPassword = uiState.showPassword,
+            onShowPasswordClick = { viewModel.togglePasswordVisibility() },
+            errorMsg = uiState.passwordError
         )
         ShowAndHidePasswordTextField(
             label = "Confirm Password",
-            password = confirmPassword,
-            onTextChange = { confirmPassword = it },
-            showPassword = showConfirmPassword,
-            onShowPasswordClick = { showConfirmPassword = !showConfirmPassword },
-            errorMsg = confirmPasswordError
+            password = uiState.confirmPassword,
+            onTextChange = { viewModel.onConfirmPasswordChange(it) },
+            showPassword = uiState.showConfirmPassword,
+            onShowPasswordClick = { viewModel.toggleConfirmPasswordVisibility() },
+            errorMsg = uiState.confirmPasswordError
         )
         Spacer(modifier = Modifier.height(12.dp))
         Button(
             onClick = {
-                validateEmail(email = email, setErrorMsg = { emailError = it })
+                validateEmail(email = uiState.email, setErrorMsg = { viewModel.setEmailError(it) })
                 validatePassword(
-                    password = password,
-                    setPasswordError = { passwordError = it })
+                    password = uiState.password,
+                    setPasswordError = { viewModel.setPasswordError(it) })
                 validatePassword(
-                    password = confirmPassword,
-                    setPasswordError = { confirmPasswordError = it })
+                    password = uiState.confirmPassword,
+                    setPasswordError = { viewModel.setConfirmPasswordError(it) })
                 when {
-                    password.trim() != confirmPassword.trim()
-                        -> confirmPasswordError = "Passwords don't match!"
+                    uiState.password.trim() != uiState.confirmPassword.trim()
+                        -> viewModel.setConfirmPasswordError("Passwords don't match!")
 
-                    emailError.isBlank() and passwordError.isBlank() and confirmPasswordError.isBlank()
-                        -> viewModel.emailSignUp(email, password)
+                    uiState.emailError.isBlank() and uiState.passwordError.isBlank() and uiState.confirmPasswordError.isBlank()
+                        -> viewModel.emailSignUp(uiState.email, uiState.password)
                 }
             },
             modifier = Modifier.fillMaxWidth(),
