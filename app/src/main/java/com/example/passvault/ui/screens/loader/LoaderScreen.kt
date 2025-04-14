@@ -29,16 +29,13 @@ import com.example.passvault.ui.state.ScreenState
 @Composable
 fun LoaderScreen(
     toLoginScreen: () -> Unit,
-    toCreateMasterKeyScreen:()-> Unit,
+    toCreateMasterKeyScreen: () -> Unit,
     toEnterMasterKeyScreen: () -> Unit,
     loaderViewModel: LoaderViewModel = hiltViewModel()
 ) {
 
     val context = LocalContext.current
     val state = loaderViewModel.screenState.collectAsState().value
-    LaunchedEffect(true) {
-        loaderViewModel.checkSession()
-    }
     LaunchedEffect(state) {
         when (state) {
             is ScreenState.Loaded -> {
@@ -89,7 +86,9 @@ fun LoaderScreen(
 fun LoaderScreenPreview() {
     Surface {
         LoaderScreen(
-            loaderViewModel = LoaderViewModel(AuthRepository(SupabaseModule.mockClient)),
+            loaderViewModel = LoaderViewModel(
+                AuthRepository(SupabaseModule.mockClient)
+            ),
             toLoginScreen = {},
             toCreateMasterKeyScreen = {},
             toEnterMasterKeyScreen = {}

@@ -8,6 +8,8 @@ import javax.inject.Singleton
 
 @Singleton
 class AuthRepository @Inject constructor(private val supabaseClient: SupabaseClient) {
+    val sessionStatus = supabaseClient.auth.sessionStatus
+
     suspend fun emailLogin(email: String, password: String) {
         supabaseClient.auth.signOut()
         return supabaseClient.auth.signInWith(Email) {
@@ -21,6 +23,4 @@ class AuthRepository @Inject constructor(private val supabaseClient: SupabaseCli
             this.email = email
             this.password = password
         }
-
-    fun checkIfUserLoggedIn(): Boolean = supabaseClient.auth.currentUserOrNull() != null
 }
