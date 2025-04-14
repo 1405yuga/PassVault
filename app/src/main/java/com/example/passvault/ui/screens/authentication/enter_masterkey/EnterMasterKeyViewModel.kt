@@ -4,7 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.passvault.ui.screens.authentication.signup.validatePassword
+import com.example.passvault.utils.AuthInputValidators
 
 class MasterKeyViewModel : ViewModel() {
     var uiState by mutableStateOf((MasterKeyUiState()))
@@ -18,13 +18,15 @@ class MasterKeyViewModel : ViewModel() {
         uiState = uiState.copy(showMasterKeyPassword = !uiState.showMasterKeyPassword)
     }
 
-    fun setMasterKeyError(errorMsg: String) {
-        uiState = uiState.copy(masterKeyError = errorMsg)
+    private fun inputValidators() {
+        uiState = uiState.copy(
+            masterKeyError = AuthInputValidators.validatePassword(uiState.masterKey) ?: ""
+        )
     }
 
     fun submitMasterKey() {
-        // TODO:  add validations - uiState.password
-        validatePassword
+        //   add validations - uiState.password
+        inputValidators()
         // TODO: check materkey
     }
 }

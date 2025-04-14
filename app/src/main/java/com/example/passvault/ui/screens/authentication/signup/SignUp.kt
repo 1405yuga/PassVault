@@ -86,20 +86,7 @@ fun SignUp(
         Spacer(modifier = Modifier.height(12.dp))
         Button(
             onClick = {
-                validateEmail(email = uiState.email, setErrorMsg = { viewModel.setEmailError(it) })
-                validatePassword(
-                    password = uiState.password,
-                    setPasswordError = { viewModel.setPasswordError(it) })
-                validatePassword(
-                    password = uiState.confirmPassword,
-                    setPasswordError = { viewModel.setConfirmPasswordError(it) })
-                when {
-                    uiState.password.trim() != uiState.confirmPassword.trim()
-                        -> viewModel.setConfirmPasswordError("Passwords don't match!")
-
-                    uiState.emailError.isBlank() and uiState.passwordError.isBlank() and uiState.confirmPasswordError.isBlank()
-                        -> viewModel.emailSignUp(uiState.email, uiState.password)
-                }
+                viewModel.emailSignUp(email = uiState.email, password = uiState.password)
             },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(4.dp),
@@ -131,11 +118,14 @@ fun SignUp(
         }
         LaunchedEffect(screenState) {
             when (val state = screenState) {
-                is ScreenState.Loaded -> Toast.makeText(
-                    currentContext,
-                    state.result,
-                    Toast.LENGTH_LONG
-                ).show()
+                is ScreenState.Loaded -> {
+                    Toast.makeText(
+                        currentContext,
+                        state.result,
+                        Toast.LENGTH_LONG
+                    ).show()
+                    navToLogin()
+                }
 
                 is ScreenState.Error -> Toast.makeText(
                     currentContext,
@@ -155,24 +145,6 @@ fun ErrorText(errorMessage: String) {
         errorMessage, color = MaterialTheme.colorScheme.onErrorContainer,
         fontSize = 12.sp
     )
-}
-
-fun validateEmail(email: String, setErrorMsg: (String) -> Unit) {
-    setErrorMsg("")
-    when {
-        email.trim().isBlank() -> setErrorMsg("Email cannot be empty")
-        //todo:validate email
-    }
-}
-
-fun validatePassword(password: String, setPasswordError: (String) -> Unit) {
-    setPasswordError("")
-    when {
-        password.trim().isBlank() -> setPasswordError("Password cannot be empty")
-        password.trim().length < 6 -> setPasswordError(
-            "Password must be at least of 6 characters!"
-        )
-    }
 }
 
 @Composable

@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.passvault.utils.AuthInputValidators
 
 class CreateMasterKeyViewModel : ViewModel() {
     var uiState by mutableStateOf((MasterKeyCreationUiState()))
@@ -18,10 +19,6 @@ class CreateMasterKeyViewModel : ViewModel() {
         uiState = uiState.copy(showMasterKeyPassword = !uiState.showMasterKeyPassword)
     }
 
-    fun setMasterKeyError(errorMsg: String) {
-        uiState = uiState.copy(masterKeyError = errorMsg)
-    }
-
     fun onConfirmedMasterKeyChange(confirmedMasterKey: String) {
         uiState = uiState.copy(confirmedMasterKey = confirmedMasterKey)
     }
@@ -31,12 +28,21 @@ class CreateMasterKeyViewModel : ViewModel() {
             uiState.copy(showConfirmedMasterKeyPassword = !uiState.showConfirmedMasterKeyPassword)
     }
 
-    fun setConfirmedMasterKeyError(errorMsg: String) {
-        uiState = uiState.copy(confirmedMasterKeyError = errorMsg)
+    private fun inputValidators() {
+        uiState = uiState.copy(
+            masterKeyError = AuthInputValidators.validatePassword(
+                password = uiState.masterKey
+            ) ?: "",
+            confirmedMasterKeyError = AuthInputValidators.validateConfirmPassword(
+                password = uiState.masterKey,
+                confirmPassword = uiState.confirmedMasterKey
+            ) ?: ""
+        )
     }
 
     fun insertMasterKey() {
-        // TODO:  add validations - uiState.password
+        //   add validations - uiState.password
+        inputValidators()
         // TODO: insert materkey in user table
     }
 

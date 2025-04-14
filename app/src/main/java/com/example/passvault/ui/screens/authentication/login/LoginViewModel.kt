@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.ui.state.ScreenState
+import com.example.passvault.utils.AuthInputValidators
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,20 +35,23 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
         uiState = uiState.copy(showPassword = !uiState.showPassword)
     }
 
-    fun setEmailError(errorMsg: String) {
-        uiState = uiState.copy(emailError = errorMsg)
+    private fun inputValidators() {
+        uiState = uiState.copy(
+            emailError = AuthInputValidators.validateEmail(email = uiState.email) ?: "",
+            passwordError = AuthInputValidators.validatePassword(password = uiState.password) ?: ""
+        )
     }
 
-    fun setPasswordError(errorMsg: String) {
-        uiState = uiState.copy(passwordError = errorMsg)
-    }
-
-    fun emailLogin(email: String, password: String) {
+    fun emailLogin() {
+        inputValidators()
         if (uiState.emailError.isBlank() and uiState.passwordError.isBlank()) {
             _screenState.value = ScreenState.Loading()
             viewModelScope.launch {
                 _screenState.value = try {
-                    authRepository.emailLogin(email = email, password = password)
+                    authRepository.emailLogin(
+                        email = uiState.email.trim(),
+                        password = uiState.password.trim()
+                    )
                     Log.d("Login", "LOgged in!!!")
                     ScreenState.Loaded("Login successfully")
                 } catch (e: Exception) {

@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.passvault.ui.screens.authentication.signup.ShowAndHidePasswordTextField
-import com.example.passvault.ui.screens.authentication.signup.validatePassword
 
 @Composable
 fun EnterMasterKeyScreen(
@@ -45,9 +44,6 @@ fun EnterMasterKeyScreen(
         )
         Button(
             onClick = {
-                validatePassword(uiState.masterKey) {
-                    viewModel.setMasterKeyError(it)
-                }
                 viewModel.submitMasterKey()
             },
             modifier = Modifier.fillMaxWidth(),

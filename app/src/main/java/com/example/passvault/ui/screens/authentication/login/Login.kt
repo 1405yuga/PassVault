@@ -31,8 +31,6 @@ import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.ui.screens.authentication.signup.ShowAndHidePasswordTextField
 import com.example.passvault.ui.screens.authentication.signup.TextFieldWithErrorText
-import com.example.passvault.ui.screens.authentication.signup.validateEmail
-import com.example.passvault.ui.screens.authentication.signup.validatePassword
 import com.example.passvault.ui.state.ScreenState
 
 @Composable
@@ -75,14 +73,7 @@ fun Login(
         Spacer(modifier = Modifier.height(12.dp))
         Button(
             onClick = {
-                validateEmail(email = uiState.email, setErrorMsg = { viewModel.setEmailError(it) })
-                validatePassword(
-                    password = uiState.password,
-                    setPasswordError = { viewModel.setPasswordError(it) })
-                viewModel.emailLogin(
-                    email = uiState.email.trim(),
-                    password = uiState.password.trim()
-                )
+                viewModel.emailLogin()
             },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(4.dp),

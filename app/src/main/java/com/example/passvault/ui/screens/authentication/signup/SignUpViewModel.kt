@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.ui.state.ScreenState
+import com.example.passvault.utils.AuthInputValidators
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,19 +43,19 @@ class SignUpViewModel @Inject constructor(private val authRepository: AuthReposi
         uiState = uiState.copy(showConfirmPassword = !uiState.showConfirmPassword)
     }
 
-    fun setEmailError(errorMsg: String) {
-        uiState = uiState.copy(emailError = errorMsg)
-    }
-
-    fun setPasswordError(errorMsg: String) {
-        uiState = uiState.copy(passwordError = errorMsg)
-    }
-
-    fun setConfirmPasswordError(errorMsg: String) {
-        uiState = uiState.copy(confirmPasswordError = errorMsg)
+    private fun inputValidators() {
+        uiState = uiState.copy(
+            emailError = AuthInputValidators.validateEmail(email = uiState.email) ?: "",
+            passwordError = AuthInputValidators.validatePassword(password = uiState.password) ?: "",
+            confirmPasswordError = AuthInputValidators.validateConfirmPassword(
+                password = uiState.password,
+                confirmPassword = uiState.confirmPassword
+            ) ?: ""
+        )
     }
 
     fun emailSignUp(email: String, password: String) {
+        inputValidators()
         if (uiState.emailError.isBlank() and uiState.passwordError.isBlank() and uiState.confirmPasswordError.isBlank()) {
             _screenState.value = ScreenState.Loading()
             viewModelScope.launch {

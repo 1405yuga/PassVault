@@ -21,6 +21,7 @@ class LoaderViewModel @Inject constructor(private val authRepository: AuthReposi
         _screenState.value = ScreenState.Loading()
         viewModelScope.launch {
             try {
+                // TODO: check user logged in 
                 val loggedIn = authRepository.checkIfUserLoggedIn()
                 Log.d("LoaderViewModel", "Logged in : $loggedIn")
                 _screenState.value = if (loggedIn) {
