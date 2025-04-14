@@ -16,8 +16,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.passvault.ui.screens.authentication.create_masterkey.CreateMasterKeyScreen
+import com.example.passvault.ui.screens.authentication.enter_masterkey.EnterMasterKeyScreen
 import com.example.passvault.ui.screens.authentication.login.Login
-import com.example.passvault.ui.screens.authentication.masterkey.MasterKeyScreen
 import com.example.passvault.ui.screens.authentication.signup.SignUp
 import com.example.passvault.ui.screens.loader.LoaderScreen
 import com.example.passvault.ui.screens.main_screens.Home
@@ -46,20 +47,17 @@ fun PassVaultApp(
     ) {
     val navController = rememberNavController()
     NavHost(
-        navController = navController,
-        startDestination = Screen.Loader.name
+        navController = navController, startDestination = Screen.Loader.name
     ) {
         composable(Screen.Loader.name) {
             LoaderScreen(
                 toLoginScreen = { navController.navigateAndClearPrevious(Screen.Login.name) },
-                toMasterKeyScreen = { navController.navigateAndClearPrevious(Screen.MasterKey.name) },
-                toHomeScreen = { navController.navigateAndClearPrevious(Screen.Home.name) }
-            )
+                toCreateMasterKeyScreen = { navController.navigateAndClearPrevious(Screen.CreateMasterKey.name) },
+                toEnterMasterKeyScreen = { navController.navigateAndClearPrevious(Screen.EnterMasterKey.name) })
         }
         composable(Screen.Home.name) {
             Home(
-                onLogoutClick = {},
-                modifier = modifier
+                onLogoutClick = {}, modifier = modifier
             )
         }
         composable(Screen.Login.name) {
@@ -75,8 +73,11 @@ fun PassVaultApp(
                 navToLogin = { navController.navigateAndClearPrevious(Screen.Loader.name) },
             )
         }
-        composable(Screen.MasterKey.name) {
-            MasterKeyScreen(viewModel = viewModel())
+        composable(Screen.CreateMasterKey.name) {
+            CreateMasterKeyScreen(viewModel = viewModel())
+        }
+        composable(Screen.EnterMasterKey.name) {
+            EnterMasterKeyScreen(viewModel = viewModel())
         }
     }
 }
@@ -95,5 +96,5 @@ fun PassVaultAppPreview() {
 }
 
 enum class Screen {
-    Home, Login, SignUp, Loader, MasterKey
+    Home, Login, SignUp, Loader, CreateMasterKey, EnterMasterKey
 }

@@ -29,8 +29,8 @@ import com.example.passvault.ui.state.ScreenState
 @Composable
 fun LoaderScreen(
     toLoginScreen: () -> Unit,
-    toMasterKeyScreen: () -> Unit,
-    toHomeScreen: () -> Unit,
+    toCreateMasterKeyScreen:()-> Unit,
+    toEnterMasterKeyScreen: () -> Unit,
     loaderViewModel: LoaderViewModel = hiltViewModel()
 ) {
 
@@ -45,8 +45,8 @@ fun LoaderScreen(
                 Log.d("LoaderScreen", "Screen state result : ${state.result}")
                 when (state.result) {
                     UserState.NOT_LOGGED_IN -> toLoginScreen()
-                    UserState.DONT_HAVE_MASTER_KEY -> toMasterKeyScreen()
-                    UserState.HAVE_MASTER_KEY -> toHomeScreen()
+                    UserState.DONT_HAVE_MASTER_KEY -> toCreateMasterKeyScreen()
+                    UserState.HAVE_MASTER_KEY -> toEnterMasterKeyScreen()
                 }
             }
 
@@ -91,8 +91,8 @@ fun LoaderScreenPreview() {
         LoaderScreen(
             loaderViewModel = LoaderViewModel(AuthRepository(SupabaseModule.mockClient)),
             toLoginScreen = {},
-            toMasterKeyScreen = {},
-            toHomeScreen = {}
+            toCreateMasterKeyScreen = {},
+            toEnterMasterKeyScreen = {}
         )
     }
 }

@@ -1,4 +1,4 @@
-package com.example.passvault.ui.screens.authentication.masterkey
+package com.example.passvault.ui.screens.authentication.create_masterkey
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,11 +17,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.passvault.ui.screens.authentication.signup.ShowAndHidePasswordTextField
-import com.example.passvault.ui.screens.authentication.signup.validatePassword
 
 @Composable
-fun MasterKeyScreen(
-    viewModel: MasterKeyViewModel
+fun CreateMasterKeyScreen(
+    viewModel: CreateMasterKeyViewModel
 ) {
     val uiState = viewModel.uiState
     Column(
@@ -37,18 +36,24 @@ fun MasterKeyScreen(
         Text(text = "Create master key for encryption")
         ShowAndHidePasswordTextField(
             label = "Master Key",
-            password = uiState.password,
-            onTextChange = { viewModel.onPasswordChange(it) },
-            showPassword = uiState.showPassword,
-            onShowPasswordClick = { viewModel.togglePasswordVisibility() },
-            errorMsg = uiState.passwordError,
+            password = uiState.masterKey,
+            onTextChange = { viewModel.onMasterKeyChange(it) },
+            showPassword = uiState.showMasterKeyPassword,
+            onShowPasswordClick = { viewModel.toggleMasterKeyVisibility() },
+            errorMsg = uiState.masterKeyError,
+        )
+
+        ShowAndHidePasswordTextField(
+            label = "Confirm Master Key",
+            password = uiState.confirmedMasterKey,
+            onTextChange = { viewModel.onConfirmedMasterKeyChange(it) },
+            showPassword = uiState.showConfirmedMasterKeyPassword,
+            onShowPasswordClick = { viewModel.toggleConfirmedMasterKeyVisibility() },
+            errorMsg = uiState.confirmedMasterKeyError,
         )
         Button(
             onClick = {
-                validatePassword(uiState.password) {
-                    viewModel.setPasswordError(it)
-                }
-                viewModel.addMasterKey()
+                viewModel.insertMasterKey()
             },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(4.dp)
@@ -59,14 +64,15 @@ fun MasterKeyScreen(
             fontSize = 12.sp
         )
     }
+
 }
 
-@Preview
 @Composable
-fun MasterKeyScreenPreview() {
+@Preview()
+fun MasterKeyCreationCreationScreenPreview() {
     Surface {
-        MasterKeyScreen(
-            viewModel = viewModel()
+        CreateMasterKeyScreen(
+            viewModel()
         )
     }
 }
