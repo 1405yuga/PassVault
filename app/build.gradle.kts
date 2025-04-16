@@ -93,4 +93,7 @@ dependencies {
 
     //serialization--------------------------------------------------
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+
+    //gson----------------------------------------------------
+    implementation("com.google.code.gson:gson:2.12.1")
 }
