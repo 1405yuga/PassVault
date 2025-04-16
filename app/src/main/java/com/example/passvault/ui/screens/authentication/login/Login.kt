@@ -80,13 +80,8 @@ fun Login(
             enabled = screenState !is ScreenState.Loading
         ) {
             when (screenState) {
-                is ScreenState.Loading -> {
-                    Text("Loading..")
-                }
-
-                else -> {
-                    Text("Get started")
-                }
+                is ScreenState.Loading -> Text("Loading..")
+                else -> Text("Get started")
             }
         }
         Spacer(modifier = Modifier.height(22.dp))

@@ -74,7 +74,7 @@ fun PassVaultApp(
             )
         }
         composable(Screen.CreateMasterKey.name) {
-            CreateMasterKeyScreen(viewModel = viewModel())
+            CreateMasterKeyScreen(viewModel = hiltViewModel())
         }
         composable(Screen.EnterMasterKey.name) {
             EnterMasterKeyScreen(viewModel = viewModel())
