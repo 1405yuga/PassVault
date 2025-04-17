@@ -1,5 +1,6 @@
 package com.example.passvault.ui.screens.authentication.enter_masterkey
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,19 +11,26 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.passvault.ui.screens.authentication.signup.ShowAndHidePasswordTextField
+import com.example.passvault.ui.state.ScreenState
 
 @Composable
 fun EnterMasterKeyScreen(
-    viewModel: MasterKeyViewModel
+    viewModel: EnterMasterKeyViewModel
 ) {
     val uiState = viewModel.uiState
+    val screenState by viewModel.screenState.collectAsState()
+    val currentContext = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -47,13 +55,39 @@ fun EnterMasterKeyScreen(
                 viewModel.submitMasterKey()
             },
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(4.dp)
-        ) { Text(text = "Confirm") }
+            shape = RoundedCornerShape(4.dp),
+            enabled = screenState !is ScreenState.Loading
+        ) {
+            when (screenState) {
+                is ScreenState.Loading -> Text("Loading..")
+                else -> Text("Confirm")
+            }
+        }
         Text(
             text = "*Note: This key is unrecoverable if lost or forgotten",
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp
         )
+        LaunchedEffect(screenState) {
+            when (val state = screenState) {
+                is ScreenState.Error -> Toast.makeText(
+                    currentContext,
+                    state.message,
+                    Toast.LENGTH_LONG
+                ).show()
+
+                is ScreenState.Loaded -> {
+                    Toast.makeText(
+                        currentContext,
+                        state.result,
+                        Toast.LENGTH_LONG
+                    ).show()
+//                    onConfirmClick()
+                }
+
+                else -> {}
+            }
+        }
     }
 }
 

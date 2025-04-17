@@ -80,7 +80,7 @@ fun PassVaultApp(
             )
         }
         composable(Screen.EnterMasterKey.name) {
-            EnterMasterKeyScreen(viewModel = viewModel())
+            EnterMasterKeyScreen(viewModel = hiltViewModel())
         }
     }
 }
