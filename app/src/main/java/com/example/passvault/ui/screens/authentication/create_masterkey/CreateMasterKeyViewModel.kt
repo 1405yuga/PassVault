@@ -42,7 +42,7 @@ class CreateMasterKeyViewModel @Inject constructor(private val userRepository: U
             uiState.copy(showConfirmedMasterKeyPassword = !uiState.showConfirmedMasterKeyPassword)
     }
 
-    private fun inputValidators() {
+    private fun inputValidators(): Boolean {
         uiState = uiState.copy(
             masterKeyError = AuthInputValidators.validatePassword(
                 password = uiState.masterKey
@@ -52,11 +52,12 @@ class CreateMasterKeyViewModel @Inject constructor(private val userRepository: U
                 confirmPassword = uiState.confirmedMasterKey
             ) ?: ""
         )
+        return uiState.masterKeyError.isBlank() and uiState.confirmedMasterKeyError.isBlank()
     }
 
     fun insertMasterKey() {
-        _screenState.value = ScreenState.Loading()
-        inputValidators()
+        if (!inputValidators())
+            _screenState.value = ScreenState.Loading()
         viewModelScope.launch {
             _screenState.value = try {
                 val masterKeyMaterial = EncryptionHelper.performEncryption(

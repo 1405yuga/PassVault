@@ -35,29 +35,28 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
         uiState = uiState.copy(showPassword = !uiState.showPassword)
     }
 
-    private fun inputValidators() {
+    private fun inputValidators(): Boolean {
         uiState = uiState.copy(
             emailError = AuthInputValidators.validateEmail(email = uiState.email) ?: "",
             passwordError = AuthInputValidators.validatePassword(password = uiState.password) ?: ""
         )
+        return uiState.emailError.isBlank() and uiState.passwordError.isBlank()
     }
 
     fun emailLogin() {
-        inputValidators()
-        if (uiState.emailError.isBlank() and uiState.passwordError.isBlank()) {
-            _screenState.value = ScreenState.Loading()
-            viewModelScope.launch {
-                _screenState.value = try {
-                    authRepository.emailLogin(
-                        email = uiState.email.trim(),
-                        password = uiState.password.trim()
-                    )
-                    Log.d("Login", "LOgged in!!!")
-                    ScreenState.Loaded("Login successfully")
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    ScreenState.Error("Unable to Login. Something went wrong!")
-                }
+        if (!inputValidators()) return
+        _screenState.value = ScreenState.Loading()
+        viewModelScope.launch {
+            _screenState.value = try {
+                authRepository.emailLogin(
+                    email = uiState.email.trim(),
+                    password = uiState.password.trim()
+                )
+                Log.d("Login", "LOgged in!!!")
+                ScreenState.Loaded("Login successfully")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                ScreenState.Error("Unable to Login. Something went wrong!")
             }
         }
     }

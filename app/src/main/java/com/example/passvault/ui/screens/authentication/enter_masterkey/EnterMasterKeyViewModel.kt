@@ -18,15 +18,16 @@ class MasterKeyViewModel : ViewModel() {
         uiState = uiState.copy(showMasterKeyPassword = !uiState.showMasterKeyPassword)
     }
 
-    private fun inputValidators() {
+    private fun inputValidators(): Boolean {
         uiState = uiState.copy(
             masterKeyError = AuthInputValidators.validatePassword(uiState.masterKey) ?: ""
         )
+        return uiState.masterKeyError.isBlank()
     }
 
     fun submitMasterKey() {
         //   add validations - uiState.password
-        inputValidators()
+        if (!inputValidators()) return
         // TODO: check materkey
     }
 }

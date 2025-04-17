@@ -43,7 +43,7 @@ class SignUpViewModel @Inject constructor(private val authRepository: AuthReposi
         uiState = uiState.copy(showConfirmPassword = !uiState.showConfirmPassword)
     }
 
-    private fun inputValidators() {
+    private fun inputValidators(): Boolean {
         uiState = uiState.copy(
             emailError = AuthInputValidators.validateEmail(email = uiState.email) ?: "",
             passwordError = AuthInputValidators.validatePassword(password = uiState.password) ?: "",
@@ -52,20 +52,19 @@ class SignUpViewModel @Inject constructor(private val authRepository: AuthReposi
                 confirmPassword = uiState.confirmPassword
             ) ?: ""
         )
+        return uiState.emailError.isBlank() and uiState.passwordError.isBlank() and uiState.confirmPasswordError.isBlank()
     }
 
     fun emailSignUp(email: String, password: String) {
-        inputValidators()
-        if (uiState.emailError.isBlank() and uiState.passwordError.isBlank() and uiState.confirmPasswordError.isBlank()) {
-            _screenState.value = ScreenState.Loading()
-            viewModelScope.launch {
-                _screenState.value = try {
-                    authRepository.emailSignUp(email = email, password = password)
-                    ScreenState.Loaded("Account created! Check your email and verify it.")
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    ScreenState.Error("Unable to SignUp. Something went wrong!")
-                }
+        if (!inputValidators()) return
+        _screenState.value = ScreenState.Loading()
+        viewModelScope.launch {
+            _screenState.value = try {
+                authRepository.emailSignUp(email = email, password = password)
+                ScreenState.Loaded("Account created! Check your email and verify it.")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                ScreenState.Error("Unable to SignUp. Something went wrong!")
             }
         }
     }
