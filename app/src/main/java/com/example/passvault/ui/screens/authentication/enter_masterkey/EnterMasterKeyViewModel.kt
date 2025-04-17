@@ -13,10 +13,8 @@ import com.example.passvault.network.supabase.UserRepository
 import com.example.passvault.ui.state.ScreenState
 import com.example.passvault.utils.AuthInputValidators
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.example.EncryptionHelper
 import javax.inject.Inject
@@ -59,49 +57,46 @@ class EnterMasterKeyViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val status = authRepository.sessionStatus.first()
+                val currentAuthInfo = authRepository.getCurrentAuthUserInfo()
+                Log.d(
+                    this@EnterMasterKeyViewModel.javaClass.simpleName,
+                    "CurrentUser Id : $currentAuthInfo"
+                )
 
-                if (status is SessionStatus.Authenticated) {
-                    val userId = status.session.user?.id
+                if (currentAuthInfo != null) {
+                    val userId = currentAuthInfo.id
+                    val user = userRepository.getUserById(userId)
 
-                    if (userId != null) {
-                        Log.d(this@EnterMasterKeyViewModel.javaClass.simpleName, "userId : $userId")
-                        val user = userRepository.getUserById(userId)
+                    if (user != null) {
+                        val userMasterKeyMaterial = UserMasterKeyMaterial(
+                            encodedSalt = user.salt,
+                            encodedInitialisationVector = user.initialisationVector,
+                            encodedEncryptedTestText = user.encryptedTestText
+                        )
 
-                        if (user != null) {
-                            val userMasterKeyMaterial = UserMasterKeyMaterial(
-                                encodedSalt = user.salt,
-                                encodedInitialisationVector = user.initialisationVector,
-                                encodedEncryptedTestText = user.encryptedTestText
+                        try {
+                            val decryptedText = EncryptionHelper.performDecryption(
+                                masterKey = uiState.masterKey,
+                                userMasterKeyMaterial = userMasterKeyMaterial
                             )
 
-                            try {
-                                val decryptedText = EncryptionHelper.performDecryption(
-                                    masterKey = uiState.masterKey,
-                                    userMasterKeyMaterial = userMasterKeyMaterial
-                                )
-
-                                if (decryptedText == User.TEST_TEXT) {
-                                    _screenState.value =
-                                        ScreenState.Loaded("Master key verified successfully!")
-                                } else {
-                                    setIncorrectKeyError()
-                                }
-
-                            } catch (e: Exception) {
-                                // Decryption error — invalid master key or other issue
-                                e.printStackTrace()
+                            if (decryptedText == User.TEST_TEXT) {
+                                _screenState.value =
+                                    ScreenState.Loaded("Master key verified successfully!")
+                            } else {
                                 setIncorrectKeyError()
                             }
 
-                        } else {
-                            _screenState.value = ScreenState.Error("User not found")
+                        } catch (e: Exception) {
+                            // Decryption error — invalid master key or other issue
+                            e.printStackTrace()
+                            setIncorrectKeyError()
                         }
 
                     } else {
-                        Log.d(this@EnterMasterKeyViewModel.javaClass.simpleName, "User ID is null")
-                        _screenState.value = ScreenState.Error("User ID not found")
+                        _screenState.value = ScreenState.Error("User not found")
                     }
+
                 } else {
                     Log.d(this@EnterMasterKeyViewModel.javaClass.simpleName, "NOT AUTHENTICATED")
                     _screenState.value = ScreenState.Error("Not Authenticated User")
