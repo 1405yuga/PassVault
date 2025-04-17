@@ -63,7 +63,9 @@ class CreateMasterKeyViewModel @Inject constructor(private val userRepository: U
                     plainText = User.TEST_TEXT,
                     masterKey = uiState.masterKey
                 )
-                val userId = userRepository.currentUserId
+//                val userId = userRepository.currentUserId
+                // TODO: get userId from sessions 
+                val userId = "1245"
                 if (userId == null) {
                     ScreenState.Error(message = "User not found")
                 } else {
