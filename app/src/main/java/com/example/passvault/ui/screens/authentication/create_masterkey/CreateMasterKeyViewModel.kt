@@ -6,10 +6,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passvault.data.User
+import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.network.supabase.UserRepository
 import com.example.passvault.ui.state.ScreenState
 import com.example.passvault.utils.AuthInputValidators
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jan.supabase.auth.status.SessionStatus
+import io.github.jan.supabase.auth.user.UserInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -18,7 +21,10 @@ import org.example.EncryptionHelper
 import javax.inject.Inject
 
 @HiltViewModel
-class CreateMasterKeyViewModel @Inject constructor(private val userRepository: UserRepository) :
+class CreateMasterKeyViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+    private val authRepository: AuthRepository
+) :
     ViewModel() {
     private val _screenState = MutableStateFlow<ScreenState<String>>(ScreenState.PreLoad())
     val screenState: StateFlow<ScreenState<String>> = _screenState
@@ -56,8 +62,8 @@ class CreateMasterKeyViewModel @Inject constructor(private val userRepository: U
     }
 
     fun insertMasterKey() {
-        if (!inputValidators())
-            _screenState.value = ScreenState.Loading()
+        if (!inputValidators()) return
+        _screenState.value = ScreenState.Loading()
         viewModelScope.launch {
             _screenState.value = try {
                 val masterKeyMaterial = EncryptionHelper.performEncryption(
