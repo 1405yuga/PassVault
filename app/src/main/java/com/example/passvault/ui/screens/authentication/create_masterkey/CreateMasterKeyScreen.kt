@@ -26,6 +26,7 @@ import com.example.passvault.ui.state.ScreenState
 
 @Composable
 fun CreateMasterKeyScreen(
+    onConfirmClick: () -> Unit,
     viewModel: CreateMasterKeyViewModel
 ) {
     val uiState = viewModel.uiState
@@ -92,6 +93,7 @@ fun CreateMasterKeyScreen(
                     state.result,
                     Toast.LENGTH_LONG
                 ).show()
+                onConfirmClick()
             }
 
             else -> {}
@@ -104,6 +106,7 @@ fun CreateMasterKeyScreen(
 fun MasterKeyCreationCreationScreenPreview() {
     Surface {
         CreateMasterKeyScreen(
+            onConfirmClick = {},
             viewModel()
         )
     }

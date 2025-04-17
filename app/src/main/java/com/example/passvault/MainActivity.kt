@@ -74,7 +74,10 @@ fun PassVaultApp(
             )
         }
         composable(Screen.CreateMasterKey.name) {
-            CreateMasterKeyScreen(viewModel = hiltViewModel())
+            CreateMasterKeyScreen(
+                onConfirmClick = { navController.navigateAndClearPrevious(Screen.Loader.name) },
+                viewModel = hiltViewModel()
+            )
         }
         composable(Screen.EnterMasterKey.name) {
             EnterMasterKeyScreen(viewModel = viewModel())

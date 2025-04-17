@@ -13,7 +13,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock.System
+import kotlinx.datetime.Clock
+import org.example.EncryptionHelper
 import javax.inject.Inject
 
 @HiltViewModel
@@ -54,23 +55,30 @@ class CreateMasterKeyViewModel @Inject constructor(private val userRepository: U
     }
 
     fun insertMasterKey() {
-        //   add validations - uiState.password
-        inputValidators()
-        // TODO: insert materkey in user table
         _screenState.value = ScreenState.Loading()
+        inputValidators()
         viewModelScope.launch {
             _screenState.value = try {
-                userRepository.insertUser(
-                    user =
-                        User(
-                            userId = "123",
-                            salt = "1234",
-                            initialisationVector = "1234",
-                            encryptedTestText = "1234",
-                            createdAt = System.now().toString()
-                        )
+                val masterKeyMaterial = EncryptionHelper.performEncryption(
+                    plainText = User.TEST_TEXT,
+                    masterKey = uiState.masterKey
                 )
-                ScreenState.Loaded(result = "Added master key successfully!")
+                val userId = userRepository.currentUserId
+                if (userId == null) {
+                    ScreenState.Error(message = "User not found")
+                } else {
+                    userRepository.insertUser(
+                        user =
+                            User(
+                                userId = userId,
+                                salt = masterKeyMaterial.encodedSalt,
+                                initialisationVector = masterKeyMaterial.encodedInitialisationVector,
+                                encryptedTestText = masterKeyMaterial.encodedEncryptedTestText,
+                                createdAt = Clock.System.now().toString()
+                            )
+                    )
+                    ScreenState.Loaded(result = "Added master key successfully!")
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 ScreenState.Error("Unable to insert")
