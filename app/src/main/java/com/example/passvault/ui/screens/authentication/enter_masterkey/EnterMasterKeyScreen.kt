@@ -33,7 +33,7 @@ fun EnterMasterKeyScreen(
             text = "Master Key",
             fontSize = 22.sp
         )
-        Text(text = "Create master key for encryption")
+        Text(text = "Enter the master key")
         ShowAndHidePasswordTextField(
             label = "Master Key",
             password = uiState.masterKey,

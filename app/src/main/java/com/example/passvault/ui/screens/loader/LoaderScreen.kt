@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.passvault.R
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.AuthRepository
+import com.example.passvault.network.supabase.UserRepository
 import com.example.passvault.ui.state.ScreenState
 
 @Composable
@@ -87,7 +88,8 @@ fun LoaderScreenPreview() {
     Surface {
         LoaderScreen(
             loaderViewModel = LoaderViewModel(
-                AuthRepository(SupabaseModule.mockClient)
+                AuthRepository(SupabaseModule.mockClient),
+                UserRepository(SupabaseModule.mockClient)
             ),
             toLoginScreen = {},
             toCreateMasterKeyScreen = {},
