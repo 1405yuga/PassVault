@@ -51,7 +51,7 @@ fun SignUpScreen(
 ) {
     val currentContext = LocalContext.current
     val screenState by viewModel.screenState.collectAsState()
-    val uiState = viewModel.uiState
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -67,30 +67,33 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.height(20.dp))
         TextFieldWithErrorText(
             label = "Email",
-            value = uiState.email,
+            value = viewModel.email,
             onTextChange = { viewModel.onEmailChange(it) },
-            errorMsg = uiState.emailError
+            errorMsg = viewModel.emailError
         )
         ShowAndHidePasswordTextField(
             label = "Password",
-            password = uiState.password,
+            password = viewModel.password,
             onTextChange = { viewModel.onPasswordChange(it) },
-            showPassword = uiState.showPassword,
+            showPassword = viewModel.showPassword,
             onShowPasswordClick = { viewModel.togglePasswordVisibility() },
-            errorMsg = uiState.passwordError
+            errorMsg = viewModel.passwordError
         )
         ShowAndHidePasswordTextField(
             label = "Confirm Password",
-            password = uiState.confirmPassword,
+            password = viewModel.confirmPassword,
             onTextChange = { viewModel.onConfirmPasswordChange(it) },
-            showPassword = uiState.showConfirmPassword,
+            showPassword = viewModel.showConfirmPassword,
             onShowPasswordClick = { viewModel.toggleConfirmPasswordVisibility() },
-            errorMsg = uiState.confirmPasswordError
+            errorMsg = viewModel.confirmPasswordError
         )
         Spacer(modifier = Modifier.height(12.dp))
         Button(
             onClick = {
-                viewModel.emailSignUp(email = uiState.email, password = uiState.password)
+                viewModel.emailSignUp(
+                    email = viewModel.email,
+                    password = viewModel.password
+                )
             },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(4.dp),
@@ -144,14 +147,6 @@ fun SignUpScreen(
 }
 
 @Composable
-fun ErrorText(errorMessage: String) {
-    Text(
-        errorMessage, color = MaterialTheme.colorScheme.onErrorContainer,
-        fontSize = 12.sp
-    )
-}
-
-@Composable
 fun TextFieldWithErrorText(
     label: String,
     value: String,
@@ -165,8 +160,16 @@ fun TextFieldWithErrorText(
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         modifier = Modifier.fillMaxWidth(),
         isError = errorMsg.isNotBlank(),
+        supportingText = {
+            if (errorMsg.isNotBlank()) {
+                Text(
+                    text = errorMsg,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    fontSize = 12.sp
+                )
+            }
+        }
     )
-    ErrorText(errorMessage = errorMsg)
 }
 
 @Composable
@@ -204,9 +207,17 @@ fun ShowAndHidePasswordTextField(
                 }
             }
         },
-        isError = errorMsg.trim().isNotBlank()
+        isError = errorMsg.trim().isNotBlank(),
+        supportingText = {
+            if (errorMsg.isNotBlank()) {
+                Text(
+                    text = errorMsg,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    fontSize = 12.sp
+                )
+            }
+        }
     )
-    ErrorText(errorMessage = errorMsg)
 }
 
 @Composable

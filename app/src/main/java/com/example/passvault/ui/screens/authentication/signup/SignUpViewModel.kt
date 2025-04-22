@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passvault.network.supabase.AuthRepository
-import com.example.passvault.utils.state.ScreenState
 import com.example.passvault.utils.input_validations.AuthInputValidators
+import com.example.passvault.utils.state.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,39 +20,58 @@ class SignUpViewModel @Inject constructor(private val authRepository: AuthReposi
     private val _screenState = MutableStateFlow<ScreenState<String>>(ScreenState.PreLoad())
     val screenState: StateFlow<ScreenState<String>> = _screenState
 
-    var uiState by mutableStateOf(SignUpUiState())
+    var email by mutableStateOf("")
+        private set
+
+    var password by mutableStateOf("")
+        private set
+
+    var showPassword by mutableStateOf(false)
+        private set
+
+    var confirmPassword by mutableStateOf("")
+        private set
+
+    var showConfirmPassword by mutableStateOf(false)
+        private set
+
+    var emailError by mutableStateOf("")
+        private set
+
+    var passwordError by mutableStateOf("")
+        private set
+
+    var confirmPasswordError by mutableStateOf("")
         private set
 
     fun onEmailChange(newEmail: String) {
-        uiState = uiState.copy(email = newEmail)
+        email = newEmail
     }
 
     fun onPasswordChange(newPassword: String) {
-        uiState = uiState.copy(password = newPassword)
+        password = newPassword
     }
 
     fun onConfirmPasswordChange(newPassword: String) {
-        uiState = uiState.copy(confirmPassword = newPassword)
+        confirmPassword = newPassword
     }
 
     fun togglePasswordVisibility() {
-        uiState = uiState.copy(showPassword = !uiState.showPassword)
+        showPassword = !showPassword
     }
 
     fun toggleConfirmPasswordVisibility() {
-        uiState = uiState.copy(showConfirmPassword = !uiState.showConfirmPassword)
+        showConfirmPassword = !showConfirmPassword
     }
 
     private fun inputValidators(): Boolean {
-        uiState = uiState.copy(
-            emailError = AuthInputValidators.validateEmail(email = uiState.email) ?: "",
-            passwordError = AuthInputValidators.validatePassword(password = uiState.password) ?: "",
-            confirmPasswordError = AuthInputValidators.validateConfirmPassword(
-                password = uiState.password,
-                confirmPassword = uiState.confirmPassword
-            ) ?: ""
-        )
-        return uiState.emailError.isBlank() and uiState.passwordError.isBlank() and uiState.confirmPasswordError.isBlank()
+        emailError = AuthInputValidators.validateEmail(email = email) ?: ""
+        passwordError = AuthInputValidators.validatePassword(password = password) ?: ""
+        confirmPasswordError = AuthInputValidators.validateConfirmPassword(
+            password = password,
+            confirmPassword = confirmPassword
+        ) ?: ""
+        return emailError.isBlank() and passwordError.isBlank() and confirmPasswordError.isBlank()
     }
 
     fun emailSignUp(email: String, password: String) {
@@ -69,14 +88,3 @@ class SignUpViewModel @Inject constructor(private val authRepository: AuthReposi
         }
     }
 }
-
-data class SignUpUiState(
-    val email: String = "",
-    val password: String = "",
-    val showPassword: Boolean = false,
-    val confirmPassword: String = "",
-    val showConfirmPassword: Boolean = false,
-    val emailError: String = "",
-    val passwordError: String = "",
-    val confirmPasswordError: String = "",
-)
