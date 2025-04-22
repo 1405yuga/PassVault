@@ -32,7 +32,6 @@ fun CreateMasterKeyScreen(
     onConfirmClick: () -> Unit,
     viewModel: CreateMasterKeyViewModel
 ) {
-    val uiState = viewModel.uiState
     val screenState by viewModel.screenState.collectAsState()
     val currentContext = LocalContext.current
     Column(
@@ -49,20 +48,20 @@ fun CreateMasterKeyScreen(
         Text(text = "Create master key for encryption")
         ShowAndHidePasswordTextField(
             label = "Master Key",
-            password = uiState.masterKey,
+            password = viewModel.masterKey,
             onTextChange = { viewModel.onMasterKeyChange(it) },
-            showPassword = uiState.showMasterKeyPassword,
+            showPassword = viewModel.showMasterKeyPassword,
             onShowPasswordClick = { viewModel.toggleMasterKeyVisibility() },
-            errorMsg = uiState.masterKeyError,
+            errorMsg = viewModel.masterKeyError,
         )
 
         ShowAndHidePasswordTextField(
             label = "Confirm Master Key",
-            password = uiState.confirmedMasterKey,
+            password = viewModel.confirmedMasterKey,
             onTextChange = { viewModel.onConfirmedMasterKeyChange(it) },
-            showPassword = uiState.showConfirmedMasterKeyPassword,
+            showPassword = viewModel.showConfirmedMasterKeyPassword,
             onShowPasswordClick = { viewModel.toggleConfirmedMasterKeyVisibility() },
-            errorMsg = uiState.confirmedMasterKeyError,
+            errorMsg = viewModel.confirmedMasterKeyError,
         )
         Button(
             onClick = {

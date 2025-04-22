@@ -32,7 +32,6 @@ import com.example.passvault.utils.state.ScreenState
 fun EnterMasterKeyScreen(
     viewModel: EnterMasterKeyViewModel
 ) {
-    val uiState = viewModel.uiState
     val screenState by viewModel.screenState.collectAsState()
     val currentContext = LocalContext.current
     Column(
@@ -49,11 +48,11 @@ fun EnterMasterKeyScreen(
         Text(text = "Enter the master key")
         ShowAndHidePasswordTextField(
             label = "Master Key",
-            password = uiState.masterKey,
+            password = viewModel.masterKey,
             onTextChange = { viewModel.onMasterKeyChange(it) },
-            showPassword = uiState.showMasterKeyPassword,
+            showPassword = viewModel.showMasterKeyPassword,
             onShowPasswordClick = { viewModel.toggleMasterKeyVisibility() },
-            errorMsg = uiState.masterKeyError,
+            errorMsg = viewModel.masterKeyError,
         )
         Button(
             onClick = {

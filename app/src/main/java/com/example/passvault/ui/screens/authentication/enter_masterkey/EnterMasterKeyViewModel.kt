@@ -9,13 +9,13 @@ import com.example.passvault.data.User
 import com.example.passvault.data.UserMasterKeyMaterial
 import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.network.supabase.UserRepository
-import com.example.passvault.utils.state.ScreenState
+import com.example.passvault.utils.encryption.EncryptionHelper
 import com.example.passvault.utils.input_validations.AuthInputValidators
+import com.example.passvault.utils.state.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import com.example.passvault.utils.encryption.EncryptionHelper
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,22 +26,24 @@ class EnterMasterKeyViewModel @Inject constructor(
     private val _screenState = MutableStateFlow<ScreenState<String>>(ScreenState.PreLoad())
     val screenState: StateFlow<ScreenState<String>> = _screenState
 
-    var uiState by mutableStateOf((MasterKeyUiState()))
+    var masterKey by mutableStateOf("")
+        private set
+    var masterKeyError by mutableStateOf("")
+        private set
+    var showMasterKeyPassword by mutableStateOf(false)
         private set
 
     fun onMasterKeyChange(masterKey: String) {
-        uiState = uiState.copy(masterKey = masterKey)
+        this.masterKey = masterKey
     }
 
     fun toggleMasterKeyVisibility() {
-        uiState = uiState.copy(showMasterKeyPassword = !uiState.showMasterKeyPassword)
+        this.showMasterKeyPassword = !this.showMasterKeyPassword
     }
 
     private fun inputValidators(): Boolean {
-        uiState = uiState.copy(
-            masterKeyError = AuthInputValidators.validatePassword(uiState.masterKey) ?: ""
-        )
-        return uiState.masterKeyError.isBlank()
+        masterKeyError = AuthInputValidators.validatePassword(masterKey) ?: ""
+        return masterKeyError.isBlank()
     }
 
     //steps-----
@@ -67,7 +69,7 @@ class EnterMasterKeyViewModel @Inject constructor(
 
                     try {
                         val decryptedText = EncryptionHelper.performDecryption(
-                            masterKey = uiState.masterKey,
+                            masterKey = masterKey,
                             userMasterKeyMaterial = userMasterKeyMaterial
                         )
 
@@ -96,13 +98,7 @@ class EnterMasterKeyViewModel @Inject constructor(
     }
 
     private fun setIncorrectKeyError() {
-        uiState = uiState.copy(masterKeyError = "Incorrect Master Key")
+        this.masterKeyError = "Incorrect Master Key"
         _screenState.value = ScreenState.PreLoad()
     }
 }
-
-data class MasterKeyUiState(
-    val masterKey: String = "",
-    val masterKeyError: String = "",
-    val showMasterKeyPassword: Boolean = false,
-)
