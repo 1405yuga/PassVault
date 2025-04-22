@@ -66,12 +66,14 @@ fun CreateMasterKeyScreen(
             },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(4.dp),
-            enabled = screenState !is ScreenState.Loading
+            enabled = screenState !is ScreenState.Loading,
         ) {
-            when (screenState) {
-                is ScreenState.Loading -> Text("Loading..")
-                else -> Text("Confirm")
-            }
+            Text(
+                text = when (screenState) {
+                    is ScreenState.Loading -> "Loading.."
+                    else -> "Confirm"
+                }
+            )
         }
         Text(
             text = "*Note: This key is unrecoverable if lost or forgotten",

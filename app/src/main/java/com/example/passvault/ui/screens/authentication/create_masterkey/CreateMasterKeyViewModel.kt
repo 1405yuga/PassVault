@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passvault.data.User
-import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.network.supabase.UserRepository
 import com.example.passvault.ui.state.ScreenState
 import com.example.passvault.utils.AuthInputValidators
@@ -20,8 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateMasterKeyViewModel @Inject constructor(
-    private val userRepository: UserRepository,
-    private val authRepository: AuthRepository
+    private val userRepository: UserRepository
 ) :
     ViewModel() {
     private val _screenState = MutableStateFlow<ScreenState<String>>(ScreenState.PreLoad())
