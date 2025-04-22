@@ -17,8 +17,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.passvault.ui.screens.authentication.create_masterkey.CreateMasterKeyScreen
 import com.example.passvault.ui.screens.authentication.enter_masterkey.EnterMasterKeyScreen
-import com.example.passvault.ui.screens.authentication.login.Login
-import com.example.passvault.ui.screens.authentication.signup.SignUp
+import com.example.passvault.ui.screens.authentication.login.LoginScreen
+import com.example.passvault.ui.screens.authentication.signup.SignUpScreen
 import com.example.passvault.ui.screens.loader.LoaderScreen
 import com.example.passvault.ui.screens.main_screens.Home
 import com.example.passvault.ui.theme.PassVaultTheme
@@ -60,7 +60,7 @@ fun PassVaultApp(
             )
         }
         composable(Screen.Login.name) {
-            Login(
+            LoginScreen(
                 onLoginClick = { navController.navigateAndClearPrevious(Screen.Loader.name) },
                 onSignUpClick = { navController.navigateAndClearPrevious(Screen.SignUp.name) },
                 viewModel = hiltViewModel(),
@@ -68,8 +68,9 @@ fun PassVaultApp(
             )
         }
         composable(Screen.SignUp.name) {
-            SignUp(
+            SignUpScreen(
                 navToLogin = { navController.navigateAndClearPrevious(Screen.Loader.name) },
+                viewModel = hiltViewModel()
             )
         }
         composable(Screen.CreateMasterKey.name) {

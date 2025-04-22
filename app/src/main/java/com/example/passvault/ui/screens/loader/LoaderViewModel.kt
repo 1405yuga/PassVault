@@ -27,7 +27,7 @@ class LoaderViewModel @Inject constructor(
 
     fun observeAuthEvents() {
         viewModelScope.launch {
-            authRepository.sessionStatus.collect { status ->
+            authRepository.getSessionStatus().collect { status ->
                 _screenState.value = when (status) {
                     is SessionStatus.Authenticated -> {
                         status.session.user?.id?.let { userId ->

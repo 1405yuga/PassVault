@@ -20,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,15 +35,16 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.passvault.R
+import com.example.passvault.di.supabase.SupabaseModule
+import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.ui.state.ScreenState
 
 @Composable
-fun SignUp(
+fun SignUpScreen(
     navToLogin: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SignUpViewModel = hiltViewModel()
+    viewModel: SignUpViewModel
 ) {
     val currentContext = LocalContext.current
     val screenState by viewModel.screenState.collectAsState()
@@ -206,11 +206,14 @@ fun ShowAndHidePasswordTextField(
 }
 
 @Composable
-@Preview
+@Preview(showBackground = true)
 fun SignUpPreview() {
-    Surface {
-        SignUp(
-            navToLogin = {}
-        )
-    }
+    SignUpScreen(
+        navToLogin = {},
+        viewModel = SignUpViewModel(
+            authRepository = AuthRepository(
+                supabaseClient = SupabaseModule.mockClient
+            )
+        ),
+    )
 }

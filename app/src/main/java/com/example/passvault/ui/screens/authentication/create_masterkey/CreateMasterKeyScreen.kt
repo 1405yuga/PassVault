@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,7 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.passvault.di.supabase.SupabaseModule
+import com.example.passvault.network.supabase.UserRepository
 import com.example.passvault.ui.screens.authentication.signup.ShowAndHidePasswordTextField
 import com.example.passvault.ui.state.ScreenState
 
@@ -104,12 +104,14 @@ fun CreateMasterKeyScreen(
 }
 
 @Composable
-@Preview()
-fun MasterKeyCreationCreationScreenPreview() {
-    Surface {
-        CreateMasterKeyScreen(
-            onConfirmClick = {},
-            viewModel()
-        )
-    }
+@Preview(showBackground = true)
+private fun CreateMasterKeyScreenPreview() {
+    CreateMasterKeyScreen(
+        onConfirmClick = {},
+        viewModel = CreateMasterKeyViewModel(
+            userRepository = UserRepository(
+                supabaseClient = SupabaseModule.mockClient
+            )
+        ),
+    )
 }

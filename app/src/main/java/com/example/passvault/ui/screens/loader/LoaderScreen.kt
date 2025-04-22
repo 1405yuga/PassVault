@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -83,18 +82,16 @@ fun LoaderScreen(
 }
 
 @Composable
-@Preview
+@Preview(showBackground = true)
 fun LoaderScreenPreview() {
-    Surface {
-        LoaderScreen(
-            loaderViewModel = LoaderViewModel(
-                AuthRepository(SupabaseModule.mockClient),
-                UserRepository(SupabaseModule.mockClient)
-            ),
-            toLoginScreen = {},
-            toCreateMasterKeyScreen = {},
-            toEnterMasterKeyScreen = {}
-        )
-    }
+    LoaderScreen(
+        loaderViewModel = LoaderViewModel(
+            AuthRepository(SupabaseModule.mockClient),
+            UserRepository(SupabaseModule.mockClient)
+        ),
+        toLoginScreen = {},
+        toCreateMasterKeyScreen = {},
+        toEnterMasterKeyScreen = {}
+    )
 }
 

@@ -19,7 +19,8 @@ class SupabaseModule {
         val mockClient = createSupabaseClient(
             supabaseUrl = "",
             supabaseKey = "",
-            builder = { install(Auth) }
+            builder = {
+            }
         )
     }
 

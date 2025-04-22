@@ -20,7 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.passvault.di.supabase.SupabaseModule
+import com.example.passvault.network.supabase.AuthRepository
+import com.example.passvault.network.supabase.UserRepository
 import com.example.passvault.ui.screens.authentication.signup.ShowAndHidePasswordTextField
 import com.example.passvault.ui.state.ScreenState
 
@@ -91,12 +93,17 @@ fun EnterMasterKeyScreen(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun MasterKeyScreenPreview() {
-    Surface {
+private fun EnterMasterKeyScreenPreview() {
         EnterMasterKeyScreen(
-            viewModel = viewModel()
+            viewModel = EnterMasterKeyViewModel(
+                userRepository = UserRepository(
+                    supabaseClient = SupabaseModule.mockClient
+                ),
+                authRepository = AuthRepository(
+                    supabaseClient = SupabaseModule.mockClient
+                )
+            )
         )
-    }
 }
