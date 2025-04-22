@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +31,7 @@ import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.ui.screens.authentication.signup.ShowAndHidePasswordTextField
 import com.example.passvault.ui.screens.authentication.signup.TextFieldWithErrorText
+import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.state.ScreenState
 
@@ -45,7 +48,8 @@ fun LoginScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 12.dp),
+            .padding(horizontal = 12.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center
     ) {
         Text(
@@ -161,6 +165,20 @@ fun LoginScreen(
 @Composable
 @VerticalScreenPreview()
 private fun LoginScreenPreview() {
+    LoginScreen(
+        onLoginClick = {},
+        onSignUpClick = {},
+        viewModel = LoginViewModel(
+            AuthRepository(
+                SupabaseModule.mockClient
+            )
+        )
+    )
+}
+
+@Composable
+@HorizontalScreenPreview()
+private fun LoginScreenHorizontalPreview() {
     LoginScreen(
         onLoginClick = {},
         onSignUpClick = {},
