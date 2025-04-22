@@ -1,6 +1,5 @@
 package com.example.passvault.ui.screens.authentication.enter_masterkey
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -57,49 +56,36 @@ class EnterMasterKeyViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val currentAuthInfo = authRepository.getCurrentAuthUserInfo()
-                Log.d(
-                    this@EnterMasterKeyViewModel.javaClass.simpleName,
-                    "CurrentUser Id : $currentAuthInfo"
-                )
+                val user = userRepository.getUser()
 
-                if (currentAuthInfo != null) {
-                    val userId = currentAuthInfo.id
-                    val user = userRepository.getUserById(userId)
+                if (user != null) {
+                    val userMasterKeyMaterial = UserMasterKeyMaterial(
+                        encodedSalt = user.salt,
+                        encodedInitialisationVector = user.initialisationVector,
+                        encodedEncryptedTestText = user.encryptedTestText
+                    )
 
-                    if (user != null) {
-                        val userMasterKeyMaterial = UserMasterKeyMaterial(
-                            encodedSalt = user.salt,
-                            encodedInitialisationVector = user.initialisationVector,
-                            encodedEncryptedTestText = user.encryptedTestText
+                    try {
+                        val decryptedText = EncryptionHelper.performDecryption(
+                            masterKey = uiState.masterKey,
+                            userMasterKeyMaterial = userMasterKeyMaterial
                         )
 
-                        try {
-                            val decryptedText = EncryptionHelper.performDecryption(
-                                masterKey = uiState.masterKey,
-                                userMasterKeyMaterial = userMasterKeyMaterial
-                            )
-
-                            if (decryptedText == User.TEST_TEXT) {
-                                _screenState.value =
-                                    ScreenState.Loaded("Master key verified successfully!")
-                            } else {
-                                setIncorrectKeyError()
-                            }
-
-                        } catch (e: Exception) {
-                            // Decryption error — invalid master key or other issue
-                            e.printStackTrace()
+                        if (decryptedText == User.TEST_TEXT) {
+                            _screenState.value =
+                                ScreenState.Loaded("Master key verified successfully!")
+                        } else {
                             setIncorrectKeyError()
                         }
 
-                    } else {
-                        _screenState.value = ScreenState.Error("User not found")
+                    } catch (e: Exception) {
+                        // Decryption error — invalid master key or other issue
+                        e.printStackTrace()
+                        setIncorrectKeyError()
                     }
 
                 } else {
-                    Log.d(this@EnterMasterKeyViewModel.javaClass.simpleName, "NOT AUTHENTICATED")
-                    _screenState.value = ScreenState.Error("Not Authenticated User")
+                    _screenState.value = ScreenState.Error("User not found")
                 }
 
             } catch (e: Exception) {

@@ -4,6 +4,7 @@ import com.example.passvault.data.User
 import com.example.passvault.data.UserTable
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,11 +15,9 @@ class UserRepository @Inject constructor(private val supabaseClient: SupabaseCli
         supabaseClient.postgrest[UserTable.TABLE_NAME].insert(user)
     }
 
-    suspend fun getUserById(userId: String): User? {
+    suspend fun getUser(): User? {
         return supabaseClient.postgrest[UserTable.TABLE_NAME]
-            .select {
-                filter { eq(UserTable.USER_ID, userId) }
-            }
+            .select(Columns.ALL)
             .decodeSingleOrNull<User>()
     }
 }

@@ -31,7 +31,7 @@ class LoaderViewModel @Inject constructor(
                 _screenState.value = when (status) {
                     is SessionStatus.Authenticated -> {
                         status.session.user?.id?.let { userId ->
-                            val user = userRepository.getUserById(userId)
+                            val user = userRepository.getUser()
                             ScreenState.Loaded(
                                 if (user == null) UserState.DONT_HAVE_MASTER_KEY else UserState.HAVE_MASTER_KEY
                             )

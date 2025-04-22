@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class User(
-    @SerialName(value = UserTable.USER_ID) val userId: String,
+    @SerialName(value = UserTable.USER_ID) val userId: String? = null,
     val salt: String,
     @SerialName(value = UserTable.IV) val initialisationVector: String,
     @SerialName(value = UserTable.ENCRYPTED_TEST_TEXT) val encryptedTestText: String,
