@@ -1,4 +1,4 @@
-package com.example.passvault.ui.state
+package com.example.passvault.utils.state
 
 sealed class ScreenState<T> {
     class PreLoad<T> : ScreenState<T>()

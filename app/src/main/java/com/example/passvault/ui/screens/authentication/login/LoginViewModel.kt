@@ -7,8 +7,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passvault.network.supabase.AuthRepository
-import com.example.passvault.ui.state.ScreenState
-import com.example.passvault.utils.AuthInputValidators
+import com.example.passvault.utils.state.ScreenState
+import com.example.passvault.utils.input_validations.AuthInputValidators
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,27 +20,37 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
     private val _screenState = MutableStateFlow<ScreenState<String>>(ScreenState.PreLoad())
     val screenState: StateFlow<ScreenState<String>> = _screenState
 
-    var uiState by mutableStateOf(LoginUiState())
+    var email by mutableStateOf("")
+        private set
+
+    var emailError by mutableStateOf("")
+        private set
+
+    var password by mutableStateOf("")
+        private set
+
+    var passwordError by mutableStateOf("")
+        private set
+
+    var showPassword by mutableStateOf(false)
         private set
 
     fun onEmailChange(newEmail: String) {
-        uiState = uiState.copy(email = newEmail)
+        email = newEmail
     }
 
     fun onPasswordChange(newPassword: String) {
-        uiState = uiState.copy(password = newPassword)
+        password = newPassword
     }
 
     fun togglePasswordVisibility() {
-        uiState = uiState.copy(showPassword = !uiState.showPassword)
+        showPassword = !showPassword
     }
 
     private fun inputValidators(): Boolean {
-        uiState = uiState.copy(
-            emailError = AuthInputValidators.validateEmail(email = uiState.email) ?: "",
-            passwordError = AuthInputValidators.validatePassword(password = uiState.password) ?: ""
-        )
-        return uiState.emailError.isBlank() and uiState.passwordError.isBlank()
+        emailError = AuthInputValidators.validateEmail(email = email) ?: ""
+        passwordError = AuthInputValidators.validatePassword(password = password) ?: ""
+        return emailError.isBlank() and passwordError.isBlank()
     }
 
     fun emailLogin() {
@@ -49,10 +59,10 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
         viewModelScope.launch {
             _screenState.value = try {
                 authRepository.emailLogin(
-                    email = uiState.email.trim(),
-                    password = uiState.password.trim()
+                    email = email.trim(),
+                    password = password.trim()
                 )
-                Log.d("Login", "LOgged in!!!")
+                Log.d("Login", "Logged in!!!")
                 ScreenState.Loaded("Login successfully")
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -61,11 +71,3 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
         }
     }
 }
-
-data class LoginUiState(
-    val email: String = "",
-    val emailError: String = "",
-    val password: String = "",
-    val passwordError: String = "",
-    val showPassword: Boolean = false,
-)

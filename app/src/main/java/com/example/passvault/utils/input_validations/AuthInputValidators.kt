@@ -1,10 +1,12 @@
-package com.example.passvault.utils
+package com.example.passvault.utils.input_validations
+
+import android.util.Patterns
 
 object AuthInputValidators {
     fun validateEmail(email: String): String? {
         return when {
             email.isBlank() -> "Email cannot be empty"
-            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> "Invalid email format"
+            !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> "Invalid email format"
             else -> null
         }
     }

@@ -23,14 +23,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.ui.screens.authentication.signup.ShowAndHidePasswordTextField
 import com.example.passvault.ui.screens.authentication.signup.TextFieldWithErrorText
-import com.example.passvault.ui.state.ScreenState
+import com.example.passvault.utils.annotations.VerticalScreenPreview
+import com.example.passvault.utils.state.ScreenState
 
 @Composable
 fun LoginScreen(
@@ -39,7 +39,6 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel
 ) {
-    val uiState = viewModel.uiState
     val screenState by viewModel.screenState.collectAsState()
     val currentContext = LocalContext.current
 
@@ -57,17 +56,17 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(20.dp))
         TextFieldWithErrorText(
             label = "Email",
-            value = uiState.email,
+            value = viewModel.email,
             onTextChange = { viewModel.onEmailChange(it) },
-            errorMsg = uiState.emailError
+            errorMsg = viewModel.emailError
         )
         ShowAndHidePasswordTextField(
             label = "Password",
-            password = uiState.password,
+            password = viewModel.password,
             onTextChange = { viewModel.onPasswordChange(it) },
-            showPassword = uiState.showPassword,
+            showPassword = viewModel.showPassword,
             onShowPasswordClick = { viewModel.togglePasswordVisibility() },
-            errorMsg = uiState.passwordError
+            errorMsg = viewModel.passwordError
         )
         Spacer(modifier = Modifier.height(12.dp))
         Button(
@@ -160,7 +159,7 @@ fun LoginScreen(
 }
 
 @Composable
-@Preview(showBackground = true)
+@VerticalScreenPreview()
 private fun LoginScreenPreview() {
     LoginScreen(
         onLoginClick = {},

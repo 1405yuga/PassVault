@@ -1,4 +1,4 @@
-package org.example
+package com.example.passvault.utils.encryption
 
 import com.example.passvault.data.UserMasterKeyMaterial
 import com.example.passvault.data.fromBase64
@@ -68,11 +68,11 @@ object EncryptionHelper {
         val iv = userMasterKeyMaterial.encodedInitialisationVector.fromBase64()
         val encryptedData = userMasterKeyMaterial.encodedEncryptedTestText.fromBase64()
 
-        val aesKey = EncryptionHelper.deriveAESKey(
+        val aesKey = deriveAESKey(
             masterKey = masterKey, salt = salt
         )
 
-        val decryptedJson = EncryptionHelper.decrypt(
+        val decryptedJson = decrypt(
             cipherText = encryptedData,
             key = aesKey,
             iv = iv

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,7 +23,7 @@ import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.network.supabase.UserRepository
 import com.example.passvault.ui.screens.authentication.signup.ShowAndHidePasswordTextField
-import com.example.passvault.ui.state.ScreenState
+import com.example.passvault.utils.state.ScreenState
 
 @Composable
 fun EnterMasterKeyScreen(
@@ -96,14 +95,14 @@ fun EnterMasterKeyScreen(
 @Preview(showBackground = true)
 @Composable
 private fun EnterMasterKeyScreenPreview() {
-        EnterMasterKeyScreen(
-            viewModel = EnterMasterKeyViewModel(
-                userRepository = UserRepository(
-                    supabaseClient = SupabaseModule.mockClient
-                ),
-                authRepository = AuthRepository(
-                    supabaseClient = SupabaseModule.mockClient
-                )
+    EnterMasterKeyScreen(
+        viewModel = EnterMasterKeyViewModel(
+            userRepository = UserRepository(
+                supabaseClient = SupabaseModule.mockClient
+            ),
+            authRepository = AuthRepository(
+                supabaseClient = SupabaseModule.mockClient
             )
         )
+    )
 }

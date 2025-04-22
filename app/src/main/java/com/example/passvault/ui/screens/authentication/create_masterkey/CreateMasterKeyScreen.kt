@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.UserRepository
 import com.example.passvault.ui.screens.authentication.signup.ShowAndHidePasswordTextField
-import com.example.passvault.ui.state.ScreenState
+import com.example.passvault.utils.state.ScreenState
 
 @Composable
 fun CreateMasterKeyScreen(

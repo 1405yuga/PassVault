@@ -9,13 +9,13 @@ import com.example.passvault.data.User
 import com.example.passvault.data.UserMasterKeyMaterial
 import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.network.supabase.UserRepository
-import com.example.passvault.ui.state.ScreenState
-import com.example.passvault.utils.AuthInputValidators
+import com.example.passvault.utils.state.ScreenState
+import com.example.passvault.utils.input_validations.AuthInputValidators
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.example.EncryptionHelper
+import com.example.passvault.utils.encryption.EncryptionHelper
 import javax.inject.Inject
 
 @HiltViewModel
