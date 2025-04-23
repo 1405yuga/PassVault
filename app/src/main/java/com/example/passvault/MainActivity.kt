@@ -20,6 +20,7 @@ import com.example.passvault.ui.screens.authentication.login.LoginScreen
 import com.example.passvault.ui.screens.authentication.signup.SignUpScreen
 import com.example.passvault.ui.screens.loader.LoaderScreen
 import com.example.passvault.ui.screens.main_screens.Home
+import com.example.passvault.ui.screens.main_screens.MainScreen
 import com.example.passvault.ui.theme.PassVaultTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -78,7 +79,12 @@ fun PassVaultApp(
             )
         }
         composable(Screen.EnterMasterKey.name) {
-            EnterMasterKeyScreen(viewModel = hiltViewModel())
+            EnterMasterKeyScreen(
+                viewModel = hiltViewModel(),
+                onUnlocked = { navController.navigateAndClearPrevious(Screen.MainScreen.name) })
+        }
+        composable(Screen.MainScreen.name) {
+            MainScreen()
         }
     }
 }
@@ -97,5 +103,5 @@ fun PassVaultAppPreview() {
 }
 
 enum class Screen {
-    Home, Login, SignUp, Loader, CreateMasterKey, EnterMasterKey
+    Home, Login, SignUp, Loader, CreateMasterKey, EnterMasterKey, MainScreen
 }

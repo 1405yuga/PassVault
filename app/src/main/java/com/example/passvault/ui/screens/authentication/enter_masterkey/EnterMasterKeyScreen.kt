@@ -37,7 +37,8 @@ import com.example.passvault.utils.state.ScreenState
 
 @Composable
 fun EnterMasterKeyScreen(
-    viewModel: EnterMasterKeyViewModel
+    viewModel: EnterMasterKeyViewModel,
+    onUnlocked: () -> Unit
 ) {
     val screenState by viewModel.screenState.collectAsState()
     val currentContext = LocalContext.current
@@ -119,10 +120,11 @@ fun EnterMasterKeyScreen(
                     Toast.makeText(
                         currentContext,
                         state.result,
-                        Toast.LENGTH_LONG
+                        Toast.LENGTH_SHORT
                     ).show()
-//                    onConfirmClick()
+                    onUnlocked()
                 }
+
                 else -> {}
             }
         }
@@ -140,7 +142,8 @@ private fun EnterMasterKeyScreenPreview() {
             authRepository = AuthRepository(
                 supabaseClient = SupabaseModule.mockClient
             )
-        )
+        ),
+        onUnlocked = {}
     )
 }
 
@@ -155,6 +158,7 @@ private fun EnterMasterKeyScreenHorizontalPreview() {
             authRepository = AuthRepository(
                 supabaseClient = SupabaseModule.mockClient
             )
-        )
+        ),
+        onUnlocked = {}
     )
 }
