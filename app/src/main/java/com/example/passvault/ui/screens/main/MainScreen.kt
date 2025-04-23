@@ -1,9 +1,11 @@
-package com.example.passvault.ui.screens.main_screens
+package com.example.passvault.ui.screens.main
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Person
@@ -11,19 +13,20 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-
+import com.example.passvault.ui.screens.main.add.AddPasswordScreen
+import com.example.passvault.ui.screens.main.list.PasswordsListScreen
+import com.example.passvault.ui.screens.main.profile.ProfileScreen
+import com.example.passvault.utils.annotations.HorizontalScreenPreview
+import com.example.passvault.utils.annotations.VerticalScreenPreview
 
 @Composable
-fun Home(
-    onLogoutClick: () -> Unit,
+fun MainScreen(
     modifier: Modifier = Modifier
 ) {
     var selectedItem by rememberSaveable { mutableIntStateOf(0) }
@@ -34,7 +37,11 @@ fun Home(
         Icons.Filled.Person
     )
 
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -42,9 +49,9 @@ fun Home(
         ) {
             //todo: add animations on switch
             when (selectedItem) {
-                0 -> VaultList()
-                1 -> Add()
-                2 -> Profile(onLogoutClick = onLogoutClick)
+                0 -> PasswordsListScreen()
+                1 -> AddPasswordScreen()
+                2 -> ProfileScreen()
             }
         }
         NavigationBar(modifier = Modifier.fillMaxWidth()) {
@@ -60,9 +67,13 @@ fun Home(
 }
 
 @Composable
-@Preview
-fun HomePreview() {
-    Surface {
-        Home(onLogoutClick = {})
-    }
+@VerticalScreenPreview
+private fun MainScreenPreview() {
+    MainScreen()
+}
+
+@Composable
+@HorizontalScreenPreview
+private fun MainScreenHorizontalPreview() {
+    MainScreen()
 }

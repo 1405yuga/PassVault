@@ -1,15 +1,14 @@
-package com.example.passvault.ui.screens.main_screens
+package com.example.passvault.ui.screens.main.profile
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun Profile(
-    onLogoutClick: () -> Unit
+fun ProfileScreen(
 ) {
     Text("Profile..")
-    Button(onClick = onLogoutClick) {
+    Button(onClick = {}) {
         Text("Logout")
     }
 }
