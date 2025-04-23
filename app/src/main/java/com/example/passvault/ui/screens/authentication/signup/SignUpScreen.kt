@@ -18,6 +18,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,14 +29,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.passvault.R
 import com.example.passvault.di.supabase.SupabaseModule
@@ -55,22 +57,36 @@ fun SignUpScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 12.dp)
+            .padding(
+                horizontal = dimensionResource(R.dimen.large_padding),
+                vertical = dimensionResource(R.dimen.medium_padding)
+            )
             .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(R.string.app_name),
-            fontSize = 22.sp
+            text = "Create account",
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            ),
+            modifier = Modifier.padding(dimensionResource(R.dimen.small_padding))
         )
-        Text(text = "Please enter details to create an account!")
-        Spacer(modifier = Modifier.height(20.dp))
+        Text(
+            text = "Join to protect your passwords securely",
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = MaterialTheme.colorScheme.onBackground
+            ),
+            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.large_padding))
+        )
         TextFieldWithErrorText(
             label = "Email",
             value = viewModel.email,
             onTextChange = { viewModel.onEmailChange(it) },
             errorMsg = viewModel.emailError
         )
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.small_spacer_height)))
         ShowAndHidePasswordTextField(
             label = "Password",
             password = viewModel.password,
@@ -79,6 +95,7 @@ fun SignUpScreen(
             onShowPasswordClick = { viewModel.togglePasswordVisibility() },
             errorMsg = viewModel.passwordError
         )
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.small_spacer_height)))
         ShowAndHidePasswordTextField(
             label = "Confirm Password",
             password = viewModel.confirmPassword,
@@ -87,7 +104,7 @@ fun SignUpScreen(
             onShowPasswordClick = { viewModel.toggleConfirmPasswordVisibility() },
             errorMsg = viewModel.confirmPasswordError
         )
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.medium_spacer_height)))
         Button(
             onClick = {
                 viewModel.emailSignUp(
@@ -95,32 +112,44 @@ fun SignUpScreen(
                     password = viewModel.password
                 )
             },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(4.dp),
-            enabled = screenState !is ScreenState.Loading
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dimensionResource(R.dimen.min_clickable_size)),
+            shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius)),
+            enabled = screenState !is ScreenState.Loading,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
         ) {
-            when (screenState) {
-                is ScreenState.Loading -> {
-                    Text("Loading..")
+            Text(
+                text = when (screenState) {
+                    is ScreenState.Loading -> "Loading.."
+                    else -> "Get started"
                 }
-
-                else -> {
-                    Text("Get started")
-                }
-            }
+            )
         }
-        Spacer(modifier = Modifier.height(22.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.large_spacer_height)))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            HorizontalDivider(modifier = Modifier.weight(1f))
+            Text(
+                text = "  or  ",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            )
+            HorizontalDivider(modifier = Modifier.weight(1f))
+        }
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.medium_spacer_height)))
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text(text = "Already have an account? ")
             Text(
                 text = "Log in",
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.clickable {
-                    navToLogin()
-                }
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                ),
+                modifier = Modifier.clickable { navToLogin() }
             )
         }
         LaunchedEffect(screenState) {

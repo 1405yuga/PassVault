@@ -3,23 +3,30 @@ package com.example.passvault.ui.screens.authentication.enter_masterkey
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.passvault.R
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.network.supabase.UserRepository
@@ -37,15 +44,29 @@ fun EnterMasterKeyScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(12.dp)
+            .padding(
+                horizontal = dimensionResource(R.dimen.large_padding),
+                vertical = dimensionResource(R.dimen.medium_padding)
+            )
             .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Master Key",
-            fontSize = 22.sp
+            text = "Unlock your vault",
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            ),
+            modifier = Modifier.padding(dimensionResource(R.dimen.small_padding))
         )
-        Text(text = "Enter the master key")
+        Text(
+            text = "Enter your Master Key to unlock your passwords",
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = MaterialTheme.colorScheme.onBackground
+            ),
+            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.large_padding))
+        )
         ShowAndHidePasswordTextField(
             label = "Master Key",
             password = viewModel.masterKey,
@@ -54,23 +75,37 @@ fun EnterMasterKeyScreen(
             onShowPasswordClick = { viewModel.toggleMasterKeyVisibility() },
             errorMsg = viewModel.masterKeyError,
         )
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.medium_spacer_height)))
         Button(
             onClick = {
                 viewModel.submitMasterKey()
             },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(4.dp),
-            enabled = screenState !is ScreenState.Loading
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dimensionResource(R.dimen.min_clickable_size)),
+            shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius)),
+            enabled = screenState !is ScreenState.Loading,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
         ) {
-            when (screenState) {
-                is ScreenState.Loading -> Text("Loading..")
-                else -> Text("Confirm")
-            }
+            Text(
+                text = when (screenState) {
+                    is ScreenState.Loading -> "Loading.."
+                    else -> "Unlock"
+                }
+            )
         }
+        Spacer(modifier = Modifier.height(2.dp))
         Text(
             text = "*Note: This key is unrecoverable if lost or forgotten",
-            fontWeight = FontWeight.Bold,
-            fontSize = 12.sp
+            style = MaterialTheme.typography.labelSmall.copy(
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Bold
+            ),
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Start
         )
         LaunchedEffect(screenState) {
             when (val state = screenState) {
@@ -88,7 +123,6 @@ fun EnterMasterKeyScreen(
                     ).show()
 //                    onConfirmClick()
                 }
-
                 else -> {}
             }
         }

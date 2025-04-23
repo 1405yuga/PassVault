@@ -1,5 +1,6 @@
 package com.example.passvault.ui.screens.authentication.login
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -49,7 +50,10 @@ fun LoginScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = dimensionResource(R.dimen.large_padding))
+            .padding(
+                horizontal = dimensionResource(R.dimen.large_padding),
+                vertical = dimensionResource(R.dimen.medium_padding)
+            )
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -130,6 +134,7 @@ fun LoginScreen(
             )
         }
         LaunchedEffect(screenState) {
+            Log.d("LoginScreen", "Screenstate : $screenState")
             when (val state = screenState) {
                 is ScreenState.Error -> Toast.makeText(
                     currentContext,

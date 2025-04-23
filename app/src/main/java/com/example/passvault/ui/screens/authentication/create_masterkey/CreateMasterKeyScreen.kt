@@ -3,23 +3,31 @@ package com.example.passvault.ui.screens.authentication.create_masterkey
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.passvault.R
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.UserRepository
 import com.example.passvault.ui.screens.authentication.signup.ShowAndHidePasswordTextField
@@ -37,15 +45,29 @@ fun CreateMasterKeyScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(12.dp)
+            .padding(
+                horizontal = dimensionResource(R.dimen.large_padding),
+                vertical = dimensionResource(R.dimen.medium_padding)
+            )
             .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Master Key",
-            fontSize = 22.sp
+            text = "Secure your vault",
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            ),
+            modifier = Modifier.padding(dimensionResource(R.dimen.small_padding))
         )
-        Text(text = "Create master key for encryption")
+        Text(
+            text = "Create a Master Key to secure your passwords",
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = MaterialTheme.colorScheme.onBackground
+            ),
+            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.large_padding))
+        )
         ShowAndHidePasswordTextField(
             label = "Master Key",
             password = viewModel.masterKey,
@@ -54,7 +76,7 @@ fun CreateMasterKeyScreen(
             onShowPasswordClick = { viewModel.toggleMasterKeyVisibility() },
             errorMsg = viewModel.masterKeyError,
         )
-
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.small_spacer_height)))
         ShowAndHidePasswordTextField(
             label = "Confirm Master Key",
             password = viewModel.confirmedMasterKey,
@@ -63,25 +85,38 @@ fun CreateMasterKeyScreen(
             onShowPasswordClick = { viewModel.toggleConfirmedMasterKeyVisibility() },
             errorMsg = viewModel.confirmedMasterKeyError,
         )
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.medium_spacer_height)))
         Button(
             onClick = {
                 viewModel.insertMasterKey()
             },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dimensionResource(R.dimen.min_clickable_size)),
+            shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius)),
             enabled = screenState !is ScreenState.Loading,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
         ) {
             Text(
                 text = when (screenState) {
-                    is ScreenState.Loading -> "Loading.."
-                    else -> "Confirm"
+                    is ScreenState.Loading -> "Creating.."
+                    else -> "Create"
                 }
             )
         }
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = "*Note: This key is unrecoverable if lost or forgotten",
-            fontWeight = FontWeight.Bold,
-            fontSize = 12.sp
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Bold
+            ),
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Start
         )
     }
     LaunchedEffect(screenState) {
@@ -96,7 +131,7 @@ fun CreateMasterKeyScreen(
                 Toast.makeText(
                     currentContext,
                     state.result,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
                 onConfirmClick()
             }
