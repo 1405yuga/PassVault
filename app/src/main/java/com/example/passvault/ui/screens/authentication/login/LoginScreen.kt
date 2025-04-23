@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,9 +25,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.passvault.R
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.ui.screens.authentication.signup.ShowAndHidePasswordTextField
@@ -48,22 +49,33 @@ fun LoginScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 12.dp)
+            .padding(horizontal = dimensionResource(R.dimen.large_padding))
             .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Welcome Back!",
-            fontSize = 22.sp
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            ),
+            modifier = Modifier.padding(dimensionResource(R.dimen.small_padding))
         )
-        Text(text = "Please enter login details to get started!")
-        Spacer(modifier = Modifier.height(20.dp))
+        Text(
+            text = "Login to continue managing your passwords",
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = MaterialTheme.colorScheme.onBackground
+            ),
+            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.large_padding))
+        )
         TextFieldWithErrorText(
             label = "Email",
             value = viewModel.email,
             onTextChange = { viewModel.onEmailChange(it) },
             errorMsg = viewModel.emailError
         )
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.small_spacer_height)))
         ShowAndHidePasswordTextField(
             label = "Password",
             password = viewModel.password,
@@ -72,45 +84,50 @@ fun LoginScreen(
             onShowPasswordClick = { viewModel.togglePasswordVisibility() },
             errorMsg = viewModel.passwordError
         )
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.medium_spacer_height)))
         Button(
             onClick = {
                 viewModel.emailLogin()
             },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(4.dp),
-            enabled = screenState !is ScreenState.Loading
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dimensionResource(R.dimen.min_clickable_size)),
+            shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius)),
+            enabled = screenState !is ScreenState.Loading,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
         ) {
-            when (screenState) {
-                is ScreenState.Loading -> Text("Loading..")
-                else -> Text("Get started")
-            }
-        }
-        Spacer(modifier = Modifier.height(22.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(text = "Don't have account? ")
             Text(
-                text = "Create new account",
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.clickable {
-                    onSignUpClick()
+                text = when (screenState) {
+                    is ScreenState.Loading -> "Loading.."
+                    else -> "Get started"
                 }
             )
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.large_spacer_height)))
+        Row(verticalAlignment = Alignment.CenterVertically) {
             HorizontalDivider(modifier = Modifier.weight(1f))
             Text(
-                text = "or",
-                modifier = Modifier.padding(horizontal = 8.dp),
-                style = MaterialTheme.typography.bodySmall
+                text = "  or  ",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = MaterialTheme.colorScheme.onBackground
+                )
             )
             HorizontalDivider(modifier = Modifier.weight(1f))
+        }
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.medium_spacer_height)))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = "Don't have an account? ")
+            Text(
+                text = "Sign up",
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                ),
+                modifier = Modifier.clickable { onSignUpClick() }
+            )
         }
         LaunchedEffect(screenState) {
             when (val state = screenState) {
