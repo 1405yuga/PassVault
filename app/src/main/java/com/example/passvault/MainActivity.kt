@@ -45,7 +45,9 @@ fun PassVaultApp(
     ) {
     val navController = rememberNavController()
     NavHost(
-        navController = navController, startDestination = Screen.Loader.name
+        navController = navController,
+        startDestination = Screen.Loader.name,
+        modifier = modifier
     ) {
         composable(Screen.Loader.name) {
             LoaderScreen(

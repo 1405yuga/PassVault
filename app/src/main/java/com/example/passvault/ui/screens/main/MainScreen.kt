@@ -1,14 +1,12 @@
 package com.example.passvault.ui.screens.main
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -19,38 +17,35 @@ import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 
 @Composable
-fun MainScreen(
-    viewModel: MainScreenViewModel,
-    modifier: Modifier = Modifier
-) {
+fun MainScreen(viewModel: MainScreenViewModel) {
+    Scaffold(
+        bottomBar = {
+            NavigationBar(modifier = Modifier.fillMaxWidth()) {
+                viewModel.mainScreenMenusItems.forEach { menuItem ->
+                    NavigationBarItem(
+                        icon = { Icon(menuItem.icon, contentDescription = menuItem.route) },
+                        selected = viewModel.currentSelectedMenu == menuItem,
+                        onClick = { viewModel.onMenuSelected(menuItem) }
+                    )
+                }
+            }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) {
-            //todo: add animations on switch
-            when (viewModel.currentSelectedMenu) {
-                MainScreenMenus.Add -> AddPasswordScreen()
-                MainScreenMenus.List -> PasswordsListScreen()
-                MainScreenMenus.Profile -> ProfileScreen()
+        },
+        content = { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(innerPadding)
+            ) {
+                //todo: add animations on switch
+                when (viewModel.currentSelectedMenu) {
+                    MainScreenMenus.Add -> AddPasswordScreen()
+                    MainScreenMenus.List -> PasswordsListScreen()
+                    MainScreenMenus.Profile -> ProfileScreen()
+                }
             }
         }
-        NavigationBar(modifier = Modifier.fillMaxWidth()) {
-            viewModel.mainScreenMenusItems.forEach { menuItem ->
-                NavigationBarItem(
-                    icon = { Icon(menuItem.icon, contentDescription = menuItem.route) },
-                    selected = viewModel.currentSelectedMenu == menuItem,
-                    onClick = { viewModel.onMenuSelected(menuItem) }
-                )
-            }
-        }
-    }
+    )
 }
 
 @Composable

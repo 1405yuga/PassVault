@@ -50,10 +50,7 @@ fun LoginScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(
-                horizontal = dimensionResource(R.dimen.large_padding),
-                vertical = dimensionResource(R.dimen.medium_padding)
-            )
+            .padding(horizontal = dimensionResource(R.dimen.large_padding))
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
