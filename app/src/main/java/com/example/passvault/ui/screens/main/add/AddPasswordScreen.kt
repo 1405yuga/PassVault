@@ -19,6 +19,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import com.example.passvault.R
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
@@ -35,6 +36,7 @@ fun AddPasswordBottomSheet(
             onDismiss()
         },
         sheetState = bottomSheetState,
+        dragHandle = null,
         content = {
             AddPasswordScreen(
                 onClose = onDismiss
