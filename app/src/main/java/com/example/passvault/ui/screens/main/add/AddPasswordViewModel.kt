@@ -15,6 +15,10 @@ class AddPasswordViewModel : ViewModel() {
         private set
     var showPassword by mutableStateOf(false)
         private set
+    var website by mutableStateOf("") //optional
+        private set
+    var notes by mutableStateOf("") //optional
+        private set
 
     fun onTitleChange(title: String) {
         this.title = title
@@ -32,8 +36,17 @@ class AddPasswordViewModel : ViewModel() {
         showPassword = !showPassword
     }
 
+    fun onWebsiteChange(website: String) {
+        this.website = website
+    }
+
+    fun onNotesChange(notes: String) {
+        this.notes = notes
+    }
+
     var titleError by mutableStateOf("")
         private set
+
     var passwordError by mutableStateOf("")
         private set
 

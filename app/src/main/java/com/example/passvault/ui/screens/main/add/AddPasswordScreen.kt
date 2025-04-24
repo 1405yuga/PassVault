@@ -3,7 +3,6 @@ package com.example.passvault.ui.screens.main.add
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,7 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountBox
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.Language
+import androidx.compose.material.icons.outlined.Password
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -96,14 +99,14 @@ fun AddPasswordScreen(
             onTextChange = { viewModel.onTitleChange(it) },
             errorMsg = viewModel.titleError
         )
-        Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             label = { Text("Username or email") },
             value = viewModel.username,
             onValueChange = { viewModel.onUsernameChange(it) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            leadingIcon = { Icon(Icons.Outlined.AccountBox, contentDescription = "Username") }
         )
 
         ShowAndHidePasswordTextField(
@@ -112,7 +115,25 @@ fun AddPasswordScreen(
             onTextChange = { viewModel.onPasswordChange(it) },
             showPassword = viewModel.showPassword,
             onShowPasswordClick = { viewModel.togglePasswordVisibility() },
-            errorMsg = viewModel.passwordError
+            errorMsg = viewModel.passwordError,
+            leadingIcon = Icons.Outlined.Password
+        )
+        OutlinedTextField(
+            label = { Text("Website") },
+            value = viewModel.website,
+            onValueChange = { viewModel.onWebsiteChange(it) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            leadingIcon = { Icon(Icons.Outlined.Language, contentDescription = "Website") }
+        )
+        OutlinedTextField(
+            label = { Text("Notes") },
+            value = viewModel.notes,
+            onValueChange = { viewModel.onNotesChange(it) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = { Icon(Icons.Outlined.Description, contentDescription = "Notes") }
         )
     }
 }
