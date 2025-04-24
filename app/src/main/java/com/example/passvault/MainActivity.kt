@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -78,7 +79,7 @@ fun PassVaultApp(
                 onUnlocked = { navController.navigateAndClearPrevious(Screen.MainScreen.name) })
         }
         composable(Screen.MainScreen.name) {
-            MainScreen()
+            MainScreen(viewModel = viewModel())
         }
     }
 }
