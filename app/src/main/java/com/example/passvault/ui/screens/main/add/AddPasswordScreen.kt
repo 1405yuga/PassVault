@@ -3,12 +3,17 @@ package com.example.passvault.ui.screens.main.add
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBox
 import androidx.compose.material.icons.outlined.Clear
@@ -24,6 +29,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -35,6 +41,7 @@ import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ShowAndHidePasswordTextField
 import com.example.passvault.utils.custom_composables.TextFieldWithErrorText
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,18 +49,28 @@ fun AddPasswordBottomSheet(
     onDismiss: () -> Unit
 ) {
     val bottomSheetState = rememberModalBottomSheetState()
+    val coroutineScope = rememberCoroutineScope()
     ModalBottomSheet(
         onDismissRequest = {
-            onDismiss()
+            coroutineScope.launch {
+                bottomSheetState.hide()
+                onDismiss()
+            }
         },
         sheetState = bottomSheetState,
         dragHandle = null,
         content = {
             AddPasswordScreen(
-                onClose = onDismiss,
+                onClose = {
+                    coroutineScope.launch {
+                        bottomSheetState.hide()
+                        onDismiss()
+                    }
+                },
                 viewModel = viewModel()
             )
-        }
+        },
+        modifier = Modifier.statusBarsPadding()
     )
 }
 
@@ -70,6 +87,8 @@ fun AddPasswordScreen(
                 horizontal = dimensionResource(R.dimen.large_padding),
                 vertical = dimensionResource(R.dimen.medium_padding)
             )
+            .verticalScroll(rememberScrollState())
+            .imePadding()
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -99,6 +118,7 @@ fun AddPasswordScreen(
             onTextChange = { viewModel.onTitleChange(it) },
             errorMsg = viewModel.titleError
         )
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.medium_spacer_height)))
         OutlinedTextField(
             label = { Text("Username or email") },
             value = viewModel.username,
@@ -118,6 +138,7 @@ fun AddPasswordScreen(
             errorMsg = viewModel.passwordError,
             leadingIcon = Icons.Outlined.Password
         )
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.small_spacer_height)))
         OutlinedTextField(
             label = { Text("Website") },
             value = viewModel.website,
