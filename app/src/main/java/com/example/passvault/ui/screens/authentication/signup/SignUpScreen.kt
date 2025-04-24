@@ -183,7 +183,7 @@ fun TextFieldWithErrorText(
         value = value,
         onValueChange = onTextChange,
         label = { Text(text = label) },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
         modifier = Modifier.fillMaxWidth(),
         isError = errorMsg.isNotBlank(),
         singleLine = true,
