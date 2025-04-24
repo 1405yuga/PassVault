@@ -15,13 +15,29 @@ class MainScreenViewModel : ViewModel() {
     var currentSelectedMenu by mutableStateOf<MainScreenMenus>(MainScreenMenus.List)
         private set
 
+    var lastNonAddMenu by mutableStateOf<MainScreenMenus>(currentSelectedMenu)
+        private set
+
+    var showBottomSheet by mutableStateOf(true)
+        private set
+
     val mainScreenMenusItems = listOf<MainScreenMenus>(
         MainScreenMenus.List,
         MainScreenMenus.Add,
         MainScreenMenus.Profile
     )
 
+    fun onAddPasswordBottomSheetDismiss() {
+        onMenuSelected(mainScreenMenus = lastNonAddMenu)
+        showBottomSheet = false
+    }
+
     fun onMenuSelected(mainScreenMenus: MainScreenMenus) {
+        lastNonAddMenu = if (mainScreenMenus is MainScreenMenus.Add) {
+            currentSelectedMenu
+        } else {
+            mainScreenMenus
+        }
         currentSelectedMenu = mainScreenMenus
     }
 }

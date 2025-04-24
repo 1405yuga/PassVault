@@ -10,8 +10,10 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.passvault.ui.screens.main.add.AddPasswordScreen
+import com.example.passvault.R
+import com.example.passvault.ui.screens.main.add.AddPasswordBottomSheet
 import com.example.passvault.ui.screens.main.list.PasswordsListScreen
 import com.example.passvault.ui.screens.main.profile.ProfileScreen
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
@@ -36,12 +38,19 @@ fun MainScreen(viewModel: MainScreenViewModel) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
+                    .padding(horizontal = dimensionResource(R.dimen.medium_padding))
             ) {
                 //todo: add animations on switch
-                when (viewModel.currentSelectedMenu) {
-                    MainScreenMenus.Add -> AddPasswordScreen()
+                when (viewModel.lastNonAddMenu) {
                     MainScreenMenus.List -> PasswordsListScreen()
                     MainScreenMenus.Profile -> ProfileScreen()
+                    else -> {}
+                }
+
+                if (viewModel.currentSelectedMenu == MainScreenMenus.Add) {
+                    AddPasswordBottomSheet(onDismiss = {
+                        viewModel.onAddPasswordBottomSheetDismiss()
+                    })
                 }
             }
         }

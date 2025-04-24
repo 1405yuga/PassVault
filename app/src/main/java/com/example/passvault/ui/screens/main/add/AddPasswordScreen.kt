@@ -10,18 +10,44 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.example.passvault.R
+import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddPasswordScreen(modifier: Modifier = Modifier) {
+fun AddPasswordBottomSheet(
+    onDismiss: () -> Unit
+) {
+    val bottomSheetState = rememberModalBottomSheetState()
+    ModalBottomSheet(
+        onDismissRequest = {
+            onDismiss()
+        },
+        sheetState = bottomSheetState,
+        content = {
+            AddPasswordScreen(
+                onClose = onDismiss
+            )
+        }
+    )
+}
+
+@Composable
+fun AddPasswordScreen(
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(modifier = modifier.fillMaxSize()) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -29,9 +55,7 @@ fun AddPasswordScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth()
         ) {
             IconButton(
-                onClick = {
-                    //todo : implement close
-                },
+                onClick = onClose,
                 modifier = Modifier
                     .size(dimensionResource(R.dimen.min_clickable_size))
             ) {
@@ -53,5 +77,11 @@ fun AddPasswordScreen(modifier: Modifier = Modifier) {
 @Composable
 @VerticalScreenPreview
 fun AddPasswordScreenPreview() {
-    AddPasswordScreen()
+    AddPasswordScreen(onClose = {})
+}
+
+@Composable
+@HorizontalScreenPreview
+fun AddPasswordScreenHorizontalPreview() {
+    AddPasswordScreen(onClose = {})
 }
