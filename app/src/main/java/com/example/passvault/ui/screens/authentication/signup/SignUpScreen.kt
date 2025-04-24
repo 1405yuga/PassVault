@@ -186,6 +186,7 @@ fun TextFieldWithErrorText(
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         modifier = Modifier.fillMaxWidth(),
         isError = errorMsg.isNotBlank(),
+        singleLine = true,
         supportingText = {
             if (errorMsg.isNotBlank()) {
                 Text(
@@ -216,6 +217,7 @@ fun ShowAndHidePasswordTextField(
             else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         modifier = Modifier.fillMaxWidth(),
+        singleLine = true,
         trailingIcon = {
             if (showPassword) {
                 IconButton(onClick = onShowPasswordClick) {
