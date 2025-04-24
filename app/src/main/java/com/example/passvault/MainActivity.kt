@@ -3,9 +3,10 @@ package com.example.passvault
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,8 +31,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PassVaultTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    PassVaultApp(modifier = Modifier.padding(innerPadding))
+                Surface {
+                    PassVaultApp()
                 }
             }
         }
@@ -41,13 +42,12 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun PassVaultApp(
     modifier: Modifier = Modifier,
-
-    ) {
+) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
         startDestination = Screen.Loader.name,
-        modifier = modifier
+        modifier = modifier.windowInsetsPadding(WindowInsets.systemBars)
     ) {
         composable(Screen.Loader.name) {
             LoaderScreen(

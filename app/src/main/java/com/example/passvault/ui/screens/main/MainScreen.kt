@@ -1,6 +1,7 @@
 package com.example.passvault.ui.screens.main
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -29,12 +30,11 @@ fun MainScreen(viewModel: MainScreenViewModel) {
                     )
                 }
             }
-
         },
         content = { innerPadding ->
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .padding(innerPadding)
             ) {
                 //todo: add animations on switch
