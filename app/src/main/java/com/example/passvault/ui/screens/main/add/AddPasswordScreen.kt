@@ -28,10 +28,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.passvault.R
-import com.example.passvault.ui.screens.authentication.signup.ShowAndHidePasswordTextField
-import com.example.passvault.ui.screens.authentication.signup.TextFieldWithErrorText
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
+import com.example.passvault.utils.custom_composables.ShowAndHidePasswordTextField
+import com.example.passvault.utils.custom_composables.TextFieldWithErrorText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,7 +98,7 @@ fun AddPasswordScreen(
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
-            label = { Text("Username") },
+            label = { Text("Username or email") },
             value = viewModel.username,
             onValueChange = { viewModel.onUsernameChange(it) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
