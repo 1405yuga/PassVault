@@ -1,6 +1,5 @@
 package com.example.passvault.ui.screens.main.add
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -18,12 +18,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBox
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Password
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -92,7 +96,7 @@ fun AddPasswordScreen(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+//            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 12.dp)
@@ -107,6 +111,24 @@ fun AddPasswordScreen(
                     contentDescription = "close window",
                 )
             }
+            Spacer(modifier = Modifier.weight(1f))
+            Button(
+                onClick = {
+                    // TODO: get vault
+                },
+                modifier = Modifier.height(dimensionResource(R.dimen.min_clickable_size)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.secondaryContainer
+                )
+            ) {
+                Icon(Icons.Outlined.Home, contentDescription = null)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(text = "Personal")
+                Spacer(modifier = Modifier.width(4.dp))
+                Icon(Icons.Outlined.KeyboardArrowDown, contentDescription = "Get vault")
+            }
+            Spacer(modifier = Modifier.padding(4.dp))
             Button(
                 onClick = { viewModel.createPassword() },
                 modifier = Modifier.height(dimensionResource(R.dimen.min_clickable_size))
