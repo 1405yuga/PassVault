@@ -61,33 +61,26 @@ fun AddPasswordBottomSheet(
     val coroutineScope = rememberCoroutineScope()
     ModalBottomSheet(
         onDismissRequest = {
-            coroutineScope.launch {
-                bottomSheetState.hide()
-                onDismiss()
-            }
-        },
-        sheetState = bottomSheetState,
-        dragHandle = null,
-        content = {
-            AddPasswordScreen(
-                onClose = {
-                    coroutineScope.launch {
-                        bottomSheetState.hide()
-                        onDismiss()
-                    }
-                },
-                viewModel = viewModel()
-            )
-        },
-        modifier = Modifier.statusBarsPadding()
+        coroutineScope.launch {
+            bottomSheetState.hide()
+            onDismiss()
+        }
+    }, sheetState = bottomSheetState, dragHandle = null, content = {
+        AddPasswordScreen(
+            onClose = {
+                coroutineScope.launch {
+                    bottomSheetState.hide()
+                    onDismiss()
+                }
+            }, viewModel = viewModel()
+        )
+    }, modifier = Modifier.statusBarsPadding()
     )
 }
 
 @Composable
 fun AddPasswordScreen(
-    onClose: () -> Unit,
-    viewModel: AddPasswordViewModel,
-    modifier: Modifier = Modifier
+    onClose: () -> Unit, viewModel: AddPasswordViewModel, modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
@@ -106,9 +99,10 @@ fun AddPasswordScreen(
                 .padding(bottom = 12.dp)
         ) {
             IconButton(
-                onClick = onClose,
-                modifier = Modifier
-                    .size(dimensionResource(R.dimen.min_clickable_size))
+                onClick = {
+// TODO: dialog of confirmation
+                    onClose()
+                }, modifier = Modifier.size(dimensionResource(R.dimen.min_clickable_size))
             ) {
                 Icon(
                     Icons.Outlined.Clear,
@@ -136,13 +130,13 @@ fun AddPasswordScreen(
                 }
                 VaultDropDownMenu(
                     vaults = List(5) {
-                        Vault(
-                            vaultId = it.toString(),
-                            userId = "someUser",
-                            vaultName = "Vault name",
-                            imageVector = Icons.Outlined.Home
-                        )
-                    },
+                    Vault(
+                        vaultId = it.toString(),
+                        userId = "someUser",
+                        vaultName = "Vault name",
+                        imageVector = Icons.Outlined.Home
+                    )
+                },
                     vaultDropDownExpanded = viewModel.vaultMenuExpanded,
                     onMenuDismiss = { viewModel.toggleVaultMenuExpantion() },
                     onVaultClick = {
@@ -173,8 +167,7 @@ fun AddPasswordScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            leadingIcon = { Icon(Icons.Outlined.AccountBox, contentDescription = "Username") }
-        )
+            leadingIcon = { Icon(Icons.Outlined.AccountBox, contentDescription = "Username") })
 
         ShowAndHidePasswordTextField(
             label = "Password",
@@ -193,16 +186,14 @@ fun AddPasswordScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            leadingIcon = { Icon(Icons.Outlined.Language, contentDescription = "Website") }
-        )
+            leadingIcon = { Icon(Icons.Outlined.Language, contentDescription = "Website") })
         OutlinedTextField(
             label = { Text("Notes") },
             value = viewModel.notes,
             onValueChange = { viewModel.onNotesChange(it) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             modifier = Modifier.fillMaxWidth(),
-            leadingIcon = { Icon(Icons.Outlined.Description, contentDescription = "Notes") }
-        )
+            leadingIcon = { Icon(Icons.Outlined.Description, contentDescription = "Notes") })
     }
 }
 
@@ -234,8 +225,7 @@ fun VaultDropDownMenu(
                     } else {
                         null
                     }
-                }
-            )
+                })
         }
     }
 }
