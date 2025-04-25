@@ -19,6 +19,8 @@ class AddPasswordViewModel : ViewModel() {
         private set
     var notes by mutableStateOf("") //optional
         private set
+    var vaultMenuExpanded by mutableStateOf(false)
+        private set
 
     fun onTitleChange(title: String) {
         this.title = title
@@ -42,6 +44,10 @@ class AddPasswordViewModel : ViewModel() {
 
     fun onNotesChange(notes: String) {
         this.notes = notes
+    }
+
+    fun toggleVaultMenuExpantion() {
+        this.vaultMenuExpanded = !this.vaultMenuExpanded
     }
 
     var titleError by mutableStateOf("")

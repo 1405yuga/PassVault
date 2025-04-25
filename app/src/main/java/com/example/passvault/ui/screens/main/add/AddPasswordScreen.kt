@@ -1,5 +1,6 @@
 package com.example.passvault.ui.screens.main.add
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +25,8 @@ import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Password
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,6 +44,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.passvault.R
+import com.example.passvault.data.Vault
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ShowAndHidePasswordTextField
@@ -52,7 +56,7 @@ import kotlinx.coroutines.launch
 fun AddPasswordBottomSheet(
     onDismiss: () -> Unit
 ) {
-    val bottomSheetState = rememberModalBottomSheetState()
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     ModalBottomSheet(
         onDismissRequest = {
@@ -96,7 +100,6 @@ fun AddPasswordScreen(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-//            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 12.dp)
@@ -112,21 +115,40 @@ fun AddPasswordScreen(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            Button(
-                onClick = {
-                    // TODO: get vault
-                },
-                modifier = Modifier.height(dimensionResource(R.dimen.min_clickable_size)),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.secondaryContainer
+            Box {
+                Button(
+                    onClick = {
+                        // TODO: get vault list
+                        viewModel.toggleVaultMenuExpantion()
+                    },
+                    modifier = Modifier.height(dimensionResource(R.dimen.min_clickable_size)),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                ) {
+                    Icon(Icons.Outlined.Home, contentDescription = null)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = "Personal")
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(Icons.Outlined.KeyboardArrowDown, contentDescription = "Get vault")
+                }
+                VaultDropDownMenu(
+                    vaults = List(5) {
+                        Vault(
+                            vaultId = it.toString(),
+                            userId = "someUser",
+                            vaultName = "Vault name",
+                            imageVector = Icons.Outlined.Home
+                        )
+                    },
+                    vaultDropDownExpanded = viewModel.vaultMenuExpanded,
+                    onMenuDismiss = { viewModel.toggleVaultMenuExpantion() },
+                    onVaultClick = {
+                        // TODO: get vault
+                        viewModel.toggleVaultMenuExpantion()
+                    }
                 )
-            ) {
-                Icon(Icons.Outlined.Home, contentDescription = null)
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(text = "Personal")
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(Icons.Outlined.KeyboardArrowDown, contentDescription = "Get vault")
             }
             Spacer(modifier = Modifier.padding(4.dp))
             Button(
@@ -178,6 +200,30 @@ fun AddPasswordScreen(
             modifier = Modifier.fillMaxWidth(),
             leadingIcon = { Icon(Icons.Outlined.Description, contentDescription = "Notes") }
         )
+    }
+}
+
+@Composable
+fun VaultDropDownMenu(
+    vaults: List<Vault>,
+    vaultDropDownExpanded: Boolean,
+    onMenuDismiss: () -> Unit,
+    onVaultClick: () -> Unit
+) {
+    DropdownMenu(
+        expanded = vaultDropDownExpanded,
+        onDismissRequest = onMenuDismiss
+    ) {
+        vaults.forEach { option ->
+            DropdownMenuItem(
+                text = { Text(option.vaultName) },
+                leadingIcon = { Icon(imageVector = option.imageVector, contentDescription = null) },
+                onClick = {
+                    // TODO:
+                    onVaultClick()
+                }
+            )
+        }
     }
 }
 
