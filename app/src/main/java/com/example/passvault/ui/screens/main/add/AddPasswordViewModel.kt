@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.passvault.data.Vault
 
 class AddPasswordViewModel : ViewModel() {
 
@@ -20,6 +21,8 @@ class AddPasswordViewModel : ViewModel() {
     var notes by mutableStateOf("") //optional
         private set
     var vaultMenuExpanded by mutableStateOf(false)
+        private set
+    var selectedVault by mutableStateOf(Vault.defaultVault())
         private set
 
     fun onTitleChange(title: String) {
@@ -48,6 +51,10 @@ class AddPasswordViewModel : ViewModel() {
 
     fun toggleVaultMenuExpantion() {
         this.vaultMenuExpanded = !this.vaultMenuExpanded
+    }
+
+    fun onSelectedVaultChange(vault: Vault) {
+        this.selectedVault = vault
     }
 
     var titleError by mutableStateOf("")

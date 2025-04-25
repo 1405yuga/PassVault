@@ -17,6 +17,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBox
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Home
@@ -127,9 +128,9 @@ fun AddPasswordScreen(
                         contentColor = MaterialTheme.colorScheme.secondaryContainer
                     )
                 ) {
-                    Icon(Icons.Outlined.Home, contentDescription = null)
+                    Icon(viewModel.selectedVault.imageVector, contentDescription = null)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "Personal")
+                    Text(text = viewModel.selectedVault.vaultName)
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(Icons.Outlined.KeyboardArrowDown, contentDescription = "Get vault")
                 }
@@ -146,8 +147,10 @@ fun AddPasswordScreen(
                     onMenuDismiss = { viewModel.toggleVaultMenuExpantion() },
                     onVaultClick = {
                         // TODO: get vault
+                        viewModel.onSelectedVaultChange(it)
                         viewModel.toggleVaultMenuExpantion()
-                    }
+                    },
+                    selectedVault = viewModel.selectedVault
                 )
             }
             Spacer(modifier = Modifier.padding(4.dp))
@@ -208,11 +211,14 @@ fun VaultDropDownMenu(
     vaults: List<Vault>,
     vaultDropDownExpanded: Boolean,
     onMenuDismiss: () -> Unit,
-    onVaultClick: () -> Unit
+    onVaultClick: (vault: Vault) -> Unit,
+    selectedVault: Vault,
+    modifier: Modifier = Modifier
 ) {
     DropdownMenu(
         expanded = vaultDropDownExpanded,
-        onDismissRequest = onMenuDismiss
+        onDismissRequest = onMenuDismiss,
+        modifier = modifier.padding(horizontal = 4.dp)
     ) {
         vaults.forEach { option ->
             DropdownMenuItem(
@@ -220,7 +226,14 @@ fun VaultDropDownMenu(
                 leadingIcon = { Icon(imageVector = option.imageVector, contentDescription = null) },
                 onClick = {
                     // TODO:
-                    onVaultClick()
+                    onVaultClick(option)
+                },
+                trailingIcon = {
+                    if (selectedVault == option) {
+                        Icon(Icons.Outlined.Check, contentDescription = "Selected vault")
+                    } else {
+                        null
+                    }
                 }
             )
         }
