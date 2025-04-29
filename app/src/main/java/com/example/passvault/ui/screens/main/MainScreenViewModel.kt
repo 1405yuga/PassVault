@@ -21,12 +21,6 @@ class MainScreenViewModel : ViewModel() {
     var showBottomSheet by mutableStateOf(true)
         private set
 
-    val mainScreenMenusItems = listOf<MainScreenMenus>(
-        MainScreenMenus.List,
-        MainScreenMenus.Add,
-        MainScreenMenus.Profile
-    )
-
     fun onAddPasswordBottomSheetDismiss() {
         onMenuSelected(mainScreenMenus = lastNonAddMenu)
         showBottomSheet = false
@@ -44,6 +38,7 @@ class MainScreenViewModel : ViewModel() {
 
 sealed class MainScreenMenus(val route: String, val icon: ImageVector) {
     object List : MainScreenMenus(route = "List", icon = Icons.AutoMirrored.Outlined.List)
+    object AddVault : MainScreenMenus(route = "Add Vault", icon = Icons.Outlined.Add)
     object Add : MainScreenMenus(route = "Add", icon = Icons.Outlined.Add)
     object Profile : MainScreenMenus(route = "Profile", icon = Icons.Filled.Person)
 }

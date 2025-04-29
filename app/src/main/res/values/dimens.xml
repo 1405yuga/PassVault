@@ -8,4 +8,6 @@
     <dimen name="small_spacer_height">12dp</dimen>
     <dimen name="medium_spacer_height">20dp</dimen>
     <dimen name="large_spacer_height">28dp</dimen>
+    <dimen name="menu_small_padding">8dp</dimen>
+    <dimen name="menu_medium_padding">16dp</dimen>
 </resources>

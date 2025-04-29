@@ -20,10 +20,20 @@ val AppTypography = Typography(
         fontWeight = FontWeight.Bold,
         fontSize = 24.sp
     ),
+    bodyLarge = TextStyle(
+        fontFamily = poppinsFont,
+        fontWeight = FontWeight.Normal,
+        fontSize = 22.sp
+    ),
     bodyMedium = TextStyle(
         fontFamily = poppinsFont,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp
+    ),
+    bodySmall = TextStyle(
+        fontFamily = poppinsFont,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp
     ),
     labelMedium = TextStyle(
         fontFamily = poppinsFont,
