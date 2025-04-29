@@ -90,33 +90,65 @@ fun VaultHomeScreen(navController: NavController, viewModel: MainScreenViewModel
                         bottom = dimensionResource(R.dimen.menu_small_padding)
                     )
                 )
-                NavigationDrawerItem(
-                    label = {
-                        Column {
-                            Text(
-                                text = NavDrawerMenus.List.label,
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Text(
-                                text = "0 items",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    },
-                    selected = viewModel.currentSelectedMenu == NavDrawerMenus.List,
-                    onClick = {
-                        viewModel.onMenuSelected(NavDrawerMenus.List)
-                        scope.launch { drawerState.close() }
-                    },
-                    icon = { Icon(NavDrawerMenus.List.icon, contentDescription = null) },
-                    modifier = Modifier.padding(
-                        start = dimensionResource(R.dimen.medium_padding),
-                        end = dimensionResource(R.dimen.medium_padding),
-                        bottom = dimensionResource(R.dimen.medium_padding)
-                    ),
-                    shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius))
-                )
+//                NavigationDrawerItem(
+//                    label = {
+//                        Column {
+//                            Text(
+//                                text = NavDrawerMenus.List.label,
+//                                style = MaterialTheme.typography.bodyLarge
+//                            )
+//                            Text(
+//                                text = "0 items",
+//                                style = MaterialTheme.typography.bodySmall,
+//                                color = MaterialTheme.colorScheme.onSurfaceVariant
+//                            )
+//                        }
+//                    },
+//                    selected = viewModel.currentSelectedMenu == NavDrawerMenus.List,
+//                    onClick = {
+//                        viewModel.onMenuSelected(NavDrawerMenus.List)
+//                        scope.launch { drawerState.close() }
+//                    },
+//                    icon = { Icon(NavDrawerMenus.List.icon, contentDescription = null) },
+//                    modifier = Modifier.padding(
+//                        start = dimensionResource(R.dimen.medium_padding),
+//                        end = dimensionResource(R.dimen.medium_padding),
+//                        bottom = dimensionResource(R.dimen.medium_padding)
+//                    ),
+//                    shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius))
+//                )
+
+                viewModel.dummyVaultList.forEach {
+                    val vaultMenu = NavDrawerMenus.VaultItem(vault = it)
+                    NavigationDrawerItem(
+                        label = {
+                            Column {
+                                Text(
+                                    text = vaultMenu.label,
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                                Text(
+                                    text = "0 items",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        },
+                        selected = viewModel.lastVaultMenu == vaultMenu,
+                        onClick = {
+                            viewModel.onMenuSelected(vaultMenu)
+                            scope.launch { drawerState.close() }
+                        },
+                        icon = { Icon(vaultMenu.icon, contentDescription = null) },
+                        modifier = Modifier.padding(
+                            start = dimensionResource(R.dimen.medium_padding),
+                            end = dimensionResource(R.dimen.medium_padding),
+                            bottom = dimensionResource(R.dimen.medium_padding)
+                        ),
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius))
+                    )
+
+                }
                 NavigationDrawerItem(
                     label = {
                         Text(
@@ -146,7 +178,7 @@ fun VaultHomeScreen(navController: NavController, viewModel: MainScreenViewModel
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
-                    selected = viewModel.currentSelectedMenu == NavDrawerMenus.Profile,
+                    selected = false,
                     onClick = {
                         viewModel.onMenuSelected(NavDrawerMenus.Profile)
                         scope.launch { drawerState.close() }
@@ -175,7 +207,7 @@ fun VaultHomeScreen(navController: NavController, viewModel: MainScreenViewModel
                     navigationIcon = {
                         IconButton(onClick = {
                             scope.launch { drawerState.open() }
-                        }) { Icon(viewModel.currentSelectedMenu.icon, contentDescription = "Menu") }
+                        }) { Icon(viewModel.lastVaultMenu.icon, contentDescription = "Menu") }
                     })
             },
             content = { innerPadding ->
@@ -186,15 +218,12 @@ fun VaultHomeScreen(navController: NavController, viewModel: MainScreenViewModel
                         .padding(horizontal = dimensionResource(R.dimen.medium_padding))
                 ) {
                     // TODO: load screen when vault menu clicked
-                    when (viewModel.currentSelectedMenu) {
-                        NavDrawerMenus.List -> PasswordsListScreen(onAddClick = {
+                    PasswordsListScreen(
+                        onAddClick = {
                             navController.navigate(
                                 MainScreens.AddPassword.route
                             )
                         })
-
-                        else -> {}
-                    }
                 }
             }
         )
