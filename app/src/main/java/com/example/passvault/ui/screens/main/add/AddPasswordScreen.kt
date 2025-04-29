@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -28,16 +27,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -50,33 +45,33 @@ import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ShowAndHidePasswordTextField
 import com.example.passvault.utils.custom_composables.TextFieldWithErrorText
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AddPasswordBottomSheet(
-    onDismiss: () -> Unit
-) {
-    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val coroutineScope = rememberCoroutineScope()
-    ModalBottomSheet(
-        onDismissRequest = {
-        coroutineScope.launch {
-            bottomSheetState.hide()
-            onDismiss()
-        }
-    }, sheetState = bottomSheetState, dragHandle = null, content = {
-        AddPasswordScreen(
-            onClose = {
-                coroutineScope.launch {
-                    bottomSheetState.hide()
-                    onDismiss()
-                }
-            }, viewModel = viewModel()
-        )
-    }, modifier = Modifier.statusBarsPadding()
-    )
-}
+//
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun AddPasswordBottomSheet(
+//    onDismiss: () -> Unit
+//) {
+//    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+//    val coroutineScope = rememberCoroutineScope()
+//    ModalBottomSheet(
+//        onDismissRequest = {
+//        coroutineScope.launch {
+//            bottomSheetState.hide()
+//            onDismiss()
+//        }
+//    }, sheetState = bottomSheetState, dragHandle = null, content = {
+//        AddPasswordScreen(
+//            onClose = {
+//                coroutineScope.launch {
+//                    bottomSheetState.hide()
+//                    onDismiss()
+//                }
+//            }, viewModel = viewModel()
+//        )
+//    }, modifier = Modifier.statusBarsPadding()
+//    )
+//}
 
 @Composable
 fun AddPasswordScreen(
@@ -130,13 +125,13 @@ fun AddPasswordScreen(
                 }
                 VaultDropDownMenu(
                     vaults = List(5) {
-                    Vault(
-                        vaultId = it.toString(),
-                        userId = "someUser",
-                        vaultName = "Vault name",
-                        imageVector = Icons.Outlined.Home
-                    )
-                },
+                        Vault(
+                            vaultId = it.toString(),
+                            userId = "someUser",
+                            vaultName = "Vault name",
+                            imageVector = Icons.Outlined.Home
+                        )
+                    },
                     vaultDropDownExpanded = viewModel.vaultMenuExpanded,
                     onMenuDismiss = { viewModel.toggleVaultMenuExpantion() },
                     onVaultClick = {

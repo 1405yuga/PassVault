@@ -12,33 +12,32 @@ import androidx.lifecycle.ViewModel
 
 class MainScreenViewModel : ViewModel() {
 
-    var currentSelectedMenu by mutableStateOf<MainScreenMenus>(MainScreenMenus.List)
+    var currentSelectedMenu by mutableStateOf<NavDrawerMenus>(NavDrawerMenus.List)
         private set
 
-    var lastNonAddMenu by mutableStateOf<MainScreenMenus>(currentSelectedMenu)
-        private set
+//    var nonVaultMenu by mutableStateOf<NavDrawerMenus>(currentSelectedMenu)
+//        private set
 
-    var showBottomSheet by mutableStateOf(true)
-        private set
-
-    fun onAddPasswordBottomSheetDismiss() {
-        onMenuSelected(mainScreenMenus = lastNonAddMenu)
-        showBottomSheet = false
-    }
-
-    fun onMenuSelected(mainScreenMenus: MainScreenMenus) {
-        lastNonAddMenu = if (mainScreenMenus is MainScreenMenus.Add) {
-            currentSelectedMenu
-        } else {
-            mainScreenMenus
-        }
-        currentSelectedMenu = mainScreenMenus
+    fun onMenuSelected(navDrawerMenus: NavDrawerMenus) {
+//        nonVaultMenu =
+//            if ((navDrawerMenus !is NavDrawerMenus.AddVault) or (navDrawerMenus !is NavDrawerMenus.Profile)) {
+//                currentSelectedMenu
+//            } else {
+//                navDrawerMenus
+//            }
+        currentSelectedMenu = navDrawerMenus
     }
 }
 
-sealed class MainScreenMenus(val route: String, val icon: ImageVector) {
-    object List : MainScreenMenus(route = "List", icon = Icons.AutoMirrored.Outlined.List)
-    object AddVault : MainScreenMenus(route = "Add Vault", icon = Icons.Outlined.Add)
-    object Add : MainScreenMenus(route = "Add", icon = Icons.Outlined.Add)
-    object Profile : MainScreenMenus(route = "Profile", icon = Icons.Filled.Person)
+sealed class NavDrawerMenus(val label: String, val icon: ImageVector) {
+    object List : NavDrawerMenus(label = "List", icon = Icons.AutoMirrored.Outlined.List)
+    object AddVault : NavDrawerMenus(label = "Add Vault", icon = Icons.Outlined.Add)
+    object Profile : NavDrawerMenus(label = "Profile", icon = Icons.Filled.Person)
+}
+
+sealed class MainScreens(val route: String) {
+    object VaultHome : MainScreens(route = "VaultHome")
+    object AddVault : MainScreens(route = "Add Vault")
+    object AddPassword : MainScreens(route = "AddPassword")
+    object Profile : MainScreens(route = "Profile")
 }

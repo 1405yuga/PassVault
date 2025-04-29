@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -28,8 +26,12 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.passvault.R
-import com.example.passvault.ui.screens.main.add.AddPasswordBottomSheet
+import com.example.passvault.ui.screens.main.add.AddPasswordScreen
 import com.example.passvault.ui.screens.main.list.PasswordsListScreen
 import com.example.passvault.ui.screens.main.profile.ProfileScreen
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
@@ -39,7 +41,32 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(viewModel: MainScreenViewModel) {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = MainScreens.VaultHome.route) {
+        composable(route = MainScreens.VaultHome.route) {
+            VaultHomeScreen(navController = navController, viewModel = viewModel)
+        }
+        composable(route = MainScreens.AddPassword.route) {
+            AddPasswordScreen(
+                onClose = { navController.popBackStack() },
+                viewModel = viewModel(),
+                modifier = Modifier
+            )
+        }
+        composable(route = MainScreens.AddVault.route) {
+            // TODO: create screen
+        }
+        composable(route = MainScreens.Profile.route) {
+            ProfileScreen()
+        }
+
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun VaultHomeScreen(navController: NavController, viewModel: MainScreenViewModel) {
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -67,7 +94,7 @@ fun MainScreen(viewModel: MainScreenViewModel) {
                     label = {
                         Column {
                             Text(
-                                text = MainScreenMenus.List.route,
+                                text = NavDrawerMenus.List.label,
                                 style = MaterialTheme.typography.bodyLarge
                             )
                             Text(
@@ -77,12 +104,12 @@ fun MainScreen(viewModel: MainScreenViewModel) {
                             )
                         }
                     },
-                    selected = viewModel.currentSelectedMenu == MainScreenMenus.List,
+                    selected = viewModel.currentSelectedMenu == NavDrawerMenus.List,
                     onClick = {
-                        viewModel.onMenuSelected(MainScreenMenus.List)
+                        viewModel.onMenuSelected(NavDrawerMenus.List)
                         scope.launch { drawerState.close() }
                     },
-                    icon = { Icon(MainScreenMenus.List.icon, contentDescription = null) },
+                    icon = { Icon(NavDrawerMenus.List.icon, contentDescription = null) },
                     modifier = Modifier.padding(
                         start = dimensionResource(R.dimen.medium_padding),
                         end = dimensionResource(R.dimen.medium_padding),
@@ -93,16 +120,16 @@ fun MainScreen(viewModel: MainScreenViewModel) {
                 NavigationDrawerItem(
                     label = {
                         Text(
-                            text = MainScreenMenus.AddVault.route,
+                            text = NavDrawerMenus.AddVault.label,
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
                     selected = false,
                     onClick = {
-                        viewModel.onMenuSelected(MainScreenMenus.AddVault)
+                        viewModel.onMenuSelected(NavDrawerMenus.AddVault)
                         scope.launch { drawerState.close() }
                     },
-                    icon = { Icon(MainScreenMenus.AddVault.icon, contentDescription = null) },
+                    icon = { Icon(NavDrawerMenus.AddVault.icon, contentDescription = null) },
                     modifier = Modifier
                         .padding(
                             horizontal = dimensionResource(R.dimen.medium_padding),
@@ -115,16 +142,17 @@ fun MainScreen(viewModel: MainScreenViewModel) {
                 NavigationDrawerItem(
                     label = {
                         Text(
-                            text = MainScreenMenus.Profile.route,
+                            text = NavDrawerMenus.Profile.label,
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
-                    selected = viewModel.currentSelectedMenu == MainScreenMenus.Profile,
+                    selected = viewModel.currentSelectedMenu == NavDrawerMenus.Profile,
                     onClick = {
-                        viewModel.onMenuSelected(MainScreenMenus.Profile)
+                        viewModel.onMenuSelected(NavDrawerMenus.Profile)
                         scope.launch { drawerState.close() }
+                        navController.navigate(MainScreens.Profile.route)
                     },
-                    icon = { Icon(MainScreenMenus.Profile.icon, contentDescription = null) },
+                    icon = { Icon(NavDrawerMenus.Profile.icon, contentDescription = null) },
                     modifier = Modifier.padding(
                         start = dimensionResource(R.dimen.medium_padding),
                         end = dimensionResource(R.dimen.medium_padding),
@@ -147,7 +175,7 @@ fun MainScreen(viewModel: MainScreenViewModel) {
                     navigationIcon = {
                         IconButton(onClick = {
                             scope.launch { drawerState.open() }
-                        }) { Icon(Icons.Default.Menu, contentDescription = "Menu") }
+                        }) { Icon(viewModel.currentSelectedMenu.icon, contentDescription = "Menu") }
                     })
             },
             content = { innerPadding ->
@@ -157,22 +185,21 @@ fun MainScreen(viewModel: MainScreenViewModel) {
                         .padding(innerPadding)
                         .padding(horizontal = dimensionResource(R.dimen.medium_padding))
                 ) {
-                    //todo: add animations on switch
-                    when (viewModel.lastNonAddMenu) {
-                        MainScreenMenus.List -> PasswordsListScreen()
-                        MainScreenMenus.Profile -> ProfileScreen()
-                        else -> {}
-                    }
-
-                    if (viewModel.currentSelectedMenu == MainScreenMenus.Add) {
-                        AddPasswordBottomSheet(onDismiss = {
-                            viewModel.onAddPasswordBottomSheetDismiss()
+                    // TODO: load screen when vault menu clicked
+                    when (viewModel.currentSelectedMenu) {
+                        NavDrawerMenus.List -> PasswordsListScreen(onAddClick = {
+                            navController.navigate(
+                                MainScreens.AddPassword.route
+                            )
                         })
+
+                        else -> {}
                     }
                 }
             }
         )
     }
+
 }
 
 @Composable
