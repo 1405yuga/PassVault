@@ -59,6 +59,13 @@ class VaultHomeViewModel : ViewModel() {
         currentSelectedMenu = navDrawerMenus
     }
 
+    var showCreateVaultDialog by mutableStateOf(false)
+        private set
+
+    fun toggleCreateVaultDialog(showDialog: Boolean) {
+        this.showCreateVaultDialog = showDialog
+    }
+
 }
 
 sealed class NavDrawerMenus(val label: String, val icon: ImageVector) {
