@@ -8,11 +8,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Favorite
@@ -59,11 +62,14 @@ fun AddVaultDialog(
         Surface(
             shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius)),
             color = MaterialTheme.colorScheme.surfaceContainerLow,
-            modifier = Modifier
-                .fillMaxWidth()
-//                .padding(horizontal = dimensionResource(R.dimen.large_padding))
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(20.dp)) {
+            Column(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .verticalScroll(rememberScrollState())
+                    .height(400.dp)
+            ) {
                 Text(
                     text = "Add Vault",
                     style = MaterialTheme.typography.headlineMedium.copy(
@@ -96,7 +102,8 @@ fun AddVaultDialog(
                     onClick = { onAddVaultClick() },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(dimensionResource(R.dimen.min_clickable_size)),
+                        .height(dimensionResource(R.dimen.min_clickable_size))
+                        .widthIn(min = dimensionResource(R.dimen.min_clickable_size)),
                     shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius))
                 ) {
                     Text(text = "Add")
