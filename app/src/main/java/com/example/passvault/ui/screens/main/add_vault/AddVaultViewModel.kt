@@ -1,14 +1,14 @@
 package com.example.passvault.ui.screens.main.add_vault
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.PermMedia
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Work
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -19,12 +19,12 @@ class AddVaultViewModel : ViewModel() {
     val iconList = listOf(
         Icons.Default.Home,
         Icons.Default.Person,
+        Icons.Default.Language,
+        Icons.Default.Work,
         Icons.Default.Lock,
-        Icons.Default.Email,
-        Icons.Default.Star,
-        Icons.Default.Phone,
-        Icons.Default.ShoppingCart,
-        Icons.Default.Settings
+        Icons.Default.AttachMoney,
+        Icons.Default.Favorite,
+        Icons.Default.PermMedia,
     )
 
     var vaultName by mutableStateOf("")
