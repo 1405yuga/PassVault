@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 @Composable
 fun ProfileScreen(
 ) {
-    Column (modifier = Modifier.fillMaxSize()){
+    Column(modifier = Modifier.fillMaxSize()) {
         Text("Profile..")
         Button(onClick = {}) {
             Text("Logout")
