@@ -73,7 +73,7 @@ fun AddVaultDialog(
                 Text(
                     text = "Add Vault",
                     style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                 )
