@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.passvault.R
 import com.example.passvault.ui.screens.main.add_vault.AddVaultDialog
@@ -175,7 +176,7 @@ fun VaultHomeScreen(
                         })
                     if (viewModel.showCreateVaultDialog) {
                         AddVaultDialog(
-                            addVaultViewModel = viewModel(),
+                            addVaultViewModel = hiltViewModel(),
                             setShowDialog = { viewModel.toggleCreateVaultDialog(it) },
                             onAddVaultClick = {
                                 // TODO:  

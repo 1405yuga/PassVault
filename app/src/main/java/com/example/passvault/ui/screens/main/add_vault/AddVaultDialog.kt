@@ -99,7 +99,10 @@ fun AddVaultDialog(
                 )
                 Spacer(modifier = Modifier.size(24.dp))
                 Button(
-                    onClick = { onAddVaultClick() },
+                    onClick = {
+//                        onAddVaultClick()
+                        addVaultViewModel.addNewVault()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(dimensionResource(R.dimen.min_clickable_size))

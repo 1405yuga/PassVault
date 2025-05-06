@@ -14,8 +14,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.passvault.data.Vault
+import com.example.passvault.network.supabase.VaultRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AddVaultViewModel : ViewModel() {
+@HiltViewModel
+class AddVaultViewModel @Inject constructor(private val vaultRepository: VaultRepository) :
+    ViewModel() {
     val iconList = listOf(
         Icons.Default.Home,
         Icons.Default.Person,
@@ -46,6 +54,18 @@ class AddVaultViewModel : ViewModel() {
     private fun checkInputFields(): Boolean {
         vaultNameError = if (vaultName.trim().isBlank()) "Vault Name is required" else ""
         return vaultNameError.isBlank()
+    }
+
+    fun addNewVault() {
+        if (!checkInputFields()) return
+        viewModelScope.launch {
+            vaultRepository.insertVault(
+                vault = Vault(
+                    vaultName = this@AddVaultViewModel.vaultName,
+                    iconKey = this@AddVaultViewModel.currentSelectedIcon.name
+                )
+            )
+        }
     }
 
     fun clearInputs() {
