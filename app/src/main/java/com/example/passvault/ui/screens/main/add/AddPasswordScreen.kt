@@ -45,6 +45,7 @@ import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ShowAndHidePasswordTextField
 import com.example.passvault.utils.custom_composables.TextFieldWithErrorText
+import com.example.passvault.utils.extension_functions.toOutlinedIcon
 
 //
 //@OptIn(ExperimentalMaterial3Api::class)
@@ -117,7 +118,10 @@ fun AddPasswordScreen(
                         contentColor = MaterialTheme.colorScheme.secondaryContainer
                     )
                 ) {
-                    Icon(viewModel.selectedVault.imageVector, contentDescription = null)
+                    Icon(
+                        imageVector = viewModel.selectedVault.iconKey.toOutlinedIcon(),
+                        contentDescription = viewModel.selectedVault.iconKey
+                    )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(text = viewModel.selectedVault.vaultName)
                     Spacer(modifier = Modifier.width(4.dp))
@@ -126,10 +130,11 @@ fun AddPasswordScreen(
                 VaultDropDownMenu(
                     vaults = List(5) {
                         Vault(
-                            vaultId = it.toString(),
+                            vaultId = it.toLong(),
                             userId = "someUser",
                             vaultName = "Vault name",
-                            imageVector = Icons.Outlined.Home
+                            iconKey = Icons.Outlined.Home.name,
+                            createdAt = ""
                         )
                     },
                     vaultDropDownExpanded = viewModel.vaultMenuExpanded,
@@ -209,7 +214,12 @@ fun VaultDropDownMenu(
         vaults.forEach { option ->
             DropdownMenuItem(
                 text = { Text(option.vaultName) },
-                leadingIcon = { Icon(imageVector = option.imageVector, contentDescription = null) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = option.iconKey.toOutlinedIcon(),
+                        contentDescription = null
+                    )
+                },
                 onClick = {
                     // TODO:
                     onVaultClick(option)

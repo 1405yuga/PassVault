@@ -1,10 +1,6 @@
 package com.example.passvault.ui.screens.main.vault_home
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.runtime.getValue
@@ -13,32 +9,37 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import com.example.passvault.data.Vault
+import com.example.passvault.utils.extension_functions.toOutlinedIcon
 
 class VaultHomeViewModel : ViewModel() {
     val dummyVaultList = listOf(
         Vault(
-            vaultId = "1",
+            vaultId = 0L,
             userId = "123",
             vaultName = "Personal",
-            imageVector = Icons.Default.Home
+            iconKey = "Home",
+            createdAt = ""
         ),
         Vault(
-            vaultId = "2",
+            vaultId = 0L,
             userId = "123",
             vaultName = "Websites",
-            imageVector = Icons.Default.Language
+            iconKey = "Language",
+            createdAt = ""
         ),
         Vault(
-            vaultId = "1",
+            vaultId = 0L,
             userId = "123",
             vaultName = "Favourites",
-            imageVector = Icons.Default.Favorite
+            iconKey = "Favorite",
+            createdAt = ""
         ),
         Vault(
-            vaultId = "1",
+            vaultId = 0L,
             userId = "123",
             vaultName = "Important",
-            imageVector = Icons.Default.Lock
+            iconKey = "Lock",
+            createdAt = "",
         )
 
     )
@@ -70,7 +71,7 @@ class VaultHomeViewModel : ViewModel() {
 
 sealed class NavDrawerMenus(val label: String, val icon: ImageVector) {
     data class VaultItem(val vault: Vault) :
-        NavDrawerMenus(label = vault.vaultName, icon = vault.imageVector)
+        NavDrawerMenus(label = vault.vaultName, icon = vault.iconKey.toOutlinedIcon())
 
     object AddVault : NavDrawerMenus(label = "Add Vault", icon = Icons.Outlined.Add)
     object Profile : NavDrawerMenus(label = "Profile", icon = Icons.Filled.Person)
