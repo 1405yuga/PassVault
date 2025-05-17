@@ -17,13 +17,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passvault.data.Vault
 import com.example.passvault.network.supabase.VaultRepository
+import com.example.passvault.utils.state.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AddVaultViewModel @Inject constructor(private val vaultRepository: VaultRepository) :
     ViewModel() {
+
+    private val _screenState = MutableStateFlow<ScreenState<String>>(ScreenState.PreLoad())
+    val screenState: StateFlow<ScreenState<String>> = _screenState
+
     var vaultName by mutableStateOf("")
         private set
 
@@ -47,13 +54,20 @@ class AddVaultViewModel @Inject constructor(private val vaultRepository: VaultRe
 
     fun addNewVault() {
         if (!checkInputFields()) return
+        _screenState.value = ScreenState.Loading()
         viewModelScope.launch {
-            vaultRepository.insertVault(
-                vault = Vault(
-                    vaultName = this@AddVaultViewModel.vaultName,
-                    iconKey = this@AddVaultViewModel.currentSelectedIcon.name
+            _screenState.value = try {
+                vaultRepository.insertVault(
+                    vault = Vault(
+                        vaultName = this@AddVaultViewModel.vaultName,
+                        iconKey = this@AddVaultViewModel.currentSelectedIcon.name
+                    )
                 )
-            )
+                ScreenState.Loaded("Added vault successfully")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                ScreenState.Error("Unable to add vault")
+            }
         }
     }
 
@@ -61,6 +75,7 @@ class AddVaultViewModel @Inject constructor(private val vaultRepository: VaultRe
         vaultName = ""
         vaultNameError = ""
         currentSelectedIcon = IconsList.getIconsList()[0]
+        _screenState.value = ScreenState.PreLoad()
     }
 }
 

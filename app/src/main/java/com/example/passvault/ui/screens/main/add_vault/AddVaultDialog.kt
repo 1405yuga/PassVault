@@ -1,5 +1,6 @@
 package com.example.passvault.ui.screens.main.add_vault
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,9 +36,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -47,6 +52,7 @@ import com.example.passvault.R
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.TextFieldWithErrorText
+import com.example.passvault.utils.state.ScreenState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,6 +60,9 @@ fun AddVaultDialog(
     addVaultViewModel: AddVaultViewModel,
     setShowDialog: (Boolean) -> Unit,
 ) {
+    val screenState by addVaultViewModel.screenState.collectAsState()
+    val currentContext = LocalContext.current
+
     Dialog(onDismissRequest = {
         setShowDialog(false)
         addVaultViewModel.clearInputs()
@@ -105,10 +114,29 @@ fun AddVaultDialog(
                         .fillMaxWidth()
                         .height(dimensionResource(R.dimen.min_clickable_size))
                         .widthIn(min = dimensionResource(R.dimen.min_clickable_size)),
-                    shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius))
+                    shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius)),
+                    enabled = screenState !is ScreenState.Loading
                 ) {
-                    Text(text = "Add")
+                    Text(
+                        text =
+                            if (screenState is ScreenState.Loading) "Loading.." else "Add"
+                    )
                 }
+            }
+        }
+        LaunchedEffect(screenState) {
+            when (val state = screenState) {
+                is ScreenState.Error -> {
+                    Toast.makeText(currentContext, state.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is ScreenState.Loaded -> {
+                    Toast.makeText(currentContext, state.result, Toast.LENGTH_SHORT).show()
+                    addVaultViewModel.clearInputs()
+                    setShowDialog(false)
+                }
+
+                else -> {}
             }
         }
     }
