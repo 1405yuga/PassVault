@@ -1,5 +1,6 @@
 package com.example.passvault.ui.screens.main.vault_home
 
+import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Add
@@ -8,49 +9,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.passvault.data.Vault
+import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.utils.extension_functions.toOutlinedIcon
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class VaultHomeViewModel : ViewModel() {
-    val dummyVaultList = listOf(
-        Vault(
-            vaultId = 0L,
-            userId = "123",
-            vaultName = "Personal",
-            iconKey = "Home",
-            createdAt = ""
-        ),
-        Vault(
-            vaultId = 0L,
-            userId = "123",
-            vaultName = "Websites",
-            iconKey = "Language",
-            createdAt = ""
-        ),
-        Vault(
-            vaultId = 0L,
-            userId = "123",
-            vaultName = "Favourites",
-            iconKey = "Favorite",
-            createdAt = ""
-        ),
-        Vault(
-            vaultId = 0L,
-            userId = "123",
-            vaultName = "Important",
-            iconKey = "Lock",
-            createdAt = "",
-        )
+@HiltViewModel
+class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultRepository) :
+    ViewModel() {
 
-    )
-    var currentSelectedMenu by mutableStateOf<NavDrawerMenus>(
-        NavDrawerMenus.VaultItem(
-            dummyVaultList[0]
-        )
-    )
+    private val _vaults = MutableStateFlow<List<Vault>>(emptyList())
+    val vaults: StateFlow<List<Vault>> = _vaults
+
+    var currentSelectedMenu by mutableStateOf<NavDrawerMenus?>(null)
         private set
 
-    var lastVaultMenu by mutableStateOf<NavDrawerMenus>(currentSelectedMenu)
+    var lastVaultMenu by mutableStateOf<NavDrawerMenus?>(currentSelectedMenu)
         private set
 
     fun onMenuSelected(navDrawerMenus: NavDrawerMenus) {
@@ -65,6 +44,26 @@ class VaultHomeViewModel : ViewModel() {
 
     fun toggleCreateVaultDialog(showDialog: Boolean) {
         this.showCreateVaultDialog = showDialog
+    }
+
+    init {
+        getVaults()
+    }
+
+    fun getVaults() {
+        try {
+            viewModelScope.launch {
+                val result = vaultRepository.getAllVaults()
+                _vaults.value = result
+                Log.d(this@VaultHomeViewModel.javaClass.simpleName, "Vaults : ${result.size}")
+
+                if (result.isNotEmpty() && currentSelectedMenu == null) {
+                    onMenuSelected(NavDrawerMenus.VaultItem(result[0]))
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 }

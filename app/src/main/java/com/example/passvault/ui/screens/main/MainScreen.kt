@@ -3,6 +3,7 @@ package com.example.passvault.ui.screens.main
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,7 +21,7 @@ fun MainScreen() {
     NavHost(navController = navController, startDestination = MainScreens.VaultHome.route) {
         composable(route = MainScreens.VaultHome.route) {
             VaultHomeScreen(
-                viewModel = viewModel(),
+                viewModel = hiltViewModel(),
                 toProfileScreen = { navController.navigate(MainScreens.Profile.route) },
                 toAddPasswordScreen = { navController.navigate(MainScreens.AddPassword.route) }
             )

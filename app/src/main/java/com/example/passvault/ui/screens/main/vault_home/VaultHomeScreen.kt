@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -22,6 +24,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -45,6 +49,7 @@ fun VaultHomeScreen(
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val vaultList by viewModel.vaults.collectAsState()
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -68,7 +73,7 @@ fun VaultHomeScreen(
                             bottom = dimensionResource(R.dimen.menu_small_padding)
                         )
                     )
-                    viewModel.dummyVaultList.forEach {
+                    vaultList.forEach {
                         val vaultMenu = NavDrawerMenus.VaultItem(vault = it)
                         NavigationDrawerItem(
                             label = {
@@ -84,7 +89,7 @@ fun VaultHomeScreen(
                                     )
                                 }
                             },
-                            selected = viewModel.lastVaultMenu == vaultMenu,
+                            selected = vaultMenu == (viewModel.lastVaultMenu ?: false),
                             onClick = {
                                 viewModel.onMenuSelected(vaultMenu)
                                 scope.launch { drawerState.close() }
@@ -109,7 +114,7 @@ fun VaultHomeScreen(
                         selected = false,
                         onClick = {
                             viewModel.onMenuSelected(NavDrawerMenus.AddVault)
-//                        scope.launch { drawerState.close() }
+                            scope.launch { drawerState.close() }
                             viewModel.toggleCreateVaultDialog(showDialog = true)
                         },
                         icon = { Icon(NavDrawerMenus.AddVault.icon, contentDescription = null) },
@@ -159,7 +164,12 @@ fun VaultHomeScreen(
                     navigationIcon = {
                         IconButton(onClick = {
                             scope.launch { drawerState.open() }
-                        }) { Icon(viewModel.lastVaultMenu.icon, contentDescription = "Menu") }
+                        }) {
+                            Icon(
+                                imageVector = viewModel.lastVaultMenu?.icon ?: Icons.Outlined.Menu,
+                                contentDescription = "Menu"
+                            )
+                        }
                     })
             },
             content = { innerPadding ->
@@ -169,7 +179,7 @@ fun VaultHomeScreen(
                         .padding(innerPadding)
                         .padding(horizontal = dimensionResource(R.dimen.medium_padding))
                 ) {
-                    // TODO: load screen when vault menu clicked
+                    //  load screen when vault menu clicked
                     PasswordsListScreen(
                         onAddClick = {
                             toAddPasswordScreen()

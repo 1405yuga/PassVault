@@ -4,6 +4,7 @@ import com.example.passvault.data.Vault
 import com.example.passvault.data.VaultTable
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,5 +13,12 @@ class VaultRepository @Inject constructor(private val supabaseClient: SupabaseCl
 
     suspend fun insertVault(vault: Vault) {
         supabaseClient.postgrest[VaultTable.TABLE_NAME].insert(vault)
+    }
+
+    suspend fun getAllVaults(): List<Vault> {
+        return supabaseClient
+            .postgrest[VaultTable.TABLE_NAME]
+            .select(columns = Columns.ALL)
+            .decodeList()
     }
 }
