@@ -16,7 +16,8 @@ class UserRepository @Inject constructor(private val supabaseClient: SupabaseCli
     }
 
     suspend fun getUser(): User? {
-        return supabaseClient.postgrest[UserTable.TABLE_NAME]
+        return supabaseClient
+            .postgrest[UserTable.TABLE_NAME]
             .select(Columns.ALL)
             .decodeSingleOrNull<User>()
     }
