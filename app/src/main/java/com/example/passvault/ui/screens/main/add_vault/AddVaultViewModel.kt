@@ -24,17 +24,6 @@ import javax.inject.Inject
 @HiltViewModel
 class AddVaultViewModel @Inject constructor(private val vaultRepository: VaultRepository) :
     ViewModel() {
-    val iconList = listOf(
-        Icons.Default.Home,
-        Icons.Default.Person,
-        Icons.Default.Language,
-        Icons.Default.Work,
-        Icons.Default.Lock,
-        Icons.Default.AttachMoney,
-        Icons.Default.Favorite,
-        Icons.Default.PermMedia,
-    )
-
     var vaultName by mutableStateOf("")
         private set
 
@@ -44,7 +33,7 @@ class AddVaultViewModel @Inject constructor(private val vaultRepository: VaultRe
 
     var vaultNameError by mutableStateOf("")
         private set
-    var currentSelectedIcon by mutableStateOf(iconList[0])
+    var currentSelectedIcon by mutableStateOf(IconsList.getIconsList()[0])
         private set
 
     fun onIconSelected(icon: ImageVector) {
@@ -71,6 +60,19 @@ class AddVaultViewModel @Inject constructor(private val vaultRepository: VaultRe
     fun clearInputs() {
         vaultName = ""
         vaultNameError = ""
-        currentSelectedIcon = iconList[0]
+        currentSelectedIcon = IconsList.getIconsList()[0]
     }
+}
+
+object IconsList {
+    fun getIconsList(): List<ImageVector> = listOf(
+        Icons.Default.Home,
+        Icons.Default.Person,
+        Icons.Default.Language,
+        Icons.Default.Work,
+        Icons.Default.Lock,
+        Icons.Default.AttachMoney,
+        Icons.Default.Favorite,
+        Icons.Default.PermMedia,
+    )
 }

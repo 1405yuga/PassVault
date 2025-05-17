@@ -53,7 +53,6 @@ import com.example.passvault.utils.custom_composables.TextFieldWithErrorText
 fun AddVaultDialog(
     addVaultViewModel: AddVaultViewModel,
     setShowDialog: (Boolean) -> Unit,
-    onAddVaultClick: () -> Unit
 ) {
     Dialog(onDismissRequest = {
         setShowDialog(false)
@@ -93,14 +92,13 @@ fun AddVaultDialog(
                 )
                 Spacer(modifier = Modifier.size(12.dp))
                 IconSelector(
-                    icons = addVaultViewModel.iconList,
+                    icons = IconsList.getIconsList(),
                     onIconSelected = { addVaultViewModel.onIconSelected(it) },
                     selectedIcon = addVaultViewModel.currentSelectedIcon
                 )
                 Spacer(modifier = Modifier.size(24.dp))
                 Button(
                     onClick = {
-//                        onAddVaultClick()
                         addVaultViewModel.addNewVault()
                     },
                     modifier = Modifier
@@ -166,7 +164,6 @@ fun AddVaultDialogPreview() {
     AddVaultDialog(
         addVaultViewModel = viewModel(),
         setShowDialog = {},
-        onAddVaultClick = {},
     )
 }
 
@@ -176,7 +173,6 @@ fun AddVaultDialogHorizontalPreview() {
     AddVaultDialog(
         addVaultViewModel = viewModel(),
         setShowDialog = {},
-        onAddVaultClick = {},
     )
 }
 

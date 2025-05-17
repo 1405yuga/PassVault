@@ -177,10 +177,7 @@ fun VaultHomeScreen(
                     if (viewModel.showCreateVaultDialog) {
                         AddVaultDialog(
                             addVaultViewModel = hiltViewModel(),
-                            setShowDialog = { viewModel.toggleCreateVaultDialog(it) },
-                            onAddVaultClick = {
-                                // TODO:  
-                            },
+                            setShowDialog = { viewModel.toggleCreateVaultDialog(it) }
                         )
                     }
                 }
