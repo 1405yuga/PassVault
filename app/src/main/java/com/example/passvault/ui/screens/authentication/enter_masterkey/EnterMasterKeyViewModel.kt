@@ -9,7 +9,7 @@ import com.example.passvault.data.User
 import com.example.passvault.data.UserMasterKeyMaterial
 import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.network.supabase.UserRepository
-import com.example.passvault.utils.encryption.EncryptionHelper
+import com.example.passvault.utils.helper.EncryptionHelper
 import com.example.passvault.utils.input_validations.AuthInputValidators
 import com.example.passvault.utils.state.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
