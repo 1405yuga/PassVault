@@ -1,4 +1,4 @@
-package com.example.passvault.utils.encryption
+package com.example.passvault.utils.helper
 
 import com.example.passvault.data.UserMasterKeyMaterial
 import com.example.passvault.data.fromBase64
