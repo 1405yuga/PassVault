@@ -117,6 +117,7 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
                         )
                     )
                     getVaults(isInitialLoad = false)
+                    toggleCreateVaultDialog(showDialog = false)
                     ScreenState.Loaded("Vault Added")
                 } catch (e: Exception) {
                     e.printStackTrace()
