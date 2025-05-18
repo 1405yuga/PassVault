@@ -13,6 +13,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.passvault.data.Vault
 import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.utils.extension_functions.toOutlinedIcon
+import com.example.passvault.utils.helper.VaultIconsList
+import com.example.passvault.utils.state.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,6 +46,7 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
 
     fun toggleCreateVaultDialog(showDialog: Boolean) {
         this.showCreateVaultDialog = showDialog
+        if (showDialog == false) resetDialogState()
     }
 
     init {
@@ -66,6 +69,54 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
         }
     }
 
+    var addVaultDialogState by mutableStateOf(AddVaultDialogState())
+        private set
+
+    fun onVaultNameChange(vaultName: String) {
+        addVaultDialogState = addVaultDialogState.copy(vaultName = vaultName)
+    }
+
+    fun onIconSelected(icon: ImageVector) {
+        addVaultDialogState = addVaultDialogState.copy(iconSelected = icon)
+    }
+
+    private fun updateDialogScreenState(state: ScreenState<String>) {
+        addVaultDialogState = addVaultDialogState.copy(screenState = state)
+    }
+
+    private fun checkInputFields(): Boolean {
+        addVaultDialogState = addVaultDialogState.copy(
+            vaultError = if (addVaultDialogState.vaultName.trim()
+                    .isBlank()
+            ) "Vault Name is required" else ""
+        )
+        return addVaultDialogState.vaultError.isBlank()
+    }
+
+    private fun resetDialogState() {
+        addVaultDialogState = AddVaultDialogState()
+    }
+
+    fun addNewVault() {
+        if (!checkInputFields()) return
+        updateDialogScreenState(ScreenState.Loading())
+        viewModelScope.launch {
+            updateDialogScreenState(
+                state = try {
+                    vaultRepository.insertVault(
+                        vault = Vault(
+                            vaultName = this@VaultHomeViewModel.addVaultDialogState.vaultName,
+                            iconKey = this@VaultHomeViewModel.addVaultDialogState.iconSelected.name
+                        )
+                    )
+                    ScreenState.Loaded("Vault Added")
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    ScreenState.Error(message = "Unable to add vault")
+                }
+            )
+        }
+    }
 }
 
 sealed class NavDrawerMenus(val label: String, val icon: ImageVector) {
@@ -75,3 +126,10 @@ sealed class NavDrawerMenus(val label: String, val icon: ImageVector) {
     object AddVault : NavDrawerMenus(label = "Add Vault", icon = Icons.Outlined.Add)
     object Profile : NavDrawerMenus(label = "Profile", icon = Icons.Filled.Person)
 }
+
+data class AddVaultDialogState(
+    val screenState: ScreenState<String> = ScreenState.PreLoad(),
+    val vaultName: String = "",
+    val vaultError: String = "",
+    val iconSelected: ImageVector = VaultIconsList.getIconsList()[0]
+)

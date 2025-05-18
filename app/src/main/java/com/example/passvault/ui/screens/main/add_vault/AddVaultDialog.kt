@@ -37,8 +37,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -47,25 +45,30 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.passvault.R
+import com.example.passvault.ui.screens.main.vault_home.AddVaultDialogState
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.TextFieldWithErrorText
+import com.example.passvault.utils.helper.VaultIconsList
 import com.example.passvault.utils.state.ScreenState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddVaultDialog(
-    addVaultViewModel: AddVaultViewModel,
+//    addVaultViewModel: AddVaultViewModel,
+    dialogState: AddVaultDialogState,
+    onVaultNameChange: (String) -> Unit,
+    onIconSelected: (ImageVector) -> Unit,
+    insertNewVault: () -> Unit,
     setShowDialog: (Boolean) -> Unit,
 ) {
-    val screenState by addVaultViewModel.screenState.collectAsState()
+//    val screenState by addVaultViewModel.screenState.collectAsState()
     val currentContext = LocalContext.current
 
     Dialog(onDismissRequest = {
         setShowDialog(false)
-        addVaultViewModel.clearInputs()
+//        addVaultViewModel.clearInputs()
     }) {
         Surface(
             shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius)),
@@ -95,44 +98,43 @@ fun AddVaultDialog(
                 Spacer(modifier = Modifier.size(12.dp))
                 TextFieldWithErrorText(
                     label = "Vault name",
-                    value = addVaultViewModel.vaultName,
-                    onTextChange = { addVaultViewModel.onVaultNameChange(it) },
-                    errorMsg = addVaultViewModel.vaultNameError
+                    value = dialogState.vaultName,
+                    onTextChange = { onVaultNameChange(it) },
+                    errorMsg = dialogState.vaultError
                 )
                 Spacer(modifier = Modifier.size(12.dp))
                 IconSelector(
-                    icons = IconsList.getIconsList(),
-                    onIconSelected = { addVaultViewModel.onIconSelected(it) },
-                    selectedIcon = addVaultViewModel.currentSelectedIcon
+                    icons = VaultIconsList.getIconsList(),
+                    onIconSelected = { onIconSelected(it) },
+                    selectedIcon = dialogState.iconSelected
                 )
                 Spacer(modifier = Modifier.size(24.dp))
                 Button(
                     onClick = {
-                        addVaultViewModel.addNewVault()
+                        insertNewVault()
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(dimensionResource(R.dimen.min_clickable_size))
                         .widthIn(min = dimensionResource(R.dimen.min_clickable_size)),
                     shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius)),
-                    enabled = screenState !is ScreenState.Loading
+                    enabled = dialogState.screenState !is ScreenState.Loading
                 ) {
                     Text(
                         text =
-                            if (screenState is ScreenState.Loading) "Loading.." else "Add"
+                            if (dialogState.screenState is ScreenState.Loading) "Loading.." else "Add"
                     )
                 }
             }
         }
-        LaunchedEffect(screenState) {
-            when (val state = screenState) {
+        LaunchedEffect(dialogState.screenState) {
+            when (val state = dialogState.screenState) {
                 is ScreenState.Error -> {
                     Toast.makeText(currentContext, state.message, Toast.LENGTH_SHORT).show()
                 }
 
                 is ScreenState.Loaded -> {
                     Toast.makeText(currentContext, state.result, Toast.LENGTH_SHORT).show()
-                    addVaultViewModel.clearInputs()
                     setShowDialog(false)
                 }
 
@@ -190,8 +192,11 @@ fun IconSelector(
 @VerticalScreenPreview
 fun AddVaultDialogPreview() {
     AddVaultDialog(
-        addVaultViewModel = viewModel(),
-        setShowDialog = {},
+        dialogState = AddVaultDialogState(),
+        onVaultNameChange = {},
+        onIconSelected = {},
+        insertNewVault = {},
+        setShowDialog = {}
     )
 }
 
@@ -199,8 +204,11 @@ fun AddVaultDialogPreview() {
 @HorizontalScreenPreview
 fun AddVaultDialogHorizontalPreview() {
     AddVaultDialog(
-        addVaultViewModel = viewModel(),
-        setShowDialog = {},
+        dialogState = AddVaultDialogState(),
+        onVaultNameChange = {},
+        onIconSelected = {},
+        insertNewVault = {},
+        setShowDialog = {}
     )
 }
 

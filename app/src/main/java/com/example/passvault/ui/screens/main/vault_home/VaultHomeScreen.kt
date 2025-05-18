@@ -31,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.passvault.R
 import com.example.passvault.ui.screens.main.add_vault.AddVaultDialog
@@ -114,7 +113,6 @@ fun VaultHomeScreen(
                         selected = false,
                         onClick = {
                             viewModel.onMenuSelected(NavDrawerMenus.AddVault)
-                            scope.launch { drawerState.close() }
                             viewModel.toggleCreateVaultDialog(showDialog = true)
                         },
                         icon = { Icon(NavDrawerMenus.AddVault.icon, contentDescription = null) },
@@ -186,7 +184,10 @@ fun VaultHomeScreen(
                         })
                     if (viewModel.showCreateVaultDialog) {
                         AddVaultDialog(
-                            addVaultViewModel = hiltViewModel(),
+                            dialogState = viewModel.addVaultDialogState,
+                            onVaultNameChange = { viewModel.onVaultNameChange(it) },
+                            onIconSelected = { viewModel.onIconSelected(it) },
+                            insertNewVault = { viewModel.addNewVault() },
                             setShowDialog = { viewModel.toggleCreateVaultDialog(it) }
                         )
                     }
