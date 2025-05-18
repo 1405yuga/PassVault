@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -37,6 +38,7 @@ import com.example.passvault.ui.screens.main.add_vault.AddVaultDialog
 import com.example.passvault.ui.screens.main.list.PasswordsListScreen
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
+import com.example.passvault.utils.state.ScreenState
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,7 +50,8 @@ fun VaultHomeScreen(
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val vaultList by viewModel.vaults.collectAsState()
+    val vaultScreenState by viewModel.vaultScreenState.collectAsState()
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -72,36 +75,54 @@ fun VaultHomeScreen(
                             bottom = dimensionResource(R.dimen.menu_small_padding)
                         )
                     )
-                    vaultList.forEach {
-                        val vaultMenu = NavDrawerMenus.VaultItem(vault = it)
-                        NavigationDrawerItem(
-                            label = {
-                                Column {
-                                    Text(
-                                        text = vaultMenu.label,
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    Text(
-                                        text = "0 items",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    when (val state = vaultScreenState) {
+                        is ScreenState.Error -> {
+                            Text(text = state.message ?: "Unable to load vaults")
+                        }
+
+                        is ScreenState.Loaded -> {
+                            if (state.result.isEmpty()) {
+                                // TODO: create ui to displaye below message
+                                Text(text = "Add vaults to get started!")
+                            } else {
+                                state.result.forEach {
+                                    val vaultMenu = NavDrawerMenus.VaultItem(vault = it)
+                                    NavigationDrawerItem(
+                                        label = {
+                                            Column {
+                                                Text(
+                                                    text = vaultMenu.label,
+                                                    style = MaterialTheme.typography.bodyLarge
+                                                )
+                                                Text(
+                                                    text = "0 items",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                            }
+                                        },
+                                        selected = vaultMenu == (viewModel.lastVaultMenu ?: false),
+                                        onClick = {
+                                            viewModel.onMenuSelected(vaultMenu)
+                                            scope.launch { drawerState.close() }
+                                        },
+                                        icon = { Icon(vaultMenu.icon, contentDescription = null) },
+                                        modifier = Modifier.padding(
+                                            start = dimensionResource(R.dimen.medium_padding),
+                                            end = dimensionResource(R.dimen.medium_padding),
+                                            bottom = dimensionResource(R.dimen.medium_padding)
+                                        ),
+                                        shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius))
                                     )
                                 }
-                            },
-                            selected = vaultMenu == (viewModel.lastVaultMenu ?: false),
-                            onClick = {
-                                viewModel.onMenuSelected(vaultMenu)
-                                scope.launch { drawerState.close() }
-                            },
-                            icon = { Icon(vaultMenu.icon, contentDescription = null) },
-                            modifier = Modifier.padding(
-                                start = dimensionResource(R.dimen.medium_padding),
-                                end = dimensionResource(R.dimen.medium_padding),
-                                bottom = dimensionResource(R.dimen.medium_padding)
-                            ),
-                            shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius))
-                        )
+                            }
+                        }
 
+                        is ScreenState.Loading -> {
+                            CircularProgressIndicator()
+                        }
+
+                        is ScreenState.PreLoad -> {}
                     }
                     NavigationDrawerItem(
                         label = {
@@ -156,7 +177,8 @@ fun VaultHomeScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            stringResource(R.string.app_name),
+                            text = viewModel.lastVaultMenu?.label
+                                ?: stringResource(R.string.app_name)
                         )
                     },
                     navigationIcon = {

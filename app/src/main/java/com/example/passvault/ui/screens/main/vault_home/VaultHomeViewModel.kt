@@ -25,8 +25,9 @@ import javax.inject.Inject
 class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultRepository) :
     ViewModel() {
 
-    private val _vaults = MutableStateFlow<List<Vault>>(emptyList())
-    val vaults: StateFlow<List<Vault>> = _vaults
+    private var _vaultListScreenState =
+        MutableStateFlow<ScreenState<List<Vault>>>(ScreenState.PreLoad())
+    val vaultScreenState: StateFlow<ScreenState<List<Vault>>> = _vaultListScreenState
 
     var currentSelectedMenu by mutableStateOf<NavDrawerMenus?>(null)
         private set
@@ -50,22 +51,28 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
     }
 
     init {
-        getVaults()
+        getVaults(isInitialLoad = true)
     }
 
-    fun getVaults() {
+    fun getVaults(isInitialLoad: Boolean) {
+        _vaultListScreenState.value = ScreenState.Loading()
         try {
             viewModelScope.launch {
                 val result = vaultRepository.getAllVaults()
-                _vaults.value = result
                 Log.d(this@VaultHomeViewModel.javaClass.simpleName, "Vaults : ${result.size}")
 
-                if (result.isNotEmpty() && currentSelectedMenu == null) {
-                    onMenuSelected(NavDrawerMenus.VaultItem(result[0]))
+                if (result.isNotEmpty()) {
+                    onMenuSelected(
+                        navDrawerMenus = NavDrawerMenus.VaultItem(
+                            vault = if (isInitialLoad) result.first() else result.last()
+                        )
+                    )
                 }
+                _vaultListScreenState.value = ScreenState.Loaded(result = result)
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            _vaultListScreenState.value = ScreenState.Error(message = "Unable to load Vaults")
         }
     }
 
@@ -109,6 +116,7 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
                             iconKey = this@VaultHomeViewModel.addVaultDialogState.iconSelected.name
                         )
                     )
+                    getVaults(isInitialLoad = false)
                     ScreenState.Loaded("Vault Added")
                 } catch (e: Exception) {
                     e.printStackTrace()
