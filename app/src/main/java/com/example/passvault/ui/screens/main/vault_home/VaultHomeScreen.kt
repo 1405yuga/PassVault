@@ -2,6 +2,7 @@ package com.example.passvault.ui.screens.main.vault_home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,8 +34,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.passvault.R
+import com.example.passvault.di.supabase.SupabaseModule
+import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.ui.screens.main.add_vault.AddVaultDialog
 import com.example.passvault.ui.screens.main.list.PasswordsListScreen
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
@@ -48,7 +51,7 @@ fun VaultHomeScreen(
     toAddPasswordScreen: () -> Unit,
     viewModel: VaultHomeViewModel
 ) {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
     val scope = rememberCoroutineScope()
     val vaultScreenState by viewModel.vaultScreenState.collectAsState()
 
@@ -85,21 +88,35 @@ fun VaultHomeScreen(
                                 // TODO: create ui to displaye below message
                                 Text(text = "Add vaults to get started!")
                             } else {
-                                state.result.forEach {
-                                    val vaultMenu = NavDrawerMenus.VaultItem(vault = it)
+                                state.result.forEach { vault ->
+                                    val vaultMenu = NavDrawerMenus.VaultItem(vault = vault)
                                     NavigationDrawerItem(
                                         label = {
-                                            Column {
-                                                Text(
-                                                    text = vaultMenu.label,
-                                                    style = MaterialTheme.typography.bodyLarge
-                                                )
-                                                Text(
-                                                    text = "0 items",
-                                                    style = MaterialTheme.typography.bodySmall,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
+                                            Row(modifier = Modifier.fillMaxWidth()) {
+                                                Column(modifier = Modifier.weight(1f)) {
+                                                    Text(
+                                                        text = vaultMenu.label,
+                                                        style = MaterialTheme.typography.bodyLarge
+                                                    )
+                                                    Text(
+                                                        text = "0 items",
+                                                        style = MaterialTheme.typography.bodySmall,
+                                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                    )
+                                                }
+
+                                                IconButton(
+                                                    onClick = {
+                                                        viewModel.removeVault(vaultId = vault.vaultId)
+                                                    }
+                                                ) {
+                                                    Icon(
+                                                        imageVector = Icons.Outlined.Remove,
+                                                        contentDescription = "Remove Vault"
+                                                    )
+                                                }
                                             }
+
                                         },
                                         selected = vaultMenu == (viewModel.lastVaultMenu ?: false),
                                         onClick = {
@@ -223,7 +240,9 @@ fun VaultHomeScreen(
 @VerticalScreenPreview
 fun VaultHomeScreenPreview() {
     VaultHomeScreen(
-        viewModel = viewModel(),
+        viewModel = VaultHomeViewModel(
+            vaultRepository = VaultRepository(SupabaseModule.mockClient)
+        ),
         toProfileScreen = {},
         toAddPasswordScreen = {},
     )
@@ -233,8 +252,38 @@ fun VaultHomeScreenPreview() {
 @HorizontalScreenPreview
 fun VaultHomeScreenHorizontalPreview() {
     VaultHomeScreen(
-        viewModel = viewModel(),
+        viewModel = VaultHomeViewModel(
+            vaultRepository = VaultRepository(SupabaseModule.mockClient)
+        ),
         toProfileScreen = {},
         toAddPasswordScreen = {},
     )
+}
+
+@Composable
+@VerticalScreenPreview
+fun MenuPreview() {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Vault name",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = "0 items",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        IconButton(
+            onClick = {}
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Remove,
+                contentDescription = "More Options"
+            )
+        }
+    }
+
 }

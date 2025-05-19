@@ -126,6 +126,22 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
             )
         }
     }
+
+    fun removeVault(vaultId: Long?) {
+        try {
+            viewModelScope.launch {
+                val result = vaultRepository.deleteVault(vaultId = vaultId)
+                result.onSuccess {
+                    getVaults(isInitialLoad = false)
+                    Log.d(this@VaultHomeViewModel.javaClass.simpleName, "Vault deleted")
+                }.onFailure { exception ->
+                    exception.printStackTrace()
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }
 
 sealed class NavDrawerMenus(val label: String, val icon: ImageVector) {

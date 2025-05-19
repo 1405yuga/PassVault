@@ -21,4 +21,23 @@ class VaultRepository @Inject constructor(private val supabaseClient: SupabaseCl
             .select(columns = Columns.ALL)
             .decodeList()
     }
+
+    suspend fun deleteVault(vaultId: Long?): Result<Unit> {
+        return runCatching {
+            vaultId?.let {
+                supabaseClient
+                    .postgrest[VaultTable.TABLE_NAME]
+                    .delete {
+                        filter {
+                            eq(
+                                VaultTable.VAULT_ID,
+                                vaultId
+                            )
+                        }
+                    }
+            } ?: run {
+                throw NullPointerException("Vault Id is null")
+            }
+        }
+    }
 }
