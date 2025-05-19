@@ -4,13 +4,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -21,6 +24,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
+import com.example.passvault.utils.annotations.VerticalScreenPreview
 
 @Composable
 fun TextFieldWithErrorText(
@@ -129,6 +133,36 @@ fun ShowAndHidePasswordTextField(
         }
         if (errorMsg.isNotBlank()) ErrorText(errorText = errorMsg)
     }
+}
+
+@Composable
+fun ConfirmationAlertDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    dialogTitle: String,
+    dialogText: String,
+    icon: ImageVector?
+) {
+    AlertDialog(
+        icon = icon?.let { { Icon(icon, contentDescription = "Confirmation icon") } },
+        title = { Text(text = dialogTitle) },
+        text = { Text(text = dialogText) },
+        onDismissRequest = { onDismissRequest() },
+        confirmButton = { TextButton(onClick = { onDismissRequest() }) { Text("Dismiss") } },
+        dismissButton = { TextButton(onClick = { onConfirmation() }) { Text("Confirm") } }
+    )
+}
+
+@VerticalScreenPreview
+@Composable
+fun ConfirmationDialogPreview() {
+    ConfirmationAlertDialog(
+        onDismissRequest = {},
+        onConfirmation = {},
+        dialogTitle = "Some Title",
+        dialogText = "Deleting this vault will permanently remove all passwords stored within it.\n\nAre you sure you want to proceed?",
+        icon = Icons.Default.Home
+    )
 }
 
 class NoPaddingPasswordTransformation : VisualTransformation {

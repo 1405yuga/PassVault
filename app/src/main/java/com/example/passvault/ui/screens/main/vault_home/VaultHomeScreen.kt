@@ -41,6 +41,8 @@ import com.example.passvault.ui.screens.main.add_vault.AddVaultDialog
 import com.example.passvault.ui.screens.main.list.PasswordsListScreen
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
+import com.example.passvault.utils.custom_composables.ConfirmationAlertDialog
+import com.example.passvault.utils.extension_functions.toOutlinedIcon
 import com.example.passvault.utils.state.ScreenState
 import kotlinx.coroutines.launch
 
@@ -85,7 +87,7 @@ fun VaultHomeScreen(
 
                         is ScreenState.Loaded -> {
                             if (state.result.isEmpty()) {
-                                // TODO: create ui to displaye below message
+                                // TODO: create ui to display below message
                                 Text(text = "Add vaults to get started!")
                             } else {
                                 state.result.forEach { vault ->
@@ -107,12 +109,13 @@ fun VaultHomeScreen(
 
                                                 IconButton(
                                                     onClick = {
-                                                        viewModel.removeVault(vaultId = vault.vaultId)
+                                                        viewModel.showRemoveConfirmation(vault = vault)
                                                     }
                                                 ) {
                                                     Icon(
                                                         imageVector = Icons.Outlined.Remove,
-                                                        contentDescription = "Remove Vault"
+                                                        contentDescription = "Remove Vault",
+                                                        tint = MaterialTheme.colorScheme.error
                                                     )
                                                 }
                                             }
@@ -151,7 +154,7 @@ fun VaultHomeScreen(
                         selected = false,
                         onClick = {
                             viewModel.onMenuSelected(NavDrawerMenus.AddVault)
-                            viewModel.toggleCreateVaultDialog(showDialog = true)
+                            viewModel.toggleCreateVaultDialog(openDialog = true)
                         },
                         icon = { Icon(NavDrawerMenus.AddVault.icon, contentDescription = null) },
                         modifier = Modifier
@@ -221,14 +224,28 @@ fun VaultHomeScreen(
                         onAddClick = {
                             toAddPasswordScreen()
                         })
-                    if (viewModel.openAddVaultDialog) {
-                        AddVaultDialog(
-                            dialogState = viewModel.addVaultDialogState,
-                            onVaultNameChange = { viewModel.onVaultNameChange(it) },
-                            onIconSelected = { viewModel.onIconSelected(it) },
-                            insertNewVault = { viewModel.addNewVault() },
-                            setShowDialog = { viewModel.toggleCreateVaultDialog(it) }
-                        )
+
+                    // loadDialogs
+                    when {
+                        viewModel.openAddVaultDialog -> {
+                            AddVaultDialog(
+                                dialogState = viewModel.addVaultDialogState,
+                                onVaultNameChange = { viewModel.onVaultNameChange(it) },
+                                onIconSelected = { viewModel.onIconSelected(it) },
+                                insertNewVault = { viewModel.addNewVault() },
+                                setShowDialog = { viewModel.toggleCreateVaultDialog(it) }
+                            )
+                        }
+
+                        viewModel.openRemoveVaultConfirmationDialog -> {
+                            ConfirmationAlertDialog(
+                                onDismissRequest = { viewModel.closeRemoveDialog() },
+                                onConfirmation = { viewModel.removeVault() },
+                                dialogTitle = "Delete ${viewModel.vaultToBeRemoved?.vaultName}",
+                                dialogText = "Deleting this vault deletes all its passwords permanently.\n\nAre you sure to proceed?",
+                                icon = viewModel.vaultToBeRemoved?.iconKey?.toOutlinedIcon()
+                            )
+                        }
                     }
                 }
             }

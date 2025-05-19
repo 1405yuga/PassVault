@@ -42,14 +42,6 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
         currentSelectedMenu = navDrawerMenus
     }
 
-    var openAddVaultDialog by mutableStateOf(false)
-        private set
-
-    fun toggleCreateVaultDialog(showDialog: Boolean) {
-        this.openAddVaultDialog = showDialog
-        if (showDialog == false) resetDialogState()
-    }
-
     init {
         getVaults(isInitialLoad = true)
     }
@@ -74,6 +66,15 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
             e.printStackTrace()
             _vaultListScreenState.value = ScreenState.Error(message = "Unable to load Vaults")
         }
+    }
+
+    //Add Vault-------------------------------------------------------------------------------
+    var openAddVaultDialog by mutableStateOf(false)
+        private set
+
+    fun toggleCreateVaultDialog(openDialog: Boolean) {
+        this.openAddVaultDialog = openDialog
+        if (openDialog == false) resetDialogState()
     }
 
     var addVaultDialogState by mutableStateOf(AddVaultDialogState())
@@ -117,7 +118,7 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
                         )
                     )
                     getVaults(isInitialLoad = false)
-                    toggleCreateVaultDialog(showDialog = false)
+                    toggleCreateVaultDialog(openDialog = false)
                     ScreenState.Loaded("Vault Added")
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -127,15 +128,35 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
         }
     }
 
-    fun removeVault(vaultId: Long?) {
+    //Remove Vault----------------------------------------------------------------
+
+    var openRemoveVaultConfirmationDialog by mutableStateOf(false)
+        private set
+
+    var vaultToBeRemoved: Vault? by mutableStateOf(null)
+        private set
+
+    fun showRemoveConfirmation(vault: Vault) {
+        this.vaultToBeRemoved = vault
+        this.openRemoveVaultConfirmationDialog = true
+    }
+
+    fun closeRemoveDialog() {
+        this.vaultToBeRemoved = null
+        this.openRemoveVaultConfirmationDialog = false
+    }
+
+    fun removeVault() {
         try {
-            viewModelScope.launch {
-                val result = vaultRepository.deleteVault(vaultId = vaultId)
-                result.onSuccess {
-                    getVaults(isInitialLoad = false)
-                    Log.d(this@VaultHomeViewModel.javaClass.simpleName, "Vault deleted")
-                }.onFailure { exception ->
-                    exception.printStackTrace()
+            if (vaultToBeRemoved != null) {
+                viewModelScope.launch {
+                    val result = vaultRepository.deleteVault(vaultId = vaultToBeRemoved!!.vaultId)
+                    result.onSuccess {
+                        getVaults(isInitialLoad = false)
+                        Log.d(this@VaultHomeViewModel.javaClass.simpleName, "Vault deleted")
+                    }.onFailure { exception ->
+                        exception.printStackTrace()
+                    }
                 }
             }
         } catch (e: Exception) {
