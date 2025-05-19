@@ -221,7 +221,7 @@ fun VaultHomeScreen(
                         onAddClick = {
                             toAddPasswordScreen()
                         })
-                    if (viewModel.showCreateVaultDialog) {
+                    if (viewModel.openAddVaultDialog) {
                         AddVaultDialog(
                             dialogState = viewModel.addVaultDialogState,
                             onVaultNameChange = { viewModel.onVaultNameChange(it) },

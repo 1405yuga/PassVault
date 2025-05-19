@@ -42,11 +42,11 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
         currentSelectedMenu = navDrawerMenus
     }
 
-    var showCreateVaultDialog by mutableStateOf(false)
+    var openAddVaultDialog by mutableStateOf(false)
         private set
 
     fun toggleCreateVaultDialog(showDialog: Boolean) {
-        this.showCreateVaultDialog = showDialog
+        this.openAddVaultDialog = showDialog
         if (showDialog == false) resetDialogState()
     }
 
