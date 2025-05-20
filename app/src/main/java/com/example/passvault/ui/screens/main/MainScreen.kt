@@ -4,7 +4,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -29,7 +28,7 @@ fun MainScreen() {
         composable(route = MainScreens.AddPassword.route) {
             AddPasswordScreen(
                 onClose = { navController.popBackStack() },
-                viewModel = viewModel(),
+                viewModel = hiltViewModel(),
                 modifier = Modifier
             )
         }

@@ -151,7 +151,13 @@ fun ConfirmationAlertDialog(
     AlertDialog(
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                icon?.let { Icon(icon, contentDescription = "Confirmation icon", modifier = Modifier.padding(8.dp)) }
+                icon?.let {
+                    Icon(
+                        icon,
+                        contentDescription = "Confirmation icon",
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
                 Text(
                     text = dialogTitle,
                     textAlign = TextAlign.Start,

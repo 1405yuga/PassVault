@@ -4,9 +4,42 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.passvault.data.Vault
+import com.example.passvault.network.supabase.VaultRepository
+import com.example.passvault.utils.state.ScreenState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AddPasswordViewModel : ViewModel() {
+@HiltViewModel
+class AddPasswordViewModel @Inject constructor(private val vaultRepository: VaultRepository) :
+    ViewModel() {
+
+    private var _vaultListScreenState =
+        MutableStateFlow<ScreenState<List<Vault>>>(ScreenState.PreLoad())
+    val vaultListScreenState: StateFlow<ScreenState<List<Vault>>> = _vaultListScreenState
+
+    init {
+        loadVaults()
+    }
+
+    fun loadVaults() {
+        _vaultListScreenState.value = ScreenState.Loading()
+        try {
+            viewModelScope.launch {
+                val result = vaultRepository.getAllVaults()
+                _vaultListScreenState.value = ScreenState.Loaded(result = result)
+                onSelectedVaultChange(vault = result.first())
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            _vaultListScreenState.value = ScreenState.Error(message = "Unable to load Vaults")
+        }
+    }
 
     var title by mutableStateOf("")
         private set
