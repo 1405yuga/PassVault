@@ -46,7 +46,7 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
         getVaults(isInitialLoad = true)
     }
 
-    fun getVaults(isInitialLoad: Boolean) {
+    fun getVaults(isInitialLoad: Boolean? = null) {
         _vaultListScreenState.value = ScreenState.Loading()
         try {
             viewModelScope.launch {
@@ -54,11 +54,23 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
                 Log.d(this@VaultHomeViewModel.javaClass.simpleName, "Vaults : ${result.size}")
 
                 if (result.isNotEmpty()) {
-                    onMenuSelected(
-                        navDrawerMenus = NavDrawerMenus.VaultItem(
-                            vault = if (isInitialLoad) result.first() else result.last()
+                    when (isInitialLoad) {
+                        true -> onMenuSelected(
+                            navDrawerMenus = NavDrawerMenus.VaultItem(vault = result.first())
                         )
-                    )
+
+                        false -> onMenuSelected(
+                            navDrawerMenus = NavDrawerMenus.VaultItem(vault = result.last())
+                        )
+
+                        null -> {
+                            if (result.size == 1) {
+                                onMenuSelected(
+                                    navDrawerMenus = NavDrawerMenus.VaultItem(vault = result.first())
+                                )
+                            }
+                        }
+                    }
                 }
                 _vaultListScreenState.value = ScreenState.Loaded(result = result)
             }
@@ -94,9 +106,9 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
 
     private fun checkInputFields(): Boolean {
         addVaultDialogState = addVaultDialogState.copy(
-            vaultError = if (addVaultDialogState.vaultName.trim()
-                    .isBlank()
-            ) "Vault Name is required" else ""
+            vaultError =
+                if (addVaultDialogState.vaultName.trim().isBlank()) "Vault Name is required"
+                else ""
         )
         return addVaultDialogState.vaultError.isBlank()
     }
@@ -153,7 +165,7 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
                     val result = vaultRepository.deleteVault(vaultId = vaultToBeRemoved!!.vaultId)
                     closeRemoveDialog()
                     result.onSuccess {
-                        getVaults(isInitialLoad = false)
+                        getVaults()
                         Log.d(this@VaultHomeViewModel.javaClass.simpleName, "Vault deleted")
                     }.onFailure { exception ->
                         exception.printStackTrace()
