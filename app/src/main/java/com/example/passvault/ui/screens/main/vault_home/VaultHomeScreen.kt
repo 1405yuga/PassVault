@@ -43,13 +43,15 @@ import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ConfirmationAlertDialog
 import com.example.passvault.utils.extension_functions.HandleScreenState
 import com.example.passvault.utils.extension_functions.toOutlinedIcon
+import com.example.passvault.utils.extension_functions.toVault
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VaultHomeScreen(
     toProfileScreen: () -> Unit,
-    toAddPasswordScreen: () -> Unit,
+    toAddPasswordScreen: (vaultString: String) -> Unit,
     viewModel: VaultHomeViewModel
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
@@ -214,7 +216,9 @@ fun VaultHomeScreen(
                     //  load screen when vault menu clicked
                     PasswordsListScreen(
                         onAddClick = {
-                            toAddPasswordScreen()
+                            viewModel.lastVaultMenu?.let {
+                                toAddPasswordScreen(Gson().toJson(it.toVault()))
+                            }
                         })
 
                     // loadDialogs

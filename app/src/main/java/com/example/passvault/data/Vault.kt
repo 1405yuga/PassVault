@@ -31,4 +31,5 @@ object VaultTable {
     const val VAULT_NAME = "vault_name"
     const val ICON_KEY = "icon_key"
     const val CREATED_AT = "created_at"
+    const val VAULT_JSON_ARGUMENT_NAME = "argument"
 }

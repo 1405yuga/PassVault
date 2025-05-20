@@ -33,6 +33,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -53,13 +54,17 @@ import com.example.passvault.utils.extension_functions.toOutlinedIcon
 
 @Composable
 fun AddPasswordScreen(
-    onClose: () -> Unit, viewModel: AddPasswordViewModel, modifier: Modifier = Modifier
+    onClose: () -> Unit,
+    selectedVault: Vault,
+    viewModel: AddPasswordViewModel,
+    modifier: Modifier = Modifier
 ) {
     val vaultsState by viewModel.vaultListScreenState.collectAsState()
     HandleScreenState(state = vaultsState, onLoaded = {
         AddPasswordDetailsScreen(
             onClose = onClose,
             viewModel = viewModel,
+            selectedVault = selectedVault,
             modifier = modifier,
             vaults = it
         )
@@ -70,9 +75,11 @@ fun AddPasswordScreen(
 fun AddPasswordDetailsScreen(
     onClose: () -> Unit,
     viewModel: AddPasswordViewModel,
+    selectedVault: Vault,
     vaults: List<Vault>,
     modifier: Modifier = Modifier
 ) {
+    LaunchedEffect(Unit) { viewModel.onSelectedVaultChange(selectedVault) }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -225,36 +232,43 @@ fun VaultDropDownMenu(
 @Composable
 @VerticalScreenPreview
 private fun AddPasswordScreenPreview() {
+    val vaults = List(5) {
+        Vault(
+            vaultId = it.toLong(),
+            userId = "someUser",
+            vaultName = "Vault name",
+            iconKey = Icons.Outlined.Home.name,
+            createdAt = ""
+        )
+    }
     AddPasswordDetailsScreen(
-        onClose = {}, viewModel = AddPasswordViewModel(
+        onClose = {},
+        viewModel = AddPasswordViewModel(
             vaultRepository = VaultRepository(SupabaseModule.mockClient)
         ),
-        vaults = List(5) {
-            Vault(
-                vaultId = it.toLong(),
-                userId = "someUser",
-                vaultName = "Vault name",
-                iconKey = Icons.Outlined.Home.name,
-                createdAt = ""
-            )
-        })
+        vaults = vaults,
+        selectedVault = vaults.first(),
+    )
 }
 
 @Composable
 @HorizontalScreenPreview
 private fun AddPasswordScreenHorizontalPreview() {
+    val vaults = List(5) {
+        Vault(
+            vaultId = it.toLong(),
+            userId = "someUser",
+            vaultName = "Vault name",
+            iconKey = Icons.Outlined.Home.name,
+            createdAt = ""
+        )
+    }
     AddPasswordDetailsScreen(
-        onClose = {}, viewModel = AddPasswordViewModel(
+        onClose = {},
+        viewModel = AddPasswordViewModel(
             vaultRepository = VaultRepository(SupabaseModule.mockClient)
         ),
-        vaults = List(5) {
-            Vault(
-                vaultId = it.toLong(),
-                userId = "someUser",
-                vaultName = "Vault name",
-                iconKey = Icons.Outlined.Home.name,
-                createdAt = ""
-            )
-        }
+        vaults = vaults,
+        selectedVault = vaults.first(),
     )
 }

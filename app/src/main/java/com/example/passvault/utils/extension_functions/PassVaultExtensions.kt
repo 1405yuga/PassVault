@@ -17,6 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.passvault.data.Vault
+import com.example.passvault.ui.screens.main.vault_home.NavDrawerMenus
 import com.example.passvault.utils.state.ScreenState
 
 fun ImageVector.toIconKey(): String {
@@ -36,6 +38,8 @@ fun String.toOutlinedIcon(): ImageVector {
         else -> Icons.Default.Home
     }
 }
+
+fun NavDrawerMenus.toVault(): Vault? = if (this is NavDrawerMenus.VaultItem) this.vault else null
 
 @Composable
 fun <T> HandleScreenState(
