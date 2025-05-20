@@ -151,6 +151,7 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
             if (vaultToBeRemoved != null) {
                 viewModelScope.launch {
                     val result = vaultRepository.deleteVault(vaultId = vaultToBeRemoved!!.vaultId)
+                    closeRemoveDialog()
                     result.onSuccess {
                         getVaults(isInitialLoad = false)
                         Log.d(this@VaultHomeViewModel.javaClass.simpleName, "Vault deleted")

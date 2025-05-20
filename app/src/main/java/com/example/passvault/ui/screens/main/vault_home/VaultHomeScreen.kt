@@ -10,8 +10,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -107,16 +107,19 @@ fun VaultHomeScreen(
                                                     )
                                                 }
 
-                                                IconButton(
-                                                    onClick = {
-                                                        viewModel.showRemoveConfirmation(vault = vault)
+                                                //atleast one vault required
+                                                if (state.result.size > 1) {
+                                                    IconButton(
+                                                        onClick = {
+                                                            viewModel.showRemoveConfirmation(vault = vault)
+                                                        }
+                                                    ) {
+                                                        Icon(
+                                                            imageVector = Icons.Outlined.DeleteOutline,
+                                                            contentDescription = "Remove Vault",
+                                                            tint = MaterialTheme.colorScheme.error
+                                                        )
                                                     }
-                                                ) {
-                                                    Icon(
-                                                        imageVector = Icons.Outlined.Remove,
-                                                        contentDescription = "Remove Vault",
-                                                        tint = MaterialTheme.colorScheme.error
-                                                    )
                                                 }
                                             }
 
@@ -242,7 +245,7 @@ fun VaultHomeScreen(
                                 onDismissRequest = { viewModel.closeRemoveDialog() },
                                 onConfirmation = { viewModel.removeVault() },
                                 dialogTitle = "Delete ${viewModel.vaultToBeRemoved?.vaultName}",
-                                dialogText = "Deleting this vault deletes all its passwords permanently.\n\nAre you sure to proceed?",
+                                dialogText = "Deleting this vault deletes all its passwords permanently.\nAre you sure to proceed?",
                                 icon = viewModel.vaultToBeRemoved?.iconKey?.toOutlinedIcon()
                             )
                         }
@@ -297,7 +300,7 @@ fun MenuPreview() {
             onClick = {}
         ) {
             Icon(
-                imageVector = Icons.Outlined.Remove,
+                imageVector = Icons.Outlined.DeleteOutline,
                 contentDescription = "More Options"
             )
         }

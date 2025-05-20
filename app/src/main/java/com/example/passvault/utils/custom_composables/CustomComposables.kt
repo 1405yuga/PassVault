@@ -1,7 +1,9 @@
 package com.example.passvault.utils.custom_composables
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -15,6 +17,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.AnnotatedString
@@ -23,6 +26,8 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 
@@ -144,9 +149,23 @@ fun ConfirmationAlertDialog(
     icon: ImageVector?
 ) {
     AlertDialog(
-        icon = icon?.let { { Icon(icon, contentDescription = "Confirmation icon") } },
-        title = { Text(text = dialogTitle) },
-        text = { Text(text = dialogText) },
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                icon?.let { Icon(icon, contentDescription = "Confirmation icon", modifier = Modifier.padding(8.dp)) }
+                Text(
+                    text = dialogTitle,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        text = {
+            Text(
+                text = dialogText,
+                textAlign = TextAlign.Start,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
         onDismissRequest = { onDismissRequest() },
         confirmButton = { TextButton(onClick = { onDismissRequest() }) { Text("Dismiss") } },
         dismissButton = { TextButton(onClick = { onConfirmation() }) { Text("Confirm") } }
@@ -160,7 +179,7 @@ fun ConfirmationDialogPreview() {
         onDismissRequest = {},
         onConfirmation = {},
         dialogTitle = "Some Title",
-        dialogText = "Deleting this vault will permanently remove all passwords stored within it.\n\nAre you sure you want to proceed?",
+        dialogText = "Deleting this vault will permanently remove all passwords stored within it.\nAre you sure you want to proceed?",
         icon = Icons.Default.Home
     )
 }
