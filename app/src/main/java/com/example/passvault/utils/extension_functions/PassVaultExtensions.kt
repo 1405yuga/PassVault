@@ -28,3 +28,26 @@ fun String.toOutlinedIcon(): ImageVector {
         else -> Icons.Default.Home
     }
 }
+
+@Composable
+fun <T> HandleScreenState(
+    state: ScreenState<T>,
+    onLoaded: @Composable (T) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    when (state) {
+        is ScreenState.Error -> {
+            // TODO: create error screen 
+            Text(text = state.message ?: "Unable to load")
+        }
+
+        is ScreenState.Loaded -> onLoaded(state.result)
+        is ScreenState.Loading -> {
+            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        }
+
+        is ScreenState.PreLoad -> {}
+    }
+}

@@ -12,7 +12,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -30,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -43,8 +41,8 @@ import com.example.passvault.ui.screens.main.list.PasswordsListScreen
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ConfirmationAlertDialog
+import com.example.passvault.utils.extension_functions.HandleScreenState
 import com.example.passvault.utils.extension_functions.toOutlinedIcon
-import com.example.passvault.utils.state.ScreenState
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,17 +79,14 @@ fun VaultHomeScreen(
                             bottom = dimensionResource(R.dimen.menu_small_padding)
                         )
                     )
-                    when (val state = vaultScreenState) {
-                        is ScreenState.Error -> {
-                            Text(text = state.message ?: "Unable to load vaults")
-                        }
-
-                        is ScreenState.Loaded -> {
-                            if (state.result.isEmpty()) {
+                    HandleScreenState(
+                        state = vaultScreenState,
+                        onLoaded = { vaultList ->
+                            if (vaultList.isEmpty()) {
                                 // TODO: create ui to display below message
                                 Text(text = "Add vaults to get started!")
                             } else {
-                                state.result.forEach { vault ->
+                                vaultList.forEach { vault ->
                                     val vaultMenu = NavDrawerMenus.VaultItem(vault = vault)
                                     NavigationDrawerItem(
                                         label = {
@@ -109,7 +104,7 @@ fun VaultHomeScreen(
                                                 }
 
                                                 //atleast one vault required
-                                                if (state.result.size > 1) {
+                                                if (vaultList.size > 1) {
                                                     IconButton(
                                                         onClick = {
                                                             viewModel.showRemoveConfirmation(vault = vault)
@@ -140,19 +135,7 @@ fun VaultHomeScreen(
                                     )
                                 }
                             }
-                        }
-
-                        is ScreenState.Loading -> {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
-                            }
-                        }
-
-                        is ScreenState.PreLoad -> {}
-                    }
+                        })
                     NavigationDrawerItem(
                         label = {
                             Text(
