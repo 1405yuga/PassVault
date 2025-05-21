@@ -102,7 +102,7 @@ class AddPasswordViewModel @Inject constructor(private val vaultRepository: Vaul
         return titleError.isBlank()
     }
 
-    fun createPassword() {
+    fun storePasswordDetails() {
         if (!areInputsValid()) return
     }
 }

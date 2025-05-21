@@ -143,7 +143,7 @@ fun AddPasswordDetailsScreen(
             }
             Spacer(modifier = Modifier.padding(4.dp))
             Button(
-                onClick = { viewModel.createPassword() },
+                onClick = { viewModel.storePasswordDetails() },
                 modifier = Modifier.height(dimensionResource(R.dimen.min_clickable_size))
             ) { Text(text = "Create") }
         }
