@@ -28,7 +28,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.passvault.R
 import com.example.passvault.di.supabase.SupabaseModule
-import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.network.supabase.UserRepository
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
@@ -135,9 +134,6 @@ private fun EnterMasterKeyScreenPreview() {
         viewModel = EnterMasterKeyViewModel(
             userRepository = UserRepository(
                 supabaseClient = SupabaseModule.mockClient
-            ),
-            authRepository = AuthRepository(
-                supabaseClient = SupabaseModule.mockClient
             )
         ),
         onUnlocked = {}
@@ -150,9 +146,6 @@ private fun EnterMasterKeyScreenHorizontalPreview() {
     EnterMasterKeyScreen(
         viewModel = EnterMasterKeyViewModel(
             userRepository = UserRepository(
-                supabaseClient = SupabaseModule.mockClient
-            ),
-            authRepository = AuthRepository(
                 supabaseClient = SupabaseModule.mockClient
             )
         ),

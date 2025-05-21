@@ -1,6 +1,5 @@
 package com.example.passvault.data
 
-import android.util.Base64
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -17,7 +16,7 @@ data class User(
     }
 }
 
-data class UserMasterKeyMaterial(
+data class CipherEncodedBundle(
     val encodedSalt: String,
     val encodedInitialisationVector: String,
     val encodedEncryptedTestText: String,
@@ -30,6 +29,3 @@ object UserTable {
     const val ENCRYPTED_TEST_TEXT = "encrypted_test_text"
     const val CREATED_AT = "created_at"
 }
-
-fun ByteArray.toBase64(): String = Base64.encodeToString(this, Base64.DEFAULT)
-fun String.fromBase64(): ByteArray = Base64.decode(this, Base64.DEFAULT)

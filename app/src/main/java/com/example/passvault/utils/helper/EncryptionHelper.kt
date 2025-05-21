@@ -1,8 +1,8 @@
 package com.example.passvault.utils.helper
 
-import com.example.passvault.data.UserMasterKeyMaterial
-import com.example.passvault.data.fromBase64
-import com.example.passvault.data.toBase64
+import com.example.passvault.data.CipherEncodedBundle
+import com.example.passvault.utils.extension_functions.fromBase64
+import com.example.passvault.utils.extension_functions.toBase64
 import java.security.SecureRandom
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
@@ -12,7 +12,7 @@ import javax.crypto.spec.SecretKeySpec
 
 object EncryptionHelper {
 
-    private fun generateSalt(): ByteArray {
+    fun generateSalt(): ByteArray {
         val salt = ByteArray(size = 16)
         SecureRandom().nextBytes(salt)
         return salt
@@ -44,8 +44,8 @@ object EncryptionHelper {
         return String(plainBytes, Charsets.UTF_8)
     }
 
-    fun performEncryption(plainText: String, masterKey: String): UserMasterKeyMaterial {
-        val salt = generateSalt()
+    fun performEncryption(plainText: String, masterKey: String, salt: ByteArray)
+            : CipherEncodedBundle {
         val aesKey = deriveAESKey(
             masterKey = masterKey,
             salt = salt
@@ -56,17 +56,17 @@ object EncryptionHelper {
             key = aesKey,
             iv = iv
         )
-        return UserMasterKeyMaterial(
+        return CipherEncodedBundle(
             encodedSalt = salt.toBase64(),
             encodedInitialisationVector = iv.toBase64(),
             encodedEncryptedTestText = encryptedData.toBase64()
         )
     }
 
-    fun performDecryption(masterKey: String, userMasterKeyMaterial: UserMasterKeyMaterial): String {
-        val salt = userMasterKeyMaterial.encodedSalt.fromBase64()
-        val iv = userMasterKeyMaterial.encodedInitialisationVector.fromBase64()
-        val encryptedData = userMasterKeyMaterial.encodedEncryptedTestText.fromBase64()
+    fun performDecryption(masterKey: String, cipherEncodedBundle: CipherEncodedBundle): String {
+        val salt = cipherEncodedBundle.encodedSalt.fromBase64()
+        val iv = cipherEncodedBundle.encodedInitialisationVector.fromBase64()
+        val encryptedData = cipherEncodedBundle.encodedEncryptedTestText.fromBase64()
 
         val aesKey = deriveAESKey(
             masterKey = masterKey, salt = salt
@@ -77,7 +77,6 @@ object EncryptionHelper {
             key = aesKey,
             iv = iv
         )
-
         return decryptedJson
     }
 

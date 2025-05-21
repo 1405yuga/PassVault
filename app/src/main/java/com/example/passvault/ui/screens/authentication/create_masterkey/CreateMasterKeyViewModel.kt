@@ -72,7 +72,8 @@ class CreateMasterKeyViewModel @Inject constructor(
             try {
                 val masterKeyMaterial = EncryptionHelper.performEncryption(
                     plainText = User.TEST_TEXT,
-                    masterKey = masterKey
+                    masterKey = masterKey,
+                    salt = EncryptionHelper.generateSalt()
                 )
                 userRepository.insertUser(
                     user = User(

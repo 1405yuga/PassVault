@@ -1,5 +1,6 @@
 package com.example.passvault.utils.extension_functions
 
+import android.util.Base64
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -63,3 +64,6 @@ fun <T> HandleScreenState(
         is ScreenState.PreLoad -> {}
     }
 }
+
+fun ByteArray.toBase64(): String = Base64.encodeToString(this, Base64.DEFAULT)
+fun String.fromBase64(): ByteArray = Base64.decode(this, Base64.DEFAULT)

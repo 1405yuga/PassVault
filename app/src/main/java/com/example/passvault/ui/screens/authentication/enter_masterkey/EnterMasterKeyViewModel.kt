@@ -5,9 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.passvault.data.CipherEncodedBundle
 import com.example.passvault.data.User
-import com.example.passvault.data.UserMasterKeyMaterial
-import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.network.supabase.UserRepository
 import com.example.passvault.utils.helper.EncryptionHelper
 import com.example.passvault.utils.input_validations.AuthInputValidators
@@ -20,9 +19,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EnterMasterKeyViewModel @Inject constructor(
-    private val userRepository: UserRepository,
-    private val authRepository: AuthRepository
+    private val userRepository: UserRepository
 ) : ViewModel() {
+
     private val _screenState = MutableStateFlow<ScreenState<String>>(ScreenState.PreLoad())
     val screenState: StateFlow<ScreenState<String>> = _screenState
 
@@ -61,7 +60,7 @@ class EnterMasterKeyViewModel @Inject constructor(
                 val user = userRepository.getUser()
 
                 if (user != null) {
-                    val userMasterKeyMaterial = UserMasterKeyMaterial(
+                    val cipherEncodedBundle = CipherEncodedBundle(
                         encodedSalt = user.salt,
                         encodedInitialisationVector = user.initialisationVector,
                         encodedEncryptedTestText = user.encryptedTestText
@@ -70,7 +69,7 @@ class EnterMasterKeyViewModel @Inject constructor(
                     try {
                         val decryptedText = EncryptionHelper.performDecryption(
                             masterKey = masterKey,
-                            userMasterKeyMaterial = userMasterKeyMaterial
+                            cipherEncodedBundle = cipherEncodedBundle
                         )
 
                         if (decryptedText == User.TEST_TEXT) {
