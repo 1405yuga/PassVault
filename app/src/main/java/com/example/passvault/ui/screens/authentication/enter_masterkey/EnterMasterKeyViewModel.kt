@@ -7,12 +7,14 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passvault.data.CipherEncodedBundle
+import com.example.passvault.data.MasterCredentials
 import com.example.passvault.data.User
-import com.example.passvault.di.shared_reference.SecurePrefsRepository
+import com.example.passvault.di.shared_reference.MasterCredentialsRepository
 import com.example.passvault.network.supabase.UserRepository
 import com.example.passvault.utils.helper.EncryptionHelper
 import com.example.passvault.utils.input_validations.AuthInputValidators
 import com.example.passvault.utils.state.ScreenState
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EnterMasterKeyViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val securePrefsRepository: SecurePrefsRepository
+    private val masterCredentialsRepository: MasterCredentialsRepository
 ) : ViewModel() {
 
     private val _screenState = MutableStateFlow<ScreenState<String>>(ScreenState.PreLoad())
@@ -78,7 +80,15 @@ class EnterMasterKeyViewModel @Inject constructor(
                         if (decryptedText == User.TEST_TEXT) {
                             _screenState.value =
                                 ScreenState.Loaded("Master key verified successfully!")
-                            securePrefsRepository.saveMasterKeyLocally(masterKey = masterKey)
+                            val masterCredentials = Gson().toJson(
+                                MasterCredentials(
+                                    masterKey = masterKey,
+                                    encodedSalt = user.salt
+                                )
+                            )
+                            masterCredentialsRepository.saveMasterCredentialsJsonLocally(
+                                masterCredentionsJson = masterCredentials
+                            )
                         } else {
                             setIncorrectKeyError()
                         }

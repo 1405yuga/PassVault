@@ -22,6 +22,12 @@ data class CipherEncodedBundle(
     val encodedEncryptedTestText: String,
 )
 
+//local-storage
+data class MasterCredentials(
+    val masterKey: String,
+    val encodedSalt: String
+)
+
 object UserTable {
     const val TABLE_NAME = "user"
     const val USER_ID = "user_id"

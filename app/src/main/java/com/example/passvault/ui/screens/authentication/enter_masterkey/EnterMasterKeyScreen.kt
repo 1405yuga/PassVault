@@ -27,6 +27,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.passvault.R
+import com.example.passvault.di.shared_reference.EncryptedPrefsModule
+import com.example.passvault.di.shared_reference.MasterCredentialsRepository
+import com.example.passvault.di.supabase.SupabaseModule
+import com.example.passvault.network.supabase.UserRepository
+import com.example.passvault.utils.annotations.HorizontalScreenPreview
+import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ShowAndHidePasswordTextField
 import com.example.passvault.utils.state.ScreenState
 
@@ -123,28 +129,34 @@ fun EnterMasterKeyScreen(
     }
 }
 
-//@Composable
-//@VerticalScreenPreview
-//private fun EnterMasterKeyScreenPreview() {
-//    EnterMasterKeyScreen(
-//        viewModel = EnterMasterKeyViewModel(
-//            userRepository = UserRepository(
-//                supabaseClient = SupabaseModule.mockClient
-//            ),
-//            encryptedPrefs = EncryptedPrefsModule.provideEncryptedSharedReference()),
-//        onUnlocked = {}
-//    )
-//}
-//
-//@Composable
-//@HorizontalScreenPreview
-//private fun EnterMasterKeyScreenHorizontalPreview() {
-//    EnterMasterKeyScreen(
-//        viewModel = EnterMasterKeyViewModel(
-//            userRepository = UserRepository(
-//                supabaseClient = SupabaseModule.mockClient
-//            )
-//        ),
-//        onUnlocked = {}
-//    )
-//}
+@Composable
+@VerticalScreenPreview
+private fun EnterMasterKeyScreenPreview() {
+    EnterMasterKeyScreen(
+        viewModel = EnterMasterKeyViewModel(
+            userRepository = UserRepository(
+                supabaseClient = SupabaseModule.mockClient
+            ),
+            masterCredentialsRepository = MasterCredentialsRepository(
+                encryptedPrefs = EncryptedPrefsModule.mockSharedPreference
+            )
+        ),
+        onUnlocked = {}
+    )
+}
+
+@Composable
+@HorizontalScreenPreview
+private fun EnterMasterKeyScreenHorizontalPreview() {
+    EnterMasterKeyScreen(
+        viewModel = EnterMasterKeyViewModel(
+            userRepository = UserRepository(
+                supabaseClient = SupabaseModule.mockClient
+            ),
+            masterCredentialsRepository = MasterCredentialsRepository(
+                encryptedPrefs = EncryptedPrefsModule.mockSharedPreference
+            )
+        ),
+        onUnlocked = {}
+    )
+}
