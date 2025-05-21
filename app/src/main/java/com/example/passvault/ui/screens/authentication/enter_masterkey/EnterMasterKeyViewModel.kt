@@ -1,5 +1,6 @@
 package com.example.passvault.ui.screens.authentication.enter_masterkey
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -7,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passvault.data.CipherEncodedBundle
 import com.example.passvault.data.User
+import com.example.passvault.di.shared_reference.SecurePrefsRepository
 import com.example.passvault.network.supabase.UserRepository
 import com.example.passvault.utils.helper.EncryptionHelper
 import com.example.passvault.utils.input_validations.AuthInputValidators
@@ -19,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EnterMasterKeyViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val securePrefsRepository: SecurePrefsRepository
 ) : ViewModel() {
 
     private val _screenState = MutableStateFlow<ScreenState<String>>(ScreenState.PreLoad())
@@ -75,6 +78,7 @@ class EnterMasterKeyViewModel @Inject constructor(
                         if (decryptedText == User.TEST_TEXT) {
                             _screenState.value =
                                 ScreenState.Loaded("Master key verified successfully!")
+                            securePrefsRepository.saveMasterKeyLocally(masterKey = masterKey)
                         } else {
                             setIncorrectKeyError()
                         }
