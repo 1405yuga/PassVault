@@ -12,7 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.passvault.data.Vault
 import com.example.passvault.data.VaultTable
-import com.example.passvault.ui.screens.main.add.AddPasswordScreen
+import com.example.passvault.ui.screens.main.add_password.AddPasswordScreen
 import com.example.passvault.ui.screens.main.profile.ProfileScreen
 import com.example.passvault.ui.screens.main.vault_home.VaultHomeScreen
 import com.example.passvault.utils.annotations.HorizontalScreenPreview

@@ -79,7 +79,7 @@ class CreateMasterKeyViewModel @Inject constructor(
                     user = User(
                         salt = masterKeyMaterial.encodedSalt,
                         initialisationVector = masterKeyMaterial.encodedInitialisationVector,
-                        encryptedTestText = masterKeyMaterial.encodedEncryptedTestText,
+                        encryptedTestText = masterKeyMaterial.encodedEncryptedText,
                         createdAt = Clock.System.now().toString()
                     )
                 )

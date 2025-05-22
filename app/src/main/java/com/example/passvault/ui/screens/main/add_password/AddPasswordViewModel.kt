@@ -1,4 +1,4 @@
-package com.example.passvault.ui.screens.main.add
+package com.example.passvault.ui.screens.main.add_password
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

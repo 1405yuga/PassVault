@@ -1,6 +1,5 @@
 package com.example.passvault.ui.screens.authentication.enter_masterkey
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -68,7 +67,7 @@ class EnterMasterKeyViewModel @Inject constructor(
                     val cipherEncodedBundle = CipherEncodedBundle(
                         encodedSalt = user.salt,
                         encodedInitialisationVector = user.initialisationVector,
-                        encodedEncryptedTestText = user.encryptedTestText
+                        encodedEncryptedText = user.encryptedTestText
                     )
 
                     try {

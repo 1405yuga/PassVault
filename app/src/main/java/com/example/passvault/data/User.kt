@@ -19,7 +19,7 @@ data class User(
 data class CipherEncodedBundle(
     val encodedSalt: String,
     val encodedInitialisationVector: String,
-    val encodedEncryptedTestText: String,
+    val encodedEncryptedText: String,
 )
 
 //local-storage

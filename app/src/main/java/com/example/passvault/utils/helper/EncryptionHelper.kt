@@ -59,14 +59,14 @@ object EncryptionHelper {
         return CipherEncodedBundle(
             encodedSalt = salt.toBase64(),
             encodedInitialisationVector = iv.toBase64(),
-            encodedEncryptedTestText = encryptedData.toBase64()
+            encodedEncryptedText = encryptedData.toBase64()
         )
     }
 
     fun performDecryption(masterKey: String, cipherEncodedBundle: CipherEncodedBundle): String {
         val salt = cipherEncodedBundle.encodedSalt.fromBase64()
         val iv = cipherEncodedBundle.encodedInitialisationVector.fromBase64()
-        val encryptedData = cipherEncodedBundle.encodedEncryptedTestText.fromBase64()
+        val encryptedData = cipherEncodedBundle.encodedEncryptedText.fromBase64()
 
         val aesKey = deriveAESKey(
             masterKey = masterKey, salt = salt
