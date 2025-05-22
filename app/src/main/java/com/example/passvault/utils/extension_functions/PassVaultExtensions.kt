@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.passvault.data.Vault
 import com.example.passvault.ui.screens.main.vault_home.NavDrawerMenus
 import com.example.passvault.utils.state.ScreenState
+import com.google.gson.Gson
 
 fun ImageVector.toIconKey(): String {
     return this.name
@@ -67,3 +68,6 @@ fun <T> HandleScreenState(
 
 fun ByteArray.toBase64(): String = Base64.encodeToString(this, Base64.DEFAULT)
 fun String.fromBase64(): ByteArray = Base64.decode(this, Base64.DEFAULT)
+
+fun Any.toJsonString(): String = Gson().toJson(this)
+inline fun <reified T> String.fromJsonString(): T = Gson().fromJson(this, T::class.java)
