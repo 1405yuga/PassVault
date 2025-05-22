@@ -1,5 +1,6 @@
 package com.example.passvault.ui.screens.main.add_password
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -54,6 +56,7 @@ import com.example.passvault.utils.custom_composables.ShowAndHidePasswordTextFie
 import com.example.passvault.utils.custom_composables.TextFieldWithErrorText
 import com.example.passvault.utils.extension_functions.HandleScreenState
 import com.example.passvault.utils.extension_functions.toOutlinedIcon
+import com.example.passvault.utils.state.ScreenState
 
 @Composable
 fun AddPasswordScreen(
@@ -83,6 +86,9 @@ fun AddPasswordDetailsScreen(
     modifier: Modifier = Modifier
 ) {
     LaunchedEffect(Unit) { viewModel.onSelectedVaultChange(selectedVault) }
+    val screenState by viewModel.screenState.collectAsState()
+    val context = LocalContext.current
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -93,6 +99,19 @@ fun AddPasswordDetailsScreen(
             .verticalScroll(rememberScrollState())
             .imePadding()
     ) {
+        LaunchedEffect(screenState) {
+            when (val state = screenState) {
+                is ScreenState.Error -> {
+                    Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is ScreenState.Loaded -> {
+                    onClose()
+                }
+
+                else -> {}
+            }
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -147,8 +166,14 @@ fun AddPasswordDetailsScreen(
             Spacer(modifier = Modifier.padding(4.dp))
             Button(
                 onClick = { viewModel.storePasswordDetails() },
-                modifier = Modifier.height(dimensionResource(R.dimen.min_clickable_size))
-            ) { Text(text = "Create") }
+                modifier = Modifier.height(dimensionResource(R.dimen.min_clickable_size)),
+                enabled = screenState !is ScreenState.Loading
+            ) {
+                when (screenState) {
+                    is ScreenState.Loading -> Text(text = "Loading..")
+                    else -> Text(text = "Create")
+                }
+            }
         }
         TextFieldWithErrorText(
             label = "Title",

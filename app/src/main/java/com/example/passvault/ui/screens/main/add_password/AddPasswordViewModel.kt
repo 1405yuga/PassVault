@@ -114,7 +114,7 @@ class AddPasswordViewModel @Inject constructor(
     private fun areInputsValid(): Boolean {
         titleError = if (title.trim().isBlank()) "Title is required" else ""
         passwordError = if (password.trim().isBlank()) "Password is required" else ""
-        return titleError.isBlank()
+        return titleError.isBlank() && passwordError.isBlank()
     }
 
     private val _screenState = MutableStateFlow<ScreenState<String>>(ScreenState.PreLoad())
@@ -161,7 +161,7 @@ class AddPasswordViewModel @Inject constructor(
                         this.javaClass.simpleName,
                         "$masterCredentials\n$passwordDetailJsonString\n$cipherEncodedBundle"
                     )
-                    _screenState.value = ScreenState.Loaded(result = "Added password successfully!")
+                    _screenState.value = ScreenState.Loaded(result = "Added password details successfully!")
                 }
             }
         } catch (e: Exception) {
