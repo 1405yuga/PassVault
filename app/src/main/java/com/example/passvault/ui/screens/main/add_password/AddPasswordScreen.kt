@@ -43,7 +43,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.passvault.R
 import com.example.passvault.data.Vault
+import com.example.passvault.di.shared_reference.EncryptedPrefsModule
+import com.example.passvault.di.shared_reference.MasterCredentialsRepository
 import com.example.passvault.di.supabase.SupabaseModule
+import com.example.passvault.network.supabase.EncryptedDataRepository
 import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
@@ -244,7 +247,11 @@ private fun AddPasswordScreenPreview() {
     AddPasswordDetailsScreen(
         onClose = {},
         viewModel = AddPasswordViewModel(
-            vaultRepository = VaultRepository(SupabaseModule.mockClient)
+            vaultRepository = VaultRepository(SupabaseModule.mockClient),
+            masterCredentialsRepository = MasterCredentialsRepository(
+                encryptedPrefs = EncryptedPrefsModule.mockSharedPreference
+            ),
+            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
         ),
         vaults = vaults,
         selectedVault = vaults.first(),
@@ -266,7 +273,10 @@ private fun AddPasswordScreenHorizontalPreview() {
     AddPasswordDetailsScreen(
         onClose = {},
         viewModel = AddPasswordViewModel(
-            vaultRepository = VaultRepository(SupabaseModule.mockClient)
+            vaultRepository = VaultRepository(SupabaseModule.mockClient),
+            masterCredentialsRepository = MasterCredentialsRepository(
+                encryptedPrefs = EncryptedPrefsModule.mockSharedPreference
+            ), encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient)
         ),
         vaults = vaults,
         selectedVault = vaults.first(),
