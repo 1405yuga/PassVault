@@ -1,65 +1,45 @@
 package com.example.passvault.ui.screens.main
 
-import android.util.Log
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.passvault.data.Vault
-import com.example.passvault.data.VaultTable
+import com.example.passvault.di.supabase.SupabaseModule
+import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.ui.screens.main.add_password.AddPasswordScreen
 import com.example.passvault.ui.screens.main.nav_drawer.NavMenusScreen
 import com.example.passvault.ui.screens.main.nav_drawer.profile.ProfileScreen
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
-import com.google.gson.Gson
+import com.example.passvault.utils.extension_functions.toVault
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = MainScreens.VaultHome.route) {
         composable(route = MainScreens.VaultHome.route) {
             NavMenusScreen(
                 viewModel = hiltViewModel(),
                 toProfileScreen = { navController.navigate(MainScreens.Profile.route) },
-                toAddPasswordScreen = { vaultString ->
-                    navController.navigate("${MainScreens.AddPassword.route}/$vaultString")
-                },
+                toAddPasswordScreen = { navController.navigate(MainScreens.AddPassword.route) },
                 mainScreenViewModel = hiltViewModel()
             )
         }
-        composable(
-            route = "${MainScreens.AddPassword.route}/{${VaultTable.VAULT_JSON_ARGUMENT_NAME}}",
-            arguments = listOf(navArgument(VaultTable.VAULT_JSON_ARGUMENT_NAME) {
-                type = NavType.StringType
-            })
-        ) { navBackStackEntry ->
-            val selectedVault =
-                navBackStackEntry.arguments?.getString(VaultTable.VAULT_JSON_ARGUMENT_NAME)
-            selectedVault?.let {
-                val vault = Gson().fromJson(it, Vault::class.java)
-                AddPasswordScreen(
-                    onClose = { navController.popBackStack() },
-                    selectedVault = vault,
-                    viewModel = hiltViewModel(),
-                    modifier = Modifier
-                )
-                Log.d("MainScreen", "Vault received : $vault")
-            }
-        }
-        composable(route = MainScreens.AddVault.route) {
-            // TODO: create dialog screen
+        composable(route = MainScreens.AddPassword.route) {
+            AddPasswordScreen(
+                onClose = { navController.popBackStack() },
+                selectedVault = mainScreenViewModel.lastVaultMenu?.toVault(),
+                viewModel = hiltViewModel(),
+                modifier = Modifier
+            )
         }
         composable(route = MainScreens.Profile.route) {
             ProfileScreen()
         }
-
     }
 }
 
@@ -67,11 +47,19 @@ fun MainScreen() {
 @Composable
 @VerticalScreenPreview
 private fun MainScreenPreview() {
-    MainScreen()
+    MainScreen(
+        mainScreenViewModel = MainScreenViewModel(
+            vaultRepository = VaultRepository(SupabaseModule.mockClient)
+        )
+    )
 }
 
 @Composable
 @HorizontalScreenPreview
 private fun MainScreenHorizontalPreview() {
-    MainScreen()
+    MainScreen(
+        mainScreenViewModel = MainScreenViewModel(
+            vaultRepository = VaultRepository(SupabaseModule.mockClient)
+        )
+    )
 }

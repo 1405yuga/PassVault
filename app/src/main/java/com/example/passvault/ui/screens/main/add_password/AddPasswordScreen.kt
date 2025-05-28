@@ -61,7 +61,7 @@ import com.example.passvault.utils.state.ScreenState
 @Composable
 fun AddPasswordScreen(
     onClose: () -> Unit,
-    selectedVault: Vault,
+    selectedVault: Vault?,
     viewModel: AddPasswordViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -81,11 +81,11 @@ fun AddPasswordScreen(
 fun AddPasswordDetailsScreen(
     onClose: () -> Unit,
     viewModel: AddPasswordViewModel,
-    selectedVault: Vault,
+    selectedVault: Vault?,
     vaults: List<Vault>,
     modifier: Modifier = Modifier
 ) {
-    LaunchedEffect(Unit) { viewModel.onSelectedVaultChange(selectedVault) }
+    LaunchedEffect(Unit) { if (selectedVault != null) viewModel.onSelectedVaultChange(selectedVault) }
     val screenState by viewModel.screenState.collectAsState()
     val context = LocalContext.current
 
