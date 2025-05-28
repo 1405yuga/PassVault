@@ -1,4 +1,4 @@
-package com.example.passvault.ui.screens.main.add_vault
+package com.example.passvault.ui.screens.main.nav_drawer.add_vault
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -51,7 +51,7 @@ import com.example.passvault.R
 import com.example.passvault.data.Vault
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.VaultRepository
-import com.example.passvault.ui.screens.main.vault_home.VaultHomeViewModel
+import com.example.passvault.ui.screens.main.nav_drawer.VaultHomeViewModel
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.TextFieldWithErrorText

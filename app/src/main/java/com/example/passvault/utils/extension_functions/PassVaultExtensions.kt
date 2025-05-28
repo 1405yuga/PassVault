@@ -19,7 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.passvault.data.Vault
-import com.example.passvault.ui.screens.main.vault_home.NavDrawerMenus
+import com.example.passvault.ui.screens.main.nav_drawer.NavDrawerMenus
 import com.example.passvault.utils.state.ScreenState
 import com.google.gson.Gson
 

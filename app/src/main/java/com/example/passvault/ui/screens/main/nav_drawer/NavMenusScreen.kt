@@ -1,4 +1,4 @@
-package com.example.passvault.ui.screens.main.vault_home
+package com.example.passvault.ui.screens.main.nav_drawer
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
@@ -40,8 +40,8 @@ import com.example.passvault.R
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.ui.screens.main.MainScreenViewModel
-import com.example.passvault.ui.screens.main.add_vault.AddVaultDialog
 import com.example.passvault.ui.screens.main.list.PasswordsListScreen
+import com.example.passvault.ui.screens.main.nav_drawer.add_vault.AddVaultDialog
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ConfirmationAlertDialog
@@ -54,7 +54,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VaultHomeScreen(
+fun NavMenusScreen(
     toProfileScreen: () -> Unit,
     toAddPasswordScreen: (vaultString: String) -> Unit,
     viewModel: VaultHomeViewModel,
@@ -279,8 +279,8 @@ fun VaultHomeScreen(
 
 @Composable
 @VerticalScreenPreview
-fun VaultHomeScreenPreview() {
-    VaultHomeScreen(
+fun NavMenusScreenPreview() {
+    NavMenusScreen(
         viewModel = VaultHomeViewModel(
             vaultRepository = VaultRepository(SupabaseModule.mockClient)
         ),
@@ -294,8 +294,8 @@ fun VaultHomeScreenPreview() {
 
 @Composable
 @HorizontalScreenPreview
-fun VaultHomeScreenHorizontalPreview() {
-    VaultHomeScreen(
+fun NavMenusScreenHorizontalPreview() {
+    NavMenusScreen(
         viewModel = VaultHomeViewModel(
             vaultRepository = VaultRepository(SupabaseModule.mockClient)
         ),

@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passvault.data.Vault
 import com.example.passvault.network.supabase.VaultRepository
-import com.example.passvault.ui.screens.main.vault_home.NavDrawerMenus
+import com.example.passvault.ui.screens.main.nav_drawer.NavDrawerMenus
 import com.example.passvault.utils.state.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

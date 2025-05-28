@@ -13,8 +13,8 @@ import androidx.navigation.navArgument
 import com.example.passvault.data.Vault
 import com.example.passvault.data.VaultTable
 import com.example.passvault.ui.screens.main.add_password.AddPasswordScreen
-import com.example.passvault.ui.screens.main.profile.ProfileScreen
-import com.example.passvault.ui.screens.main.vault_home.VaultHomeScreen
+import com.example.passvault.ui.screens.main.nav_drawer.NavMenusScreen
+import com.example.passvault.ui.screens.main.nav_drawer.profile.ProfileScreen
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.google.gson.Gson
@@ -25,7 +25,7 @@ fun MainScreen() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = MainScreens.VaultHome.route) {
         composable(route = MainScreens.VaultHome.route) {
-            VaultHomeScreen(
+            NavMenusScreen(
                 viewModel = hiltViewModel(),
                 toProfileScreen = { navController.navigate(MainScreens.Profile.route) },
                 toAddPasswordScreen = { vaultString ->

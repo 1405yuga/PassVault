@@ -161,7 +161,8 @@ class AddPasswordViewModel @Inject constructor(
                         this.javaClass.simpleName,
                         "$masterCredentials\n$passwordDetailJsonString\n$cipherEncodedBundle"
                     )
-                    _screenState.value = ScreenState.Loaded(result = "Added password details successfully!")
+                    _screenState.value =
+                        ScreenState.Loaded(result = "Added password details successfully!")
                 }
             }
         } catch (e: Exception) {

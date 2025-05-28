@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.implementation
 import java.util.Properties
 
 plugins {
@@ -99,5 +98,5 @@ dependencies {
     implementation("com.google.code.gson:gson:2.12.1")
 
     //encrypted shared preference
-    implementation ("androidx.security:security-crypto:1.1.0-alpha05")
+    implementation("androidx.security:security-crypto:1.1.0-alpha05")
 }

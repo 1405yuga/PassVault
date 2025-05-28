@@ -1,4 +1,4 @@
-package com.example.passvault.ui.screens.main.profile
+package com.example.passvault.ui.screens.main.nav_drawer.profile
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
