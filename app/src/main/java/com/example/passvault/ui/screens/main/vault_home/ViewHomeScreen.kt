@@ -1,5 +1,6 @@
 package com.example.passvault.ui.screens.main.vault_home
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.example.passvault.R
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.VaultRepository
+import com.example.passvault.ui.screens.main.MainScreenViewModel
 import com.example.passvault.ui.screens.main.add_vault.AddVaultDialog
 import com.example.passvault.ui.screens.main.list.PasswordsListScreen
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
@@ -52,11 +54,12 @@ import kotlinx.coroutines.launch
 fun VaultHomeScreen(
     toProfileScreen: () -> Unit,
     toAddPasswordScreen: (vaultString: String) -> Unit,
-    viewModel: VaultHomeViewModel
+    viewModel: VaultHomeViewModel,
+    mainScreenViewModel: MainScreenViewModel
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
     val scope = rememberCoroutineScope()
-    val vaultScreenState by viewModel.vaultScreenState.collectAsState()
+    val vaultScreenState by mainScreenViewModel.vaultScreenState.collectAsState()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -122,9 +125,10 @@ fun VaultHomeScreen(
                                             }
 
                                         },
-                                        selected = vaultMenu == (viewModel.lastVaultMenu ?: false),
+                                        selected = vaultMenu == (mainScreenViewModel.lastVaultMenu
+                                            ?: false),
                                         onClick = {
-                                            viewModel.onMenuSelected(vaultMenu)
+                                            mainScreenViewModel.onMenuSelected(vaultMenu)
                                             scope.launch { drawerState.close() }
                                         },
                                         icon = { Icon(vaultMenu.icon, contentDescription = null) },
@@ -147,7 +151,7 @@ fun VaultHomeScreen(
                         },
                         selected = false,
                         onClick = {
-                            viewModel.onMenuSelected(NavDrawerMenus.AddVault)
+                            mainScreenViewModel.onMenuSelected(NavDrawerMenus.AddVault)
                             viewModel.toggleCreateVaultDialog(openDialog = true)
                         },
                         icon = { Icon(NavDrawerMenus.AddVault.icon, contentDescription = null) },
@@ -169,7 +173,7 @@ fun VaultHomeScreen(
                         },
                         selected = false,
                         onClick = {
-                            viewModel.onMenuSelected(NavDrawerMenus.Profile)
+                            mainScreenViewModel.onMenuSelected(NavDrawerMenus.Profile)
                             scope.launch { drawerState.close() }
                             toProfileScreen()
                         },
@@ -191,7 +195,7 @@ fun VaultHomeScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = viewModel.lastVaultMenu?.label
+                            text = mainScreenViewModel.lastVaultMenu?.label
                                 ?: stringResource(R.string.app_name)
                         )
                     },
@@ -200,7 +204,8 @@ fun VaultHomeScreen(
                             scope.launch { drawerState.open() }
                         }) {
                             Icon(
-                                imageVector = viewModel.lastVaultMenu?.icon ?: Icons.Outlined.Menu,
+                                imageVector = mainScreenViewModel.lastVaultMenu?.icon
+                                    ?: Icons.Outlined.Menu,
                                 contentDescription = "Menu"
                             )
                         }
@@ -216,7 +221,7 @@ fun VaultHomeScreen(
                     //  load screen when vault menu clicked
                     PasswordsListScreen(
                         onAddClick = {
-                            viewModel.lastVaultMenu?.let {
+                            mainScreenViewModel.lastVaultMenu?.let {
                                 toAddPasswordScreen(Gson().toJson(it.toVault()))
                             }
                         })
@@ -225,11 +230,11 @@ fun VaultHomeScreen(
                     when {
                         viewModel.openAddVaultDialog -> {
                             AddVaultDialog(
-                                dialogState = viewModel.addVaultDialogState,
                                 onVaultNameChange = { viewModel.onVaultNameChange(it) },
                                 onIconSelected = { viewModel.onIconSelected(it) },
                                 insertNewVault = { viewModel.addNewVault() },
-                                setShowDialog = { viewModel.toggleCreateVaultDialog(it) }
+                                setShowDialog = { viewModel.toggleCreateVaultDialog(it) },
+                                vaultViewModel = viewModel
                             )
                         }
 
@@ -258,6 +263,9 @@ fun VaultHomeScreenPreview() {
         ),
         toProfileScreen = {},
         toAddPasswordScreen = {},
+        mainScreenViewModel = MainScreenViewModel(
+            vaultRepository = VaultRepository(SupabaseModule.mockClient)
+        ),
     )
 }
 
@@ -270,6 +278,9 @@ fun VaultHomeScreenHorizontalPreview() {
         ),
         toProfileScreen = {},
         toAddPasswordScreen = {},
+        mainScreenViewModel = MainScreenViewModel(
+            vaultRepository = VaultRepository(SupabaseModule.mockClient)
+        ),
     )
 }
 

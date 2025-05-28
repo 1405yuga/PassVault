@@ -24,63 +24,11 @@ import javax.inject.Inject
 @HiltViewModel
 class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultRepository) :
     ViewModel() {
-
-    private var _vaultListScreenState =
-        MutableStateFlow<ScreenState<List<Vault>>>(ScreenState.PreLoad())
-    val vaultScreenState: StateFlow<ScreenState<List<Vault>>> = _vaultListScreenState
-
-    var currentSelectedMenu by mutableStateOf<NavDrawerMenus?>(null)
-        private set
-
-    var lastVaultMenu by mutableStateOf<NavDrawerMenus?>(currentSelectedMenu)
-        private set
-
-    fun onMenuSelected(navDrawerMenus: NavDrawerMenus) {
-        if (navDrawerMenus is NavDrawerMenus.VaultItem) {
-            lastVaultMenu = navDrawerMenus
-        }
-        currentSelectedMenu = navDrawerMenus
-    }
-
-    init {
-        getVaults(isInitialLoad = true)
-    }
-
-    fun getVaults(isInitialLoad: Boolean? = null) {
-        _vaultListScreenState.value = ScreenState.Loading()
-        try {
-            viewModelScope.launch {
-                val result = vaultRepository.getAllVaults()
-                Log.d(this@VaultHomeViewModel.javaClass.simpleName, "Vaults : ${result.size}")
-
-                if (result.isNotEmpty()) {
-                    when (isInitialLoad) {
-                        true -> onMenuSelected(
-                            navDrawerMenus = NavDrawerMenus.VaultItem(vault = result.first())
-                        )
-
-                        false -> onMenuSelected(
-                            navDrawerMenus = NavDrawerMenus.VaultItem(vault = result.last())
-                        )
-
-                        null -> {
-                            if (result.size == 1) {
-                                onMenuSelected(
-                                    navDrawerMenus = NavDrawerMenus.VaultItem(vault = result.first())
-                                )
-                            }
-                        }
-                    }
-                }
-                _vaultListScreenState.value = ScreenState.Loaded(result = result)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            _vaultListScreenState.value = ScreenState.Error(message = "Unable to load Vaults")
-        }
-    }
-
     //Add Vault-------------------------------------------------------------------------------
+
+    private val _addDialogScreenState = MutableStateFlow<ScreenState<Vault>>(ScreenState.PreLoad())
+    val addDialogScreenState: StateFlow<ScreenState<Vault>> = _addDialogScreenState
+
     var openAddVaultDialog by mutableStateOf(false)
         private set
 
@@ -89,54 +37,57 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
         if (openDialog == false) resetDialogState()
     }
 
-    var addVaultDialogState by mutableStateOf(AddVaultDialogState())
+    var vaultName by mutableStateOf<String>("")
+        private set
+
+    var vaultError by mutableStateOf<String>("")
+        private set
+
+    var iconSelected by mutableStateOf<ImageVector?>(null)
         private set
 
     fun onVaultNameChange(vaultName: String) {
-        addVaultDialogState = addVaultDialogState.copy(vaultName = vaultName)
+        this.vaultName = vaultName
     }
 
-    fun onIconSelected(icon: ImageVector) {
-        addVaultDialogState = addVaultDialogState.copy(iconSelected = icon)
-    }
-
-    private fun updateDialogScreenState(state: ScreenState<String>) {
-        addVaultDialogState = addVaultDialogState.copy(screenState = state)
+    fun onIconSelected(icon: ImageVector?) {
+        this.iconSelected = icon
     }
 
     private fun checkInputFields(): Boolean {
-        addVaultDialogState = addVaultDialogState.copy(
-            vaultError =
-                if (addVaultDialogState.vaultName.trim().isBlank()) "Vault Name is required"
-                else ""
-        )
-        return addVaultDialogState.vaultError.isBlank()
+        this.vaultError =
+            if (this.vaultName.trim().isBlank()) "Vault Name is required"
+            else ""
+        return this.vaultError.isBlank()
     }
 
     private fun resetDialogState() {
-        addVaultDialogState = AddVaultDialogState()
+        onVaultNameChange(vaultName = "")
+        onIconSelected(null)
+        this.vaultError = ""
+//        this.openAddVaultDialog = false
+        this._addDialogScreenState.value = ScreenState.PreLoad()
     }
 
     fun addNewVault() {
         if (!checkInputFields()) return
-        updateDialogScreenState(ScreenState.Loading())
+        _addDialogScreenState.value = ScreenState.Loading()
         viewModelScope.launch {
-            updateDialogScreenState(
-                state = try {
-                    vaultRepository.insertVault(
-                        vault = Vault(
-                            vaultName = this@VaultHomeViewModel.addVaultDialogState.vaultName,
-                            iconKey = this@VaultHomeViewModel.addVaultDialogState.iconSelected.name
-                        )
-                    )
-                    getVaults(isInitialLoad = false)
-                    toggleCreateVaultDialog(openDialog = false)
-                    ScreenState.Loaded("Vault Added")
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    ScreenState.Error(message = "Unable to add vault")
-                }
-            )
+            try {
+                val resultVault = Vault(
+                    vaultName = this@VaultHomeViewModel.vaultName,
+                    iconKey = this@VaultHomeViewModel.iconSelected?.name
+                        ?: VaultIconsList.getIconsList()[0].name
+                )
+
+                vaultRepository.insertVault(vault = resultVault)
+//                    getVaults(isInitialLoad = false)
+                toggleCreateVaultDialog(openDialog = false)
+                _addDialogScreenState.value = ScreenState.Loaded(resultVault)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _addDialogScreenState.value = ScreenState.Error(message = "Unable to add vault")
+            }
         }
     }
 
@@ -165,7 +116,7 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
                     val result = vaultRepository.deleteVault(vaultId = vaultToBeRemoved!!.vaultId)
                     closeRemoveDialog()
                     result.onSuccess {
-                        getVaults()
+//                        getVaults()
                         Log.d(this@VaultHomeViewModel.javaClass.simpleName, "Vault deleted")
                     }.onFailure { exception ->
                         exception.printStackTrace()
@@ -185,10 +136,3 @@ sealed class NavDrawerMenus(val label: String, val icon: ImageVector) {
     object AddVault : NavDrawerMenus(label = "Add Vault", icon = Icons.Outlined.Add)
     object Profile : NavDrawerMenus(label = "Profile", icon = Icons.Filled.Person)
 }
-
-data class AddVaultDialogState(
-    val screenState: ScreenState<String> = ScreenState.PreLoad(),
-    val vaultName: String = "",
-    val vaultError: String = "",
-    val iconSelected: ImageVector = VaultIconsList.getIconsList()[0]
-)

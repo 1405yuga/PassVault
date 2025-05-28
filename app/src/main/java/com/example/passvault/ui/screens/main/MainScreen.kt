@@ -30,7 +30,8 @@ fun MainScreen() {
                 toProfileScreen = { navController.navigate(MainScreens.Profile.route) },
                 toAddPasswordScreen = { vaultString ->
                     navController.navigate("${MainScreens.AddPassword.route}/$vaultString")
-                }
+                },
+                mainScreenViewModel = hiltViewModel()
             )
         }
         composable(
