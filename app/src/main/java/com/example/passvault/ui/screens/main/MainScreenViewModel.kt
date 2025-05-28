@@ -53,6 +53,7 @@ class MainScreenViewModel @Inject constructor(private val vaultRepository: Vault
         vaultId?.let { id ->
             _vaultList.value = _vaultList.value.filter { id != it.vaultId }
         }
+        onMenuSelected(NavDrawerMenus.VaultItem(_vaultList.value.last()))
     }
 
     fun getVaults(isInitialLoad: Boolean? = null) {

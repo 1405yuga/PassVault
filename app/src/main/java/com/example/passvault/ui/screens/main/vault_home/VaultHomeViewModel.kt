@@ -106,21 +106,28 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
         this.openRemoveVaultConfirmationDialog = false
     }
 
+    private val _removeVaultScreenState =
+        MutableStateFlow<ScreenState<Vault>>(ScreenState.PreLoad())
+    val removeVaultScreenState: StateFlow<ScreenState<Vault>> = _removeVaultScreenState
+
     fun removeVault() {
+        _removeVaultScreenState.value = ScreenState.Loading()
         try {
             if (vaultToBeRemoved != null) {
                 viewModelScope.launch {
                     val result = vaultRepository.deleteVault(vaultId = vaultToBeRemoved!!.vaultId)
-                    closeRemoveDialog()
                     result.onSuccess {
                         Log.d(this@VaultHomeViewModel.javaClass.simpleName, "Vault deleted")
+                        _removeVaultScreenState.value = ScreenState.Loaded(vaultToBeRemoved!!)
                     }.onFailure { exception ->
                         exception.printStackTrace()
+                        _removeVaultScreenState.value = ScreenState.Error("Unable to delete Vault")
                     }
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            _removeVaultScreenState.value = ScreenState.Error("Unable to delete Vault")
         }
     }
 }

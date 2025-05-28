@@ -1,6 +1,6 @@
 package com.example.passvault.ui.screens.main.vault_home
 
-import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,6 +48,7 @@ import com.example.passvault.utils.custom_composables.ConfirmationAlertDialog
 import com.example.passvault.utils.extension_functions.HandleScreenState
 import com.example.passvault.utils.extension_functions.toOutlinedIcon
 import com.example.passvault.utils.extension_functions.toVault
+import com.example.passvault.utils.state.ScreenState
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
@@ -62,6 +64,8 @@ fun VaultHomeScreen(
     val scope = rememberCoroutineScope()
     val vaultScreenState by mainScreenViewModel.vaultScreenState.collectAsState()
     val vaultList by mainScreenViewModel.vaultList.collectAsState()
+    val removeVaultScreenState by viewModel.removeVaultScreenState.collectAsState()
+    val currentContext = LocalContext.current
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -249,6 +253,22 @@ fun VaultHomeScreen(
                                 dialogText = "Deleting this vault deletes all its passwords permanently.\nAre you sure to proceed?",
                                 icon = viewModel.vaultToBeRemoved?.iconKey?.toOutlinedIcon()
                             )
+                        }
+                    }
+
+                    LaunchedEffect(removeVaultScreenState) {
+                        when (val state = removeVaultScreenState) {
+                            is ScreenState.Error -> {
+                                Toast.makeText(currentContext, state.message, Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+
+                            is ScreenState.Loaded -> {
+                                mainScreenViewModel.removeVaultFromListById(vaultId = state.result.vaultId)
+                                viewModel.closeRemoveDialog()
+                            }
+
+                            else -> {}
                         }
                     }
                 }
