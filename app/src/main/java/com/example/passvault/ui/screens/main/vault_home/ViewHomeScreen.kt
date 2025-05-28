@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -60,6 +61,7 @@ fun VaultHomeScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
     val scope = rememberCoroutineScope()
     val vaultScreenState by mainScreenViewModel.vaultScreenState.collectAsState()
+    val vaultList by mainScreenViewModel.vaultList.collectAsState()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -86,7 +88,7 @@ fun VaultHomeScreen(
                     )
                     HandleScreenState(
                         state = vaultScreenState,
-                        onLoaded = { vaultList ->
+                        onLoaded = {
                             if (vaultList.isEmpty()) {
                                 // TODO: create ui to display below message
                                 Text(text = "Add vaults to get started!")
@@ -234,6 +236,7 @@ fun VaultHomeScreen(
                                 onIconSelected = { viewModel.onIconSelected(it) },
                                 insertNewVault = { viewModel.addNewVault() },
                                 setShowDialog = { viewModel.toggleCreateVaultDialog(it) },
+                                onSuccess = { mainScreenViewModel.addVaultToList(vault = it) },
                                 vaultViewModel = viewModel
                             )
                         }

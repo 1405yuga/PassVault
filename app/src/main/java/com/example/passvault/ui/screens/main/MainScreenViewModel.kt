@@ -46,6 +46,7 @@ class MainScreenViewModel @Inject constructor(private val vaultRepository: Vault
 
     fun addVaultToList(vault: Vault) {
         _vaultList.value = _vaultList.value + vault
+        onMenuSelected(NavDrawerMenus.VaultItem(vault))
     }
 
     fun removeVaultFromListById(vaultId: Long?) {

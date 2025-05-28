@@ -48,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.passvault.R
+import com.example.passvault.data.Vault
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.ui.screens.main.vault_home.VaultHomeViewModel
@@ -65,6 +66,7 @@ fun AddVaultDialog(
     onIconSelected: (ImageVector) -> Unit,
     insertNewVault: () -> Unit,
     setShowDialog: (Boolean) -> Unit,
+    onSuccess: (Vault) -> Unit,
 ) {
     val currentContext = LocalContext.current
     val screenState by vaultViewModel.addDialogScreenState.collectAsState()
@@ -134,8 +136,11 @@ fun AddVaultDialog(
                 }
 
                 is ScreenState.Loaded -> {
-                    Toast.makeText(currentContext, "Added Vault successfully", Toast.LENGTH_SHORT)
+                    Toast
+                        .makeText(currentContext, "Added Vault successfully", Toast.LENGTH_SHORT)
                         .show()
+                    onSuccess(state.result)
+                    setShowDialog(false)
                 }
 
                 else -> {}
@@ -200,7 +205,8 @@ fun AddVaultDialogPreview() {
         onVaultNameChange = {},
         onIconSelected = {},
         insertNewVault = {},
-        setShowDialog = {}
+        setShowDialog = {},
+        onSuccess = {}
     )
 }
 
@@ -216,7 +222,8 @@ fun AddVaultDialogHorizontalPreview() {
         onVaultNameChange = {},
         onIconSelected = {},
         insertNewVault = {},
-        setShowDialog = {}
+        setShowDialog = {},
+        onSuccess = {}
     )
 }
 

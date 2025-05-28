@@ -65,7 +65,6 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
         onVaultNameChange(vaultName = "")
         onIconSelected(null)
         this.vaultError = ""
-//        this.openAddVaultDialog = false
         this._addDialogScreenState.value = ScreenState.PreLoad()
     }
 
@@ -81,8 +80,6 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
                 )
 
                 vaultRepository.insertVault(vault = resultVault)
-//                    getVaults(isInitialLoad = false)
-                toggleCreateVaultDialog(openDialog = false)
                 _addDialogScreenState.value = ScreenState.Loaded(resultVault)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -116,7 +113,6 @@ class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultR
                     val result = vaultRepository.deleteVault(vaultId = vaultToBeRemoved!!.vaultId)
                     closeRemoveDialog()
                     result.onSuccess {
-//                        getVaults()
                         Log.d(this@VaultHomeViewModel.javaClass.simpleName, "Vault deleted")
                     }.onFailure { exception ->
                         exception.printStackTrace()
