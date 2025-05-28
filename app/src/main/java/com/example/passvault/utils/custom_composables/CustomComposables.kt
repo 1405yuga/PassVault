@@ -21,12 +21,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.passvault.utils.annotations.VerticalScreenPreview
@@ -144,8 +148,7 @@ fun ShowAndHidePasswordTextField(
 fun ConfirmationAlertDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
-    dialogTitle: String,
-    dialogText: String,
+    vaultName: String,
     icon: ImageVector?
 ) {
     AlertDialog(
@@ -159,22 +162,39 @@ fun ConfirmationAlertDialog(
                     )
                 }
                 Text(
-                    text = dialogTitle,
+                    text = "Delete $vaultName",
                     textAlign = TextAlign.Start,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         },
         text = {
             Text(
-                text = dialogText,
-                textAlign = TextAlign.Start,
+                text = buildAnnotatedString {
+                    append("This will delete all passwords in the vault ")
+                    withStyle(
+                        style = SpanStyle(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    ) { append("permanently") }
+                    append(" . This action cannot be undone.\n\nAre you sure you want to proceed?")
+                },
                 modifier = Modifier.fillMaxWidth()
             )
         },
         onDismissRequest = { onDismissRequest() },
-        confirmButton = { TextButton(onClick = { onDismissRequest() }) { Text("Dismiss") } },
-        dismissButton = { TextButton(onClick = { onConfirmation() }) { Text("Confirm") } }
+        dismissButton = { TextButton(onClick = { onDismissRequest() }) { Text("Dismiss") } },
+        confirmButton = {
+            TextButton(onClick = { onConfirmation() }) {
+                Text(
+                    "Confirm",
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        },
+        modifier = Modifier.fillMaxWidth()
     )
 }
 
@@ -184,8 +204,7 @@ fun ConfirmationDialogPreview() {
     ConfirmationAlertDialog(
         onDismissRequest = {},
         onConfirmation = {},
-        dialogTitle = "Some Title",
-        dialogText = "Deleting this vault will permanently remove all passwords stored within it.\nAre you sure you want to proceed?",
+        vaultName = "Some Title",
         icon = Icons.Default.Home
     )
 }

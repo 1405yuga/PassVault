@@ -249,8 +249,7 @@ fun NavMenusScreen(
                             ConfirmationAlertDialog(
                                 onDismissRequest = { viewModel.closeRemoveDialog() },
                                 onConfirmation = { viewModel.removeVault() },
-                                dialogTitle = "Delete ${viewModel.vaultToBeRemoved?.vaultName}",
-                                dialogText = "Deleting this vault deletes all its passwords permanently.\nAre you sure to proceed?",
+                                vaultName = viewModel.vaultToBeRemoved?.vaultName.toString(),
                                 icon = viewModel.vaultToBeRemoved?.iconKey?.toOutlinedIcon()
                             )
                         }
