@@ -20,7 +20,17 @@ data class PasswordDetails(
     val password: String,
     val website: String = "",
     val notes: String = ""
-)
+) {
+    companion object {
+        val mockPasswordDetails = PasswordDetails(
+            title = "Google",
+            email = "xyz@gmail.com",
+            password = "123456",
+            website = "www.google.com",
+            notes = "My notes can be anything.\nsomething"
+        )
+    }
+}
 
 object EncryptedDataTable {
     const val TABLE_NAME = "encrypted_data"

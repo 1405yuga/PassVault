@@ -1,9 +1,13 @@
 package com.example.passvault.utils.custom_composables
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -19,6 +23,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -207,6 +212,30 @@ fun ConfirmationDialogPreview() {
         vaultName = "Some Title",
         icon = Icons.Default.Home
     )
+}
+
+@Composable
+fun TitleSquare(title: String) {
+    Box(
+        modifier = Modifier
+            .size(55.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.onSecondary),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = title.take(2).uppercase(),
+            color = MaterialTheme.colorScheme.secondary,
+            fontSize = 22.sp,
+            modifier = Modifier.padding(6.dp)
+        )
+    }
+}
+
+@Composable
+@VerticalScreenPreview
+fun TitleSquarePreview() {
+    TitleSquare(title = "Yuga")
 }
 
 class NoPaddingPasswordTransformation : VisualTransformation {
