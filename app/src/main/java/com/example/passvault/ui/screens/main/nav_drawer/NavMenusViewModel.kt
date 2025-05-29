@@ -10,13 +10,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.passvault.data.EncryptedData
+import com.example.passvault.data.CipherEncodedBundle
+import com.example.passvault.data.MasterCredentials
+import com.example.passvault.data.PasswordDetails
 import com.example.passvault.data.Vault
+import com.example.passvault.di.shared_reference.MasterCredentialsRepository
 import com.example.passvault.network.supabase.EncryptedDataRepository
 import com.example.passvault.network.supabase.VaultRepository
+import com.example.passvault.utils.extension_functions.fromJsonString
 import com.example.passvault.utils.extension_functions.toOutlinedIcon
+import com.example.passvault.utils.helper.EncryptionHelper
 import com.example.passvault.utils.helper.VaultIconsList
 import com.example.passvault.utils.state.ScreenState
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,18 +32,19 @@ import javax.inject.Inject
 @HiltViewModel
 class VaultHomeViewModel @Inject constructor(
     private val vaultRepository: VaultRepository,
-    private val encryptedDataRepository: EncryptedDataRepository
+    private val encryptedDataRepository: EncryptedDataRepository,
+    private val masterCredentialsRepository: MasterCredentialsRepository
 ) :
     ViewModel() {
 
     //List Screen-------------------------------------------------------------------------
     private val _passwordListScreenState =
-        MutableStateFlow<ScreenState<List<EncryptedData>>>(ScreenState.PreLoad())
+        MutableStateFlow<ScreenState<List<PasswordDetails>>>(ScreenState.PreLoad())
 
-    val passwordListScreenState: StateFlow<ScreenState<List<EncryptedData>>> =
+    val passwordListScreenState: StateFlow<ScreenState<List<PasswordDetails>>> =
         _passwordListScreenState
 
-    fun fetchEncryptedData(vaultId: Long?) {
+    fun getPasswordsList(vaultId: Long?) {
         _passwordListScreenState.value = ScreenState.Loading()
         viewModelScope.launch {
             _passwordListScreenState.value = try {
@@ -46,8 +53,31 @@ class VaultHomeViewModel @Inject constructor(
                         encryptedDataRepository.getAllEncryptedDataAtVaultId(vaultId = vaultId)
                     if (result == null) {
                         ScreenState.Error("Unable to load Passwords list")
+                    } else if (result.isEmpty()) {
+                        ScreenState.Loaded(emptyList())
                     } else {
-                        ScreenState.Loaded(result)
+                        //get masterCredentials
+                        val masterCredentialsJson =
+                            masterCredentialsRepository.getLocallyStoredMasterCredentialsJson()
+                        if (masterCredentialsJson == null) {
+                            ScreenState.Error(message = "Something went wrong. Login again!")
+                        } else {
+                            val masterCredentials: MasterCredentials =
+                                masterCredentialsJson.fromJsonString()
+                            //decrypt
+                            val decryptedList: List<PasswordDetails> = result.map { encryptedData ->
+                                val decryptedData = EncryptionHelper.performDecryption(
+                                    masterKey = masterCredentials.masterKey,
+                                    cipherEncodedBundle = CipherEncodedBundle(
+                                        encodedSalt = masterCredentials.encodedSalt,
+                                        encodedInitialisationVector = encryptedData.encodedInitialisationVector,
+                                        encodedEncryptedText = encryptedData.encodedEncryptedPasswordData
+                                    )
+                                )
+                                Gson().fromJson(decryptedData, PasswordDetails::class.java)
+                            }
+                            ScreenState.Loaded(decryptedList)
+                        }
                     }
                 } else {
                     ScreenState.Error("Vault Not found")

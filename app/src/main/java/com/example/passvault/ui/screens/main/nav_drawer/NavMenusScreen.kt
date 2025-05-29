@@ -38,6 +38,8 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.passvault.R
+import com.example.passvault.di.shared_reference.EncryptedPrefsModule
+import com.example.passvault.di.shared_reference.MasterCredentialsRepository
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.EncryptedDataRepository
 import com.example.passvault.network.supabase.VaultRepository
@@ -229,12 +231,12 @@ fun NavMenusScreen(
                     //  load screen when vault menu clicked
                     mainScreenViewModel.lastVaultMenu?.let { vaultMenu ->
                         Log.d("NavMenuScreen", "Vault updated : $vaultMenu")
-                        LaunchedEffect(key1 = vaultMenu) { viewModel.fetchEncryptedData(vaultId = vaultMenu.toVault()?.vaultId) }
+                        LaunchedEffect(key1 = vaultMenu) { viewModel.getPasswordsList(vaultId = vaultMenu.toVault()?.vaultId) }
                         HandleScreenState(
                             state = passwordsScreenState,
                             onLoaded = {
                                 PasswordsListScreen(
-                                    encryptedDataList = it,
+                                    passwordDetailsList = it,
                                     onAddClick = {}
                                 )
                             }
@@ -291,7 +293,8 @@ fun NavMenusScreenPreview() {
     NavMenusScreen(
         viewModel = VaultHomeViewModel(
             vaultRepository = VaultRepository(SupabaseModule.mockClient),
-            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient)
+            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
+            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference),
         ),
         toProfileScreen = {},
         toAddPasswordScreen = {},
@@ -307,7 +310,8 @@ fun NavMenusScreenHorizontalPreview() {
     NavMenusScreen(
         viewModel = VaultHomeViewModel(
             vaultRepository = VaultRepository(SupabaseModule.mockClient),
-            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient)
+            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
+            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference)
         ),
         toProfileScreen = {},
         toAddPasswordScreen = {},

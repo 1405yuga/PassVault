@@ -6,17 +6,23 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.passvault.data.EncryptedData
+import com.example.passvault.data.PasswordDetails
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 
 @Composable
 fun PasswordsListScreen(
-    encryptedDataList: List<EncryptedData>,
+    passwordDetailsList: List<PasswordDetails>,
     onAddClick: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Passwords : ${encryptedDataList.size}")
+        if (passwordDetailsList.isEmpty()) {
+            // TODO: create ui to display empty list 
+            Text(text = "No passwords stored in this Vault!")
+        } else {
+            // TODO: create ui to display list
+            Text(text = "Passwords : ${passwordDetailsList.size}")
+        }
         Button(onClick = onAddClick) {
             Text("Go to add screen")
         }
@@ -24,11 +30,15 @@ fun PasswordsListScreen(
 }
 
 @Composable
+fun PasswordItem() {
+}
+
+@Composable
 @VerticalScreenPreview
 fun PasswordListScreenVertical() {
     PasswordsListScreen(
         onAddClick = {},
-        encryptedDataList = emptyList()
+        passwordDetailsList = emptyList()
     )
 }
 
@@ -37,6 +47,6 @@ fun PasswordListScreenVertical() {
 fun PasswordListScreenHorizontal() {
     PasswordsListScreen(
         onAddClick = {},
-        encryptedDataList = emptyList()
+        passwordDetailsList = emptyList()
     )
 }

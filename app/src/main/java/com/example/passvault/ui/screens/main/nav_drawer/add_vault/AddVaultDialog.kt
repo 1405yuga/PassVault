@@ -49,6 +49,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.passvault.R
 import com.example.passvault.data.Vault
+import com.example.passvault.di.shared_reference.EncryptedPrefsModule
+import com.example.passvault.di.shared_reference.MasterCredentialsRepository
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.EncryptedDataRepository
 import com.example.passvault.network.supabase.VaultRepository
@@ -202,7 +204,8 @@ fun AddVaultDialogPreview() {
             vaultRepository = VaultRepository(
                 supabaseClient = SupabaseModule.mockClient
             ),
-            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient)
+            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
+            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference)
         ),
         onVaultNameChange = {},
         onIconSelected = {},
@@ -220,7 +223,8 @@ fun AddVaultDialogHorizontalPreview() {
             vaultRepository = VaultRepository(
                 supabaseClient = SupabaseModule.mockClient
             ),
-            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient)
+            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
+            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference)
         ),
         onVaultNameChange = {},
         onIconSelected = {},
