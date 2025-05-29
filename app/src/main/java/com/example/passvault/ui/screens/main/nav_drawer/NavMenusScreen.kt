@@ -1,5 +1,6 @@
 package com.example.passvault.ui.screens.main.nav_drawer
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.passvault.R
 import com.example.passvault.di.supabase.SupabaseModule
+import com.example.passvault.network.supabase.EncryptedDataRepository
 import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.ui.screens.main.MainScreenViewModel
 import com.example.passvault.ui.screens.main.list.PasswordsListScreen
@@ -49,7 +51,6 @@ import com.example.passvault.utils.extension_functions.HandleScreenState
 import com.example.passvault.utils.extension_functions.toOutlinedIcon
 import com.example.passvault.utils.extension_functions.toVault
 import com.example.passvault.utils.state.ScreenState
-import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,6 +66,7 @@ fun NavMenusScreen(
     val vaultScreenState by mainScreenViewModel.vaultScreenState.collectAsState()
     val vaultList by mainScreenViewModel.vaultList.collectAsState()
     val removeVaultScreenState by viewModel.removeVaultScreenState.collectAsState()
+    val passwordsScreenState by viewModel.passwordListScreenState.collectAsState()
     val currentContext = LocalContext.current
 
     ModalNavigationDrawer(
@@ -225,12 +227,19 @@ fun NavMenusScreen(
                         .padding(horizontal = dimensionResource(R.dimen.medium_padding))
                 ) {
                     //  load screen when vault menu clicked
-                    PasswordsListScreen(
-                        onAddClick = {
-                            mainScreenViewModel.lastVaultMenu?.let {
-                                toAddPasswordScreen(Gson().toJson(it.toVault()))
+                    mainScreenViewModel.lastVaultMenu?.let { vaultMenu ->
+                        Log.d("NavMenuScreen", "Vault updated : $vaultMenu")
+                        LaunchedEffect(key1 = vaultMenu) { viewModel.fetchEncryptedData(vaultId = vaultMenu.toVault()?.vaultId) }
+                        HandleScreenState(
+                            state = passwordsScreenState,
+                            onLoaded = {
+                                PasswordsListScreen(
+                                    encryptedDataList = it,
+                                    onAddClick = {}
+                                )
                             }
-                        })
+                        )
+                    }
 
                     // loadDialogs
                     when {
@@ -281,7 +290,8 @@ fun NavMenusScreen(
 fun NavMenusScreenPreview() {
     NavMenusScreen(
         viewModel = VaultHomeViewModel(
-            vaultRepository = VaultRepository(SupabaseModule.mockClient)
+            vaultRepository = VaultRepository(SupabaseModule.mockClient),
+            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient)
         ),
         toProfileScreen = {},
         toAddPasswordScreen = {},
@@ -296,7 +306,8 @@ fun NavMenusScreenPreview() {
 fun NavMenusScreenHorizontalPreview() {
     NavMenusScreen(
         viewModel = VaultHomeViewModel(
-            vaultRepository = VaultRepository(SupabaseModule.mockClient)
+            vaultRepository = VaultRepository(SupabaseModule.mockClient),
+            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient)
         ),
         toProfileScreen = {},
         toAddPasswordScreen = {},

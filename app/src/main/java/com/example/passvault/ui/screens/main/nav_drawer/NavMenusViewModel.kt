@@ -10,7 +10,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.passvault.data.EncryptedData
 import com.example.passvault.data.Vault
+import com.example.passvault.network.supabase.EncryptedDataRepository
 import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.utils.extension_functions.toOutlinedIcon
 import com.example.passvault.utils.helper.VaultIconsList
@@ -22,8 +24,42 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class VaultHomeViewModel @Inject constructor(private val vaultRepository: VaultRepository) :
+class VaultHomeViewModel @Inject constructor(
+    private val vaultRepository: VaultRepository,
+    private val encryptedDataRepository: EncryptedDataRepository
+) :
     ViewModel() {
+
+    //List Screen-------------------------------------------------------------------------
+    private val _passwordListScreenState =
+        MutableStateFlow<ScreenState<List<EncryptedData>>>(ScreenState.PreLoad())
+
+    val passwordListScreenState: StateFlow<ScreenState<List<EncryptedData>>> =
+        _passwordListScreenState
+
+    fun fetchEncryptedData(vaultId: Long?) {
+        _passwordListScreenState.value = ScreenState.Loading()
+        viewModelScope.launch {
+            _passwordListScreenState.value = try {
+                if (vaultId != null) {
+                    val result =
+                        encryptedDataRepository.getAllEncryptedDataAtVaultId(vaultId = vaultId)
+                    if (result == null) {
+                        ScreenState.Error("Unable to load Passwords list")
+                    } else {
+                        ScreenState.Loaded(result)
+                    }
+                } else {
+                    ScreenState.Error("Vault Not found")
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                ScreenState.Error("Unable to load Passwords list")
+            }
+        }
+    }
+
     //Add Vault-------------------------------------------------------------------------------
 
     private val _addDialogScreenState = MutableStateFlow<ScreenState<Vault>>(ScreenState.PreLoad())

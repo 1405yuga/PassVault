@@ -50,6 +50,7 @@ import androidx.compose.ui.window.Dialog
 import com.example.passvault.R
 import com.example.passvault.data.Vault
 import com.example.passvault.di.supabase.SupabaseModule
+import com.example.passvault.network.supabase.EncryptedDataRepository
 import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.ui.screens.main.nav_drawer.VaultHomeViewModel
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
@@ -200,7 +201,8 @@ fun AddVaultDialogPreview() {
         vaultViewModel = VaultHomeViewModel(
             vaultRepository = VaultRepository(
                 supabaseClient = SupabaseModule.mockClient
-            )
+            ),
+            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient)
         ),
         onVaultNameChange = {},
         onIconSelected = {},
@@ -217,7 +219,8 @@ fun AddVaultDialogHorizontalPreview() {
         vaultViewModel = VaultHomeViewModel(
             vaultRepository = VaultRepository(
                 supabaseClient = SupabaseModule.mockClient
-            )
+            ),
+            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient)
         ),
         onVaultNameChange = {},
         onIconSelected = {},
