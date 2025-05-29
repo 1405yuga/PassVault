@@ -59,7 +59,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun NavMenusScreen(
     toProfileScreen: () -> Unit,
-    toAddPasswordScreen: (vaultString: String) -> Unit,
+    toAddPasswordScreen: () -> Unit,
     viewModel: VaultHomeViewModel,
     mainScreenViewModel: MainScreenViewModel
 ) {
@@ -138,8 +138,10 @@ fun NavMenusScreen(
                                         selected = vaultMenu == (mainScreenViewModel.lastVaultMenu
                                             ?: false),
                                         onClick = {
-                                            mainScreenViewModel.onMenuSelected(vaultMenu)
-                                            scope.launch { drawerState.close() }
+                                            scope.launch {
+                                                drawerState.close()
+                                                mainScreenViewModel.onMenuSelected(vaultMenu)
+                                            }
                                         },
                                         icon = { Icon(vaultMenu.icon, contentDescription = null) },
                                         modifier = Modifier.padding(
@@ -237,7 +239,7 @@ fun NavMenusScreen(
                             onLoaded = {
                                 PasswordsListScreen(
                                     passwordDetailsList = it,
-                                    onAddClick = {}
+                                    onAddClick = { toAddPasswordScreen() }
                                 )
                             }
                         )
