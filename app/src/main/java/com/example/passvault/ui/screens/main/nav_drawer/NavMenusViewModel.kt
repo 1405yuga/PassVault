@@ -24,9 +24,11 @@ import com.example.passvault.utils.helper.VaultIconsList
 import com.example.passvault.utils.state.ScreenState
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -65,17 +67,20 @@ class VaultHomeViewModel @Inject constructor(
                             val masterCredentials: MasterCredentials =
                                 masterCredentialsJson.fromJsonString()
                             //decrypt
-                            val decryptedList: List<PasswordDetails> = result.map { encryptedData ->
-                                val decryptedData = EncryptionHelper.performDecryption(
-                                    masterKey = masterCredentials.masterKey,
-                                    cipherEncodedBundle = CipherEncodedBundle(
-                                        encodedSalt = masterCredentials.encodedSalt,
-                                        encodedInitialisationVector = encryptedData.encodedInitialisationVector,
-                                        encodedEncryptedText = encryptedData.encodedEncryptedPasswordData
-                                    )
-                                )
-                                Gson().fromJson(decryptedData, PasswordDetails::class.java)
-                            }
+                            val decryptedList: List<PasswordDetails> =
+                                withContext(Dispatchers.Default) {
+                                    result.map { encryptedData ->
+                                        val decryptedData = EncryptionHelper.performDecryption(
+                                            masterKey = masterCredentials.masterKey,
+                                            cipherEncodedBundle = CipherEncodedBundle(
+                                                encodedSalt = masterCredentials.encodedSalt,
+                                                encodedInitialisationVector = encryptedData.encodedInitialisationVector,
+                                                encodedEncryptedText = encryptedData.encodedEncryptedPasswordData
+                                            )
+                                        )
+                                        Gson().fromJson(decryptedData, PasswordDetails::class.java)
+                                    }
+                                }
                             ScreenState.Loaded(decryptedList)
                         }
                     }
