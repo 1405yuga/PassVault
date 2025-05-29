@@ -12,15 +12,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -57,9 +59,15 @@ fun PasswordsListScreen(
                 }
             }
         }
-        Button(onClick = onAddClick) {
-            Text("Go to add screen")
-        }
+        ExtendedFloatingActionButton(
+            onClick = onAddClick,
+            text = { Text(text = "Add Password") },
+            icon = { Icon(Icons.Default.Add, contentDescription = null) },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .defaultMinSize(48.dp)
+                .padding(bottom = 22.dp, end = 8.dp)
+        )
     }
 }
 
@@ -98,10 +106,11 @@ fun PasswordItem(
                 }, modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.bodyMedium
             )
-            IconButton(onClick = {
-                onMoreClick()
-            }) {
-                Icon(imageVector = Icons.Default.MoreVert, contentDescription = "More")
+            IconButton(onClick = { onMoreClick() }) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "More"
+                )
             }
         }
     }

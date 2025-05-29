@@ -220,12 +220,12 @@ fun TitleSquare(title: String) {
         modifier = Modifier
             .size(55.dp)
             .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.onSecondary),
+            .background(MaterialTheme.colorScheme.secondaryContainer),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = title.take(2).uppercase(),
-            color = MaterialTheme.colorScheme.secondary,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
             fontSize = 22.sp,
             modifier = Modifier.padding(6.dp)
         )
