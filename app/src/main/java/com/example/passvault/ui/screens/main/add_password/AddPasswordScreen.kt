@@ -55,7 +55,7 @@ import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ShowAndHidePasswordTextField
 import com.example.passvault.utils.custom_composables.TextFieldWithErrorText
 import com.example.passvault.utils.extension_functions.HandleScreenState
-import com.example.passvault.utils.extension_functions.toOutlinedIcon
+import com.example.passvault.utils.extension_functions.toImageVector
 import com.example.passvault.utils.state.ScreenState
 
 @Composable
@@ -143,7 +143,7 @@ fun AddPasswordDetailsScreen(
                     )
                 ) {
                     Icon(
-                        imageVector = viewModel.selectedVault.iconKey.toOutlinedIcon(),
+                        imageVector = viewModel.selectedVault.iconKey.toImageVector(),
                         contentDescription = viewModel.selectedVault.iconKey
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -238,7 +238,7 @@ fun VaultDropDownMenu(
                 text = { Text(option.vaultName) },
                 leadingIcon = {
                     Icon(
-                        imageVector = option.iconKey.toOutlinedIcon(),
+                        imageVector = option.iconKey.toImageVector(),
                         contentDescription = null
                     )
                 },

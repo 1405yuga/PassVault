@@ -23,11 +23,7 @@ import com.example.passvault.ui.screens.main.nav_drawer.NavDrawerMenus
 import com.example.passvault.utils.state.ScreenState
 import com.google.gson.Gson
 
-fun ImageVector.toIconKey(): String {
-    return this.name
-}
-
-fun String.toOutlinedIcon(): ImageVector {
+fun String.toImageVector(): ImageVector {
     return when (this) {
         Icons.Default.Home.name -> Icons.Default.Home
         Icons.Default.Person.name -> Icons.Default.Person

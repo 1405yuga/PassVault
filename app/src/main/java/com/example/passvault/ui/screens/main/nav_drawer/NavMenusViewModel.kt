@@ -18,7 +18,7 @@ import com.example.passvault.di.shared_reference.MasterCredentialsRepository
 import com.example.passvault.network.supabase.EncryptedDataRepository
 import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.utils.extension_functions.fromJsonString
-import com.example.passvault.utils.extension_functions.toOutlinedIcon
+import com.example.passvault.utils.extension_functions.toImageVector
 import com.example.passvault.utils.helper.EncryptionHelper
 import com.example.passvault.utils.helper.VaultIconsList
 import com.example.passvault.utils.state.ScreenState
@@ -205,7 +205,7 @@ class VaultHomeViewModel @Inject constructor(
 
 sealed class NavDrawerMenus(val label: String, val icon: ImageVector) {
     data class VaultItem(val vault: Vault) :
-        NavDrawerMenus(label = vault.vaultName, icon = vault.iconKey.toOutlinedIcon())
+        NavDrawerMenus(label = vault.vaultName, icon = vault.iconKey.toImageVector())
 
     object AddVault : NavDrawerMenus(label = "Add Vault", icon = Icons.Outlined.Add)
     object Profile : NavDrawerMenus(label = "Profile", icon = Icons.Filled.Person)

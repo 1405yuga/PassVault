@@ -44,13 +44,13 @@ import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.EncryptedDataRepository
 import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.ui.screens.main.MainScreenViewModel
-import com.example.passvault.ui.screens.main.list.PasswordsListScreen
 import com.example.passvault.ui.screens.main.nav_drawer.add_vault.AddVaultDialog
+import com.example.passvault.ui.screens.main.nav_drawer.list.PasswordsListScreen
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ConfirmationAlertDialog
 import com.example.passvault.utils.extension_functions.HandleScreenState
-import com.example.passvault.utils.extension_functions.toOutlinedIcon
+import com.example.passvault.utils.extension_functions.toImageVector
 import com.example.passvault.utils.extension_functions.toVault
 import com.example.passvault.utils.state.ScreenState
 import kotlinx.coroutines.launch
@@ -263,7 +263,7 @@ fun NavMenusScreen(
                                 onDismissRequest = { viewModel.closeRemoveDialog() },
                                 onConfirmation = { viewModel.removeVault() },
                                 vaultName = viewModel.vaultToBeRemoved?.vaultName.toString(),
-                                icon = viewModel.vaultToBeRemoved?.iconKey?.toOutlinedIcon()
+                                icon = viewModel.vaultToBeRemoved?.iconKey?.toImageVector()
                             )
                         }
                     }
