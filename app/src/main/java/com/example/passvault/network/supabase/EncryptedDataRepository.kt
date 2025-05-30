@@ -19,13 +19,24 @@ class EncryptedDataRepository @Inject constructor(private val supabaseClient: Su
     suspend fun getAllEncryptedDataByVaultId(vaultId: Long): List<EncryptedData>? {
         Log.d(this.javaClass.simpleName, "Vault id recieved : $vaultId")
         return try {
-            supabaseClient.from(EncryptedDataTable.TABLE_NAME)
-                .select {
-                    filter {
-                        eq("vault_id", vaultId)
-                    }
+            supabaseClient.from(EncryptedDataTable.TABLE_NAME).select {
+                filter {
+                    eq(EncryptedDataTable.VAULT_ID, vaultId)
                 }
-                .decodeList<EncryptedData>()
+            }.decodeList<EncryptedData>()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun getEncryptedDataById(id: Long): EncryptedData? {
+        return try {
+            supabaseClient.from(EncryptedDataTable.TABLE_NAME).select {
+                filter {
+                    eq(EncryptedDataTable.PASSWORD_ID, id)
+                }
+            }.decodeSingleOrNull()
         } catch (e: Exception) {
             e.printStackTrace()
             null

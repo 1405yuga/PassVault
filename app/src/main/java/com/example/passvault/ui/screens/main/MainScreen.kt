@@ -55,7 +55,8 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
             val passwordId: Long? =
                 backStackEntry.arguments?.getLong(MainScreens.ViewPassword.argumentName) ?: -1
             ViewPasswordDetailScreen(
-                passwordId = passwordId
+                passwordId = passwordId,
+                viewModel = hiltViewModel()
             )
         }
     }
