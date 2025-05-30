@@ -4,4 +4,6 @@
     <string name="password">Password</string>
     <string name="website">Website</string>
     <string name="notes">Notes</string>
+    <string name="created">Created</string>
+    <string name="modified">Modified</string>
 </resources>
