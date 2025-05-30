@@ -16,7 +16,7 @@ class EncryptedDataRepository @Inject constructor(private val supabaseClient: Su
         supabaseClient.postgrest[EncryptedDataTable.TABLE_NAME].insert(encryptedData)
     }
 
-    suspend fun getAllEncryptedDataAtVaultId(vaultId: Long): List<EncryptedData>? {
+    suspend fun getAllEncryptedDataByVaultId(vaultId: Long): List<EncryptedData>? {
         Log.d(this.javaClass.simpleName, "Vault id recieved : $vaultId")
         return try {
             supabaseClient.from(EncryptedDataTable.TABLE_NAME)

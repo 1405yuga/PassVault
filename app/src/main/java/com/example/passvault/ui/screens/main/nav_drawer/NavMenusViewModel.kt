@@ -53,7 +53,7 @@ class VaultHomeViewModel @Inject constructor(
             _passwordListScreenState.value = try {
                 if (vaultId != null) {
                     val result =
-                        encryptedDataRepository.getAllEncryptedDataAtVaultId(vaultId = vaultId)
+                        encryptedDataRepository.getAllEncryptedDataByVaultId(vaultId = vaultId)
                     if (result == null) {
                         ScreenState.Error("Unable to load Passwords list")
                     } else if (result.isEmpty()) {
