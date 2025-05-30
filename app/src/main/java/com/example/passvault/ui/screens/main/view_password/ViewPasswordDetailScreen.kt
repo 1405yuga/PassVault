@@ -91,9 +91,13 @@ fun ViewPasswordScreenContent(
             )
             .verticalScroll(rememberScrollState())
             .imePadding(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        ) {
             IconButton(
                 onClick = {
 // TODO: back press
@@ -123,7 +127,8 @@ fun ViewPasswordScreenContent(
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(bottom = 16.dp)
         ) {
             TitleSquare(title = passwordDetail.title)
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -153,33 +158,53 @@ fun ViewPasswordScreenContent(
         }
 
         Column(
-            modifier = Modifier.border(
-                width = 0.2.dp,
-                color = MaterialTheme.colorScheme.secondary,
-                shape = RoundedCornerShape(6.dp)
-            )
+            modifier = Modifier
+                .padding(bottom = 12.dp)
+                .border(
+                    width = 0.2.dp,
+                    color = MaterialTheme.colorScheme.secondary,
+                    shape = RoundedCornerShape(6.dp)
+                )
         ) {
-            DetailItem(
-                typeName = R.string.username_or_email,
-                data = passwordDetail.email,
-                icon = Icons.Outlined.AccountBox
-            )
-            HorizontalDivider()
-            DetailItem(
-                typeName = R.string.password,
-                data = passwordDetail.password,
-                icon = Icons.Outlined.Password
-            )
-            DetailItem(
-                typeName = R.string.website,
-                data = passwordDetail.website,
-                icon = Icons.Outlined.Language
-            )
-            DetailItem(
-                typeName = R.string.notes,
-                data = passwordDetail.notes,
-                icon = Icons.Outlined.Description
-            )
+            var shownAny = false
+
+            if (passwordDetail.email.isNotBlank()) {
+                DetailItem(
+                    typeName = R.string.username_or_email,
+                    data = passwordDetail.email,
+                    icon = Icons.Outlined.AccountBox
+                )
+                shownAny = true
+            }
+
+            if (passwordDetail.password.isNotBlank()) {
+                if (shownAny) HorizontalDivider()
+                DetailItem(
+                    typeName = R.string.password,
+                    data = passwordDetail.password,
+                    icon = Icons.Outlined.Password
+                )
+                shownAny = true
+            }
+
+            if (passwordDetail.website.isNotBlank()) {
+                if (shownAny) HorizontalDivider()
+                DetailItem(
+                    typeName = R.string.website,
+                    data = passwordDetail.website,
+                    icon = Icons.Outlined.Language
+                )
+                shownAny = true
+            }
+
+            if (passwordDetail.notes.isNotBlank()) {
+                if (shownAny) HorizontalDivider()
+                DetailItem(
+                    typeName = R.string.notes,
+                    data = passwordDetail.notes,
+                    icon = Icons.Outlined.Description
+                )
+            }
         }
         Column(
             modifier = Modifier.border(
@@ -218,7 +243,7 @@ fun ViewPasswordDetailVertical() {
 @Composable
 fun DetailItem(@StringRes typeName: Int, data: String, icon: ImageVector) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .wrapContentHeight()
