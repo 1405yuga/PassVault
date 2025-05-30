@@ -57,6 +57,7 @@ fun ViewPasswordDetailScreen(
     passwordId: Long?,
     viewModel: ViewPasswordDetailViewModel,
     vault: Vault,
+    toEditPasswordScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val screenState by viewModel.screenState.collectAsState()
@@ -67,6 +68,7 @@ fun ViewPasswordDetailScreen(
         ViewPasswordScreenContent(
             passwordDetailsResult = passwordDetailsResult,
             vault = vault,
+            toEditPasswordScreen = { toEditPasswordScreen(it) },
             modifier = modifier
         )
     })
@@ -74,7 +76,10 @@ fun ViewPasswordDetailScreen(
 
 @Composable
 fun ViewPasswordScreenContent(
-    passwordDetailsResult: PasswordDetailResult, vault: Vault, modifier: Modifier = Modifier
+    passwordDetailsResult: PasswordDetailResult,
+    vault: Vault,
+    toEditPasswordScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val passwordDetail = passwordDetailsResult.passwordDetails
     Column(
@@ -101,9 +106,10 @@ fun ViewPasswordScreenContent(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            Button(onClick = {
-                // TODO: go to edit screen
-            }, modifier = Modifier.defaultMinSize(dimensionResource(R.dimen.min_clickable_size))) {
+            Button(
+                onClick = { toEditPasswordScreen(passwordDetailsResult) },
+                modifier = Modifier.defaultMinSize(dimensionResource(R.dimen.min_clickable_size))
+            ) {
                 Icon(Icons.Outlined.Edit, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = "Edit")
@@ -205,6 +211,7 @@ fun ViewPasswordDetailVertical() {
     ViewPasswordScreenContent(
         passwordDetailsResult = PasswordDetailResult.mockObject,
         vault = Vault.defaultVault(),
+        toEditPasswordScreen = {}
     )
 }
 

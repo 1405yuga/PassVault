@@ -58,6 +58,10 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
                 passwordId = passwordId,
                 viewModel = hiltViewModel(),
                 vault = mainScreenViewModel.lastVaultMenu?.toVault()!!,
+                toEditPasswordScreen = { passwordDetailResult ->
+                    // TODO: pass and load data 
+                    navController.navigate(MainScreens.AddPassword.route)
+                },
             )
         }
     }
