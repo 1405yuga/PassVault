@@ -60,6 +60,7 @@ import kotlinx.coroutines.launch
 fun NavMenusScreen(
     toProfileScreen: () -> Unit,
     toAddPasswordScreen: () -> Unit,
+    toViewPasswordScreen: (passwordId: Long?) -> Unit,
     viewModel: VaultHomeViewModel,
     mainScreenViewModel: MainScreenViewModel
 ) {
@@ -238,8 +239,9 @@ fun NavMenusScreen(
                             state = passwordsScreenState,
                             onLoaded = {
                                 PasswordsListScreen(
-                                    passwordDetailsList = it,
-                                    onAddClick = { toAddPasswordScreen() }
+                                    passwordDetailsWithIdList = it,
+                                    onAddClick = { toAddPasswordScreen() },
+                                    onItemClick = { toViewPasswordScreen(it) }
                                 )
                             }
                         )
@@ -300,6 +302,7 @@ fun NavMenusScreenPreview() {
         ),
         toProfileScreen = {},
         toAddPasswordScreen = {},
+        toViewPasswordScreen = {},
         mainScreenViewModel = MainScreenViewModel(
             vaultRepository = VaultRepository(SupabaseModule.mockClient)
         ),
@@ -317,6 +320,7 @@ fun NavMenusScreenHorizontalPreview() {
         ),
         toProfileScreen = {},
         toAddPasswordScreen = {},
+        toViewPasswordScreen = {},
         mainScreenViewModel = MainScreenViewModel(
             vaultRepository = VaultRepository(SupabaseModule.mockClient)
         ),

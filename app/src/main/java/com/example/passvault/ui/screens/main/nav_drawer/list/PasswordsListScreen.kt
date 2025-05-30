@@ -1,4 +1,4 @@
-package com.example.passvault.ui.screens.main.list
+package com.example.passvault.ui.screens.main.nav_drawer.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,29 +29,27 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.example.passvault.data.PasswordDetails
+import com.example.passvault.data.PasswordDetailsWithId
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.TitleSquare
 
 @Composable
 fun PasswordsListScreen(
-    passwordDetailsList: List<PasswordDetails>,
-    onAddClick: () -> Unit
+    passwordDetailsWithIdList: List<PasswordDetailsWithId>,
+    onAddClick: () -> Unit,
+    onItemClick: (passWordId: Long?) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        if (passwordDetailsList.isEmpty()) {
+        if (passwordDetailsWithIdList.isEmpty()) {
             // TODO: create ui to display empty list 
             Text(text = "No passwords stored in this Vault!")
         } else {
-            // TODO: create ui to display list
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(passwordDetailsList) { passwordDetail ->
+                items(passwordDetailsWithIdList) { passwordDetail ->
                     PasswordItem(
-                        passwordDetails = passwordDetail,
-                        onItemClick = {
-                            // TODO: go to screen where all details are shown
-                        },
+                        passwordDetailsWithId = passwordDetail,
+                        onItemClick = { onItemClick(it) },
                         onMoreClick = {
                             // TODO: open bottom modal
                         }
@@ -73,12 +71,13 @@ fun PasswordsListScreen(
 
 @Composable
 fun PasswordItem(
-    passwordDetails: PasswordDetails,
-    onItemClick: (passwordDetails: PasswordDetails) -> Unit,
+    passwordDetailsWithId: PasswordDetailsWithId,
+    onItemClick: (passWordId: Long?) -> Unit,
     onMoreClick: () -> Unit
 ) {
+    val passwordDetails = passwordDetailsWithId.passwordDetails
     Card(
-        onClick = { onItemClick(passwordDetails) },
+        onClick = { onItemClick(passwordDetailsWithId.passwordId) },
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -120,7 +119,7 @@ fun PasswordItem(
 @VerticalScreenPreview
 fun PasswordItemVertical() {
     PasswordItem(
-        passwordDetails = PasswordDetails.mockPasswordDetails,
+        passwordDetailsWithId = PasswordDetailsWithId.mockObject,
         onItemClick = {},
         onMoreClick = {},
     )
@@ -130,7 +129,7 @@ fun PasswordItemVertical() {
 @HorizontalScreenPreview
 fun PasswordItemHorizontal() {
     PasswordItem(
-        passwordDetails = PasswordDetails.mockPasswordDetails,
+        passwordDetailsWithId = PasswordDetailsWithId.mockObject,
         onItemClick = {},
         onMoreClick = {},
     )
@@ -141,7 +140,8 @@ fun PasswordItemHorizontal() {
 fun PasswordListScreenVertical() {
     PasswordsListScreen(
         onAddClick = {},
-        passwordDetailsList = List(10) { PasswordDetails.mockPasswordDetails }
+        passwordDetailsWithIdList = List(10) { PasswordDetailsWithId.mockObject },
+        onItemClick = {}
     )
 }
 
@@ -150,6 +150,7 @@ fun PasswordListScreenVertical() {
 fun PasswordListScreenHorizontal() {
     PasswordsListScreen(
         onAddClick = {},
-        passwordDetailsList = List(10) { PasswordDetails.mockPasswordDetails }
+        passwordDetailsWithIdList = List(10) { PasswordDetailsWithId.mockObject },
+        onItemClick = {}
     )
 }

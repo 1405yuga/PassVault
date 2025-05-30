@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.passvault.data.CipherEncodedBundle
 import com.example.passvault.data.MasterCredentials
 import com.example.passvault.data.PasswordDetails
+import com.example.passvault.data.PasswordDetailsWithId
 import com.example.passvault.data.Vault
 import com.example.passvault.di.shared_reference.MasterCredentialsRepository
 import com.example.passvault.network.supabase.EncryptedDataRepository
@@ -41,9 +42,9 @@ class VaultHomeViewModel @Inject constructor(
 
     //List Screen-------------------------------------------------------------------------
     private val _passwordListScreenState =
-        MutableStateFlow<ScreenState<List<PasswordDetails>>>(ScreenState.PreLoad())
+        MutableStateFlow<ScreenState<List<PasswordDetailsWithId>>>(ScreenState.PreLoad())
 
-    val passwordListScreenState: StateFlow<ScreenState<List<PasswordDetails>>> =
+    val passwordListScreenState: StateFlow<ScreenState<List<PasswordDetailsWithId>>> =
         _passwordListScreenState
 
     fun getPasswordsList(vaultId: Long?) {
@@ -66,8 +67,9 @@ class VaultHomeViewModel @Inject constructor(
                         } else {
                             val masterCredentials: MasterCredentials =
                                 masterCredentialsJson.fromJsonString()
+                            val gson = Gson()
                             //decrypt
-                            val decryptedList: List<PasswordDetails> =
+                            val decryptedList: List<PasswordDetailsWithId> =
                                 withContext(Dispatchers.Default) {
                                     result.map { encryptedData ->
                                         val decryptedData = EncryptionHelper.performDecryption(
@@ -78,7 +80,13 @@ class VaultHomeViewModel @Inject constructor(
                                                 encodedEncryptedText = encryptedData.encodedEncryptedPasswordData
                                             )
                                         )
-                                        Gson().fromJson(decryptedData, PasswordDetails::class.java)
+                                        PasswordDetailsWithId(
+                                            passwordId = encryptedData.passwordId!!,
+                                            passwordDetails = gson.fromJson(
+                                                decryptedData,
+                                                PasswordDetails::class.java
+                                            )
+                                        )
                                     }
                                 }
                             ScreenState.Loaded(decryptedList)

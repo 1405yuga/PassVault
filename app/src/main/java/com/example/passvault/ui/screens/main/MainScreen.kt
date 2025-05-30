@@ -4,14 +4,17 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.ui.screens.main.add_password.AddPasswordScreen
 import com.example.passvault.ui.screens.main.nav_drawer.NavMenusScreen
 import com.example.passvault.ui.screens.main.nav_drawer.profile.ProfileScreen
+import com.example.passvault.ui.screens.main.view_password.ViewPasswordDetailScreen
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.extension_functions.toVault
@@ -26,6 +29,9 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
                 viewModel = hiltViewModel(),
                 toProfileScreen = { navController.navigate(MainScreens.Profile.route) },
                 toAddPasswordScreen = { navController.navigate(MainScreens.AddPassword.route) },
+                toViewPasswordScreen = { id ->
+                    navController.navigate(MainScreens.ViewPassword.createRoute(id = id))
+                },
                 mainScreenViewModel = hiltViewModel()
             )
         }
@@ -39,6 +45,18 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
         }
         composable(route = MainScreens.Profile.route) {
             ProfileScreen()
+        }
+        composable(
+            route = MainScreens.ViewPassword.route,
+            arguments = listOf(navArgument(MainScreens.ViewPassword.argumentName) {
+                type = NavType.LongType
+            })
+        ) { backStackEntry ->
+            val passwordId: Long? =
+                backStackEntry.arguments?.getLong(MainScreens.ViewPassword.argumentName) ?: -1
+            ViewPasswordDetailScreen(
+                passwordId = passwordId
+            )
         }
     }
 }

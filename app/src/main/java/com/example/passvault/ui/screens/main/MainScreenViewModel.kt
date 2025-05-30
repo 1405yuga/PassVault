@@ -95,4 +95,8 @@ sealed class MainScreens(val route: String) {
     object VaultHome : MainScreens(route = "VaultHome")
     object AddPassword : MainScreens(route = "AddPassword")
     object Profile : MainScreens(route = "Profile")
+    object ViewPassword : MainScreens(route = "ViewPassword/{passwordId}") {
+        const val argumentName = "passwordId"
+        fun createRoute(id: Long?) = "ViewPassword/$id"
+    }
 }

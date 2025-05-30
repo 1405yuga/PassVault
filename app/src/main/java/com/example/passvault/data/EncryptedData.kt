@@ -32,6 +32,15 @@ data class PasswordDetails(
     }
 }
 
+data class PasswordDetailsWithId(val passwordId: Long, val passwordDetails: PasswordDetails) {
+    companion object {
+        val mockObject = PasswordDetailsWithId(
+            passwordId = 0L,
+            passwordDetails = PasswordDetails.mockPasswordDetails
+        )
+    }
+}
+
 object EncryptedDataTable {
     const val TABLE_NAME = "encrypted_data"
     const val PASSWORD_ID = "password_id"
