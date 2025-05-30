@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.passvault.R
@@ -183,7 +184,7 @@ fun AddPasswordDetailsScreen(
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.medium_spacer_height)))
         OutlinedTextField(
-            label = { Text("Username or email") },
+            label = { Text(text = stringResource(R.string.username_or_email)) },
             value = viewModel.username,
             onValueChange = { viewModel.onUsernameChange(it) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -192,7 +193,7 @@ fun AddPasswordDetailsScreen(
             leadingIcon = { Icon(Icons.Outlined.AccountBox, contentDescription = "Username") })
 
         ShowAndHidePasswordTextField(
-            label = "Password",
+            label = stringResource(R.string.password),
             password = viewModel.password,
             onTextChange = { viewModel.onPasswordChange(it) },
             showPassword = viewModel.showPassword,
@@ -202,7 +203,7 @@ fun AddPasswordDetailsScreen(
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.small_spacer_height)))
         OutlinedTextField(
-            label = { Text("Website") },
+            label = { Text(stringResource(R.string.website)) },
             value = viewModel.website,
             onValueChange = { viewModel.onWebsiteChange(it) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -210,7 +211,7 @@ fun AddPasswordDetailsScreen(
             singleLine = true,
             leadingIcon = { Icon(Icons.Outlined.Language, contentDescription = "Website") })
         OutlinedTextField(
-            label = { Text("Notes") },
+            label = { Text(stringResource(R.string.notes)) },
             value = viewModel.notes,
             onValueChange = { viewModel.onNotesChange(it) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
