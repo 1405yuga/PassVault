@@ -56,7 +56,8 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
                 backStackEntry.arguments?.getLong(MainScreens.ViewPassword.argumentName) ?: -1
             ViewPasswordDetailScreen(
                 passwordId = passwordId,
-                viewModel = hiltViewModel()
+                viewModel = hiltViewModel(),
+                vault = mainScreenViewModel.lastVaultMenu?.toVault()!!,
             )
         }
     }
