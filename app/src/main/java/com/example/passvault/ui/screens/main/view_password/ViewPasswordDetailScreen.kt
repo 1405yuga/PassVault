@@ -280,8 +280,8 @@ fun DetailItem(
                 append(text = stringResource(typeName))
             }
             append(text = "\n")
-            showPassword?.let {
-                if (it) append(text = data) else append(text = "•".repeat(data.length))
+            showPassword.let {
+                if (it == true || it == null) append(text = data) else append(text = "•".repeat(data.length))
             }
         }, modifier = Modifier.weight(1f))
         if (typeName == R.string.password) {
