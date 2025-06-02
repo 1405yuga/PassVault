@@ -64,6 +64,7 @@ import com.example.passvault.utils.state.ScreenState
 fun UpsertPasswordDetailScreen(
     onClose: () -> Unit,
     selectedVault: Vault?,
+    onUpdateSelectedVault:(Vault)-> Unit,
     viewModel: UpsertPasswordDetailViewModel,
     passwordDetailResult: PasswordDetailResult?,
     modifier: Modifier = Modifier
@@ -77,6 +78,7 @@ fun UpsertPasswordDetailScreen(
             onClose = onClose,
             viewModel = viewModel,
             selectedVault = selectedVault,
+            onUpdateSelectedVault={onUpdateSelectedVault(it)},
             storeButtonLable = if (passwordDetailResult == null) "Create" else "Update",
             modifier = modifier,
             vaults = it,
@@ -90,6 +92,7 @@ fun UpsertScreen(
     onClose: () -> Unit,
     viewModel: UpsertPasswordDetailViewModel,
     selectedVault: Vault?,
+    onUpdateSelectedVault:(Vault)-> Unit,
     vaults: List<Vault>,
     storeButtonLable: String,
     passwordId: Long?,
@@ -167,6 +170,7 @@ fun UpsertScreen(
                     onMenuDismiss = { viewModel.toggleVaultMenuExpantion() },
                     onVaultClick = {
                         // TODO: get vault
+                        onUpdateSelectedVault(it)
                         viewModel.onSelectedVaultChange(it)
                         viewModel.toggleVaultMenuExpantion()
                     },
@@ -291,7 +295,8 @@ private fun AddPasswordScreenPreview() {
         vaults = vaults,
         selectedVault = vaults.first(),
         storeButtonLable = "Create",
-        passwordId = 0L
+        passwordId = 0L,
+        onUpdateSelectedVault = {}
     )
 }
 
@@ -318,6 +323,7 @@ private fun AddPasswordScreenHorizontalPreview() {
         vaults = vaults,
         selectedVault = vaults.first(),
         storeButtonLable = "Create",
-        passwordId = 0L
+        passwordId = 0L,
+        onUpdateSelectedVault = {}
     )
 }

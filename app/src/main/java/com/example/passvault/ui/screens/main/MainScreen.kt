@@ -14,6 +14,7 @@ import androidx.navigation.navArgument
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.ui.screens.main.add_password.UpsertPasswordDetailScreen
+import com.example.passvault.ui.screens.main.nav_drawer.NavDrawerMenus
 import com.example.passvault.ui.screens.main.nav_drawer.NavMenusScreen
 import com.example.passvault.ui.screens.main.nav_drawer.profile.ProfileScreen
 import com.example.passvault.ui.screens.main.view_password.PasswordDetailResult
@@ -37,7 +38,7 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
                 toViewPasswordScreen = { id ->
                     navController.navigate(MainScreens.ViewPassword.createRoute(id = id))
                 },
-                mainScreenViewModel = hiltViewModel()
+                mainScreenViewModel = mainScreenViewModel
             )
         }
         composable(
@@ -63,6 +64,11 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
             UpsertPasswordDetailScreen(
                 onClose = { navController.popBackStack() },
                 selectedVault = mainScreenViewModel.lastVaultMenu?.toVault(),
+                onUpdateSelectedVault = { vault ->
+                    mainScreenViewModel.onMenuSelected(
+                        navDrawerMenus = NavDrawerMenus.VaultItem(vault = vault)
+                    )
+                },
                 passwordDetailResult = passwordDetailResult,
                 viewModel = hiltViewModel(),
                 modifier = Modifier

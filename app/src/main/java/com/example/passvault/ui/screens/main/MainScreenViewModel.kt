@@ -35,6 +35,7 @@ class MainScreenViewModel @Inject constructor(private val vaultRepository: Vault
 
     fun onMenuSelected(navDrawerMenus: NavDrawerMenus) {
         if (navDrawerMenus is NavDrawerMenus.VaultItem) {
+            Log.d(this.javaClass.simpleName, "Vault menu : $navDrawerMenus")
             lastVaultMenu = navDrawerMenus
         }
         currentSelectedMenu = navDrawerMenus
