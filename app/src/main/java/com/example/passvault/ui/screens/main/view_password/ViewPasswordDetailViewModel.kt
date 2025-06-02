@@ -1,5 +1,8 @@
 package com.example.passvault.ui.screens.main.view_password
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passvault.data.CipherEncodedBundle
@@ -29,6 +32,13 @@ class ViewPasswordDetailViewModel @Inject constructor(
     private val _screenState =
         MutableStateFlow<ScreenState<PasswordDetailResult>>(ScreenState.PreLoad())
     val screenState: StateFlow<ScreenState<PasswordDetailResult>> = _screenState
+
+    var showPassword by mutableStateOf(false)
+        private set
+
+    fun togglePasswordVisibility() {
+        showPassword = !showPassword
+    }
 
     fun loadPasswordDetails(passwordId: Long?) {
         if (passwordId == null) {

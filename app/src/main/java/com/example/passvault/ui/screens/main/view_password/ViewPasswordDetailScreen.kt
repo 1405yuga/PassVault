@@ -25,6 +25,7 @@ import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Password
+import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
@@ -68,6 +69,8 @@ fun ViewPasswordDetailScreen(
         ViewPasswordScreenContent(
             passwordDetailsResult = passwordDetailsResult,
             vault = vault,
+            showPassword = viewModel.showPassword,
+            onPasswordVisibilityClick = { viewModel.togglePasswordVisibility() },
             toEditPasswordScreen = { toEditPasswordScreen(it) },
             modifier = modifier
         )
@@ -79,7 +82,9 @@ fun ViewPasswordScreenContent(
     passwordDetailsResult: PasswordDetailResult,
     vault: Vault,
     toEditPasswordScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onPasswordVisibilityClick: () -> Unit,
+    showPassword: Boolean
 ) {
     val passwordDetail = passwordDetailsResult.passwordDetails
     Column(
@@ -182,7 +187,9 @@ fun ViewPasswordScreenContent(
                 DetailItem(
                     typeName = R.string.password,
                     data = passwordDetail.password,
-                    icon = Icons.Outlined.Password
+                    icon = Icons.Outlined.Password,
+                    onPasswordVisibilityClick = { onPasswordVisibilityClick() },
+                    showPassword = showPassword,
                 )
                 shownAny = true
             }
@@ -213,17 +220,23 @@ fun ViewPasswordScreenContent(
                 shape = RoundedCornerShape(6.dp)
             )
         ) {
-            DetailItem(
-                typeName = R.string.modified,
-                data = "29th May 2025", //todo: show modified
-                icon = Icons.Outlined.Edit
-            )
-            HorizontalDivider()
-            DetailItem(
-                typeName = R.string.created,
-                data = "20th May 2025", // todo: show created
-                icon = Icons.Outlined.Bolt
-            )
+            var showAny = false
+            if (passwordDetailsResult.modifiedAt.isNotBlank()) {
+                DetailItem(
+                    typeName = R.string.modified,
+                    data = "29th May 2025", //todo: show modified
+                    icon = Icons.Outlined.Edit
+                )
+                showAny = true
+            }
+            if (passwordDetailsResult.createdAt.isNotBlank()) {
+                if (showAny) HorizontalDivider()
+                DetailItem(
+                    typeName = R.string.created,
+                    data = "20th May 2025", // todo: show created
+                    icon = Icons.Outlined.Bolt
+                )
+            }
         }
 
     }
@@ -236,12 +249,20 @@ fun ViewPasswordDetailVertical() {
     ViewPasswordScreenContent(
         passwordDetailsResult = PasswordDetailResult.mockObject,
         vault = Vault.defaultVault(),
-        toEditPasswordScreen = {}
+        toEditPasswordScreen = {},
+        onPasswordVisibilityClick = {},
+        showPassword = false
     )
 }
 
 @Composable
-fun DetailItem(@StringRes typeName: Int, data: String, icon: ImageVector) {
+fun DetailItem(
+    @StringRes typeName: Int,
+    data: String,
+    icon: ImageVector,
+    onPasswordVisibilityClick: () -> Unit = {},
+    showPassword: Boolean? = null
+) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -258,12 +279,22 @@ fun DetailItem(@StringRes typeName: Int, data: String, icon: ImageVector) {
             ) {
                 append(text = stringResource(typeName))
             }
-            append(text = "\n$data")
+            append(text = "\n")
+            showPassword?.let {
+                if (it) append(text = data) else append(text = "•".repeat(data.length))
+            }
         }, modifier = Modifier.weight(1f))
         if (typeName == R.string.password) {
             IconButton(onClick = {
-
-            }) { Icon(Icons.Outlined.VisibilityOff, contentDescription = "Password Visibility") }
+                onPasswordVisibilityClick()
+            }) {
+                showPassword?.let {
+                    Icon(
+                        imageVector = if (it) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
+                        contentDescription = "Password Visibility"
+                    )
+                }
+            }
         }
     }
 }
