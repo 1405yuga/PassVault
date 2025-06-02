@@ -93,7 +93,12 @@ class MainScreenViewModel @Inject constructor(private val vaultRepository: Vault
 
 sealed class MainScreens(val route: String) {
     object VaultHome : MainScreens(route = "VaultHome")
-    object AddPassword : MainScreens(route = "AddPassword")
+    object AddPassword : MainScreens(route = "AddPassword/{passwordDataWithId}") {
+        const val initialPasswordData = "passwordDataWithId"
+        fun createRoute(passwordDetailsResultString: String) =
+            "AddPassword/$passwordDetailsResultString"
+    }
+
     object Profile : MainScreens(route = "Profile")
     object ViewPassword : MainScreens(route = "ViewPassword/{passwordId}") {
         const val argumentName = "passwordId"

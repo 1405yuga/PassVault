@@ -37,19 +37,21 @@ class AddPasswordViewModel @Inject constructor(
         MutableStateFlow<ScreenState<List<Vault>>>(ScreenState.PreLoad())
     val vaultListScreenState: StateFlow<ScreenState<List<Vault>>> = _vaultListScreenState
 
-    init {
-        loadVaults()
-    }
-
-    fun loadVaults() {
+    suspend fun loadInitialData(passwordDetails: PasswordDetails?) {
         _vaultListScreenState.value = ScreenState.Loading()
+        //load fields--------------------------------------
+       passwordDetails?.let {
+           title = passwordDetails.title
+           username = passwordDetails.email
+           password = passwordDetails.password
+           website = passwordDetails.website
+           notes = passwordDetails.notes
+       }
+        //load vault-----------------------------------------
         try {
-            viewModelScope.launch {
-                val result = vaultRepository.getAllVaults()
-                _vaultListScreenState.value = ScreenState.Loaded(result = result)
-                onSelectedVaultChange(vault = result.first())
-            }
-
+            val result = vaultRepository.getAllVaults()
+            _vaultListScreenState.value = ScreenState.Loaded(result = result)
+            onSelectedVaultChange(vault = result.first())
         } catch (e: Exception) {
             e.printStackTrace()
             _vaultListScreenState.value = ScreenState.Error(message = "Unable to load Vaults")

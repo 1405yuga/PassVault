@@ -51,6 +51,7 @@ import com.example.passvault.di.shared_reference.MasterCredentialsRepository
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.EncryptedDataRepository
 import com.example.passvault.network.supabase.VaultRepository
+import com.example.passvault.ui.screens.main.view_password.PasswordDetailResult
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ShowAndHidePasswordTextField
@@ -64,14 +65,19 @@ fun AddPasswordScreen(
     onClose: () -> Unit,
     selectedVault: Vault?,
     viewModel: AddPasswordViewModel,
+    passwordDetailResult: PasswordDetailResult?,
     modifier: Modifier = Modifier
 ) {
     val vaultsState by viewModel.vaultListScreenState.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.loadInitialData(passwordDetails = passwordDetailResult?.passwordDetails)
+    }
     HandleScreenState(state = vaultsState, onLoaded = {
         AddPasswordDetailsScreen(
             onClose = onClose,
             viewModel = viewModel,
             selectedVault = selectedVault,
+            storeButtonLable = if (passwordDetailResult == null) "Create" else "Update",
             modifier = modifier,
             vaults = it
         )
@@ -84,6 +90,7 @@ fun AddPasswordDetailsScreen(
     viewModel: AddPasswordViewModel,
     selectedVault: Vault?,
     vaults: List<Vault>,
+    storeButtonLable: String,
     modifier: Modifier = Modifier
 ) {
     LaunchedEffect(Unit) { if (selectedVault != null) viewModel.onSelectedVaultChange(selectedVault) }
@@ -172,7 +179,7 @@ fun AddPasswordDetailsScreen(
             ) {
                 when (screenState) {
                     is ScreenState.Loading -> Text(text = "Loading..")
-                    else -> Text(text = "Create")
+                    else -> Text(text = storeButtonLable)
                 }
             }
         }
@@ -281,6 +288,7 @@ private fun AddPasswordScreenPreview() {
         ),
         vaults = vaults,
         selectedVault = vaults.first(),
+        storeButtonLable = "Create"
     )
 }
 
@@ -306,5 +314,6 @@ private fun AddPasswordScreenHorizontalPreview() {
         ),
         vaults = vaults,
         selectedVault = vaults.first(),
+        storeButtonLable = "Create"
     )
 }

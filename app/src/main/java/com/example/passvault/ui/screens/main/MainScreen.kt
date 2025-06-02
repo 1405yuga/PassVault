@@ -14,10 +14,12 @@ import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.ui.screens.main.add_password.AddPasswordScreen
 import com.example.passvault.ui.screens.main.nav_drawer.NavMenusScreen
 import com.example.passvault.ui.screens.main.nav_drawer.profile.ProfileScreen
+import com.example.passvault.ui.screens.main.view_password.PasswordDetailResult
 import com.example.passvault.ui.screens.main.view_password.ViewPasswordDetailScreen
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.extension_functions.toVault
+import com.google.gson.Gson
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,10 +37,21 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
                 mainScreenViewModel = hiltViewModel()
             )
         }
-        composable(route = MainScreens.AddPassword.route) {
+        composable(
+            route = MainScreens.AddPassword.route, arguments = listOf(
+                navArgument(
+                    MainScreens.AddPassword.initialPasswordData
+                ) {
+                    type = NavType.StringType
+                })
+        ) { backStackEntry ->
             AddPasswordScreen(
                 onClose = { navController.popBackStack() },
                 selectedVault = mainScreenViewModel.lastVaultMenu?.toVault(),
+                passwordDetailResult = Gson().fromJson<PasswordDetailResult>(
+                    backStackEntry.arguments?.getString(MainScreens.AddPassword.initialPasswordData),
+                    PasswordDetailResult::class.java
+                ),
                 viewModel = hiltViewModel(),
                 modifier = Modifier
             )
@@ -60,7 +73,11 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
                 vault = mainScreenViewModel.lastVaultMenu?.toVault()!!,
                 toEditPasswordScreen = { passwordDetailResult ->
                     // TODO: pass and load data 
-                    navController.navigate(MainScreens.AddPassword.route)
+                    navController.navigate(
+                        MainScreens.AddPassword.createRoute(
+                            passwordDetailsResultString = Gson().toJson(passwordDetailResult)
+                        )
+                    )
                 },
             )
         }
