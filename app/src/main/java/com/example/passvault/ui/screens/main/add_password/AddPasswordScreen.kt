@@ -79,7 +79,8 @@ fun AddPasswordScreen(
             selectedVault = selectedVault,
             storeButtonLable = if (passwordDetailResult == null) "Create" else "Update",
             modifier = modifier,
-            vaults = it
+            vaults = it,
+            passwordId = passwordDetailResult?.passwordId
         )
     })
 }
@@ -91,6 +92,7 @@ fun AddPasswordDetailsScreen(
     selectedVault: Vault?,
     vaults: List<Vault>,
     storeButtonLable: String,
+    passwordId: Long?,
     modifier: Modifier = Modifier
 ) {
     LaunchedEffect(Unit) { if (selectedVault != null) viewModel.onSelectedVaultChange(selectedVault) }
@@ -173,7 +175,7 @@ fun AddPasswordDetailsScreen(
             }
             Spacer(modifier = Modifier.padding(4.dp))
             Button(
-                onClick = { viewModel.storePasswordDetails() },
+                onClick = { viewModel.storePasswordDetails(passwordId = passwordId) },
                 modifier = Modifier.height(dimensionResource(R.dimen.min_clickable_size)),
                 enabled = screenState !is ScreenState.Loading
             ) {
@@ -288,7 +290,8 @@ private fun AddPasswordScreenPreview() {
         ),
         vaults = vaults,
         selectedVault = vaults.first(),
-        storeButtonLable = "Create"
+        storeButtonLable = "Create",
+        passwordId = 0L
     )
 }
 
@@ -314,6 +317,7 @@ private fun AddPasswordScreenHorizontalPreview() {
         ),
         vaults = vaults,
         selectedVault = vaults.first(),
-        storeButtonLable = "Create"
+        storeButtonLable = "Create",
+        passwordId = 0L
     )
 }

@@ -40,13 +40,13 @@ class AddPasswordViewModel @Inject constructor(
     suspend fun loadInitialData(passwordDetails: PasswordDetails?) {
         _vaultListScreenState.value = ScreenState.Loading()
         //load fields--------------------------------------
-       passwordDetails?.let {
-           title = passwordDetails.title
-           username = passwordDetails.email
-           password = passwordDetails.password
-           website = passwordDetails.website
-           notes = passwordDetails.notes
-       }
+        passwordDetails?.let {
+            title = passwordDetails.title
+            username = passwordDetails.email
+            password = passwordDetails.password
+            website = passwordDetails.website
+            notes = passwordDetails.notes
+        }
         //load vault-----------------------------------------
         try {
             val result = vaultRepository.getAllVaults()
@@ -126,7 +126,7 @@ class AddPasswordViewModel @Inject constructor(
     //create passwordDetailJsonString
     // encrypt password details
     //store in db
-    fun storePasswordDetails() {
+    fun storePasswordDetails(passwordId: Long?) {
         if (!areInputsValid()) return
         _screenState.value = ScreenState.Loading()
         try {
@@ -153,12 +153,13 @@ class AddPasswordViewModel @Inject constructor(
                         )
 
                     val encryptedData = EncryptedData(
+                        passwordId = passwordId,
                         vaultId = selectedVault.vaultId,
                         userId = selectedVault.userId,
                         encodedInitialisationVector = cipherEncodedBundle.encodedInitialisationVector,
                         encodedEncryptedPasswordData = cipherEncodedBundle.encodedEncryptedText
                     )
-                    encryptedDataRepository.insertEncryptedData(encryptedData = encryptedData)
+                    encryptedDataRepository.storeEncryptedData(encryptedData = encryptedData)
                     Log.d(
                         this.javaClass.simpleName,
                         "$masterCredentials\n$passwordDetailJsonString\n$cipherEncodedBundle"
