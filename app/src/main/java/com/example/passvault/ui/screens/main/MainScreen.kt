@@ -43,15 +43,24 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
                     MainScreens.AddPassword.initialPasswordData
                 ) {
                     type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
                 })
         ) { backStackEntry ->
+            val passwordDetailResult: PasswordDetailResult? =
+                try {
+                    Gson().fromJson<PasswordDetailResult?>(
+                        backStackEntry.arguments?.getString(MainScreens.AddPassword.initialPasswordData),
+                        PasswordDetailResult::class.java
+                    )
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null
+                }
             AddPasswordScreen(
                 onClose = { navController.popBackStack() },
                 selectedVault = mainScreenViewModel.lastVaultMenu?.toVault(),
-                passwordDetailResult = Gson().fromJson<PasswordDetailResult>(
-                    backStackEntry.arguments?.getString(MainScreens.AddPassword.initialPasswordData),
-                    PasswordDetailResult::class.java
-                ),
+                passwordDetailResult = passwordDetailResult,
                 viewModel = hiltViewModel(),
                 modifier = Modifier
             )
