@@ -1,5 +1,7 @@
 package com.example.passvault.ui.screens.main
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -21,6 +23,7 @@ import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.extension_functions.toVault
 import com.google.gson.Gson
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
@@ -88,12 +91,14 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
                         )
                     )
                 },
+                onClose = { navController.popBackStack() },
             )
         }
     }
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 @VerticalScreenPreview
 private fun MainScreenPreview() {
@@ -104,6 +109,7 @@ private fun MainScreenPreview() {
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 @HorizontalScreenPreview
 private fun MainScreenHorizontalPreview() {

@@ -56,12 +56,14 @@ import com.example.passvault.utils.extension_functions.HandleScreenState
 import com.example.passvault.utils.extension_functions.toImageVector
 import com.example.passvault.utils.helper.DateTimeHelper
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ViewPasswordDetailScreen(
     passwordId: Long?,
     viewModel: ViewPasswordDetailViewModel,
     vault: Vault,
     toEditPasswordScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
+    onClose: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val screenState by viewModel.screenState.collectAsState()
@@ -75,6 +77,7 @@ fun ViewPasswordDetailScreen(
             showPassword = viewModel.showPassword,
             onPasswordVisibilityClick = { viewModel.togglePasswordVisibility() },
             toEditPasswordScreen = { toEditPasswordScreen(it) },
+            onClose = onClose,
             modifier = modifier
         )
     })
@@ -88,6 +91,7 @@ fun ViewPasswordScreenContent(
     toEditPasswordScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
     modifier: Modifier = Modifier,
     onPasswordVisibilityClick: () -> Unit,
+    onClose: () -> Unit,
     showPassword: Boolean
 ) {
     val passwordDetail = passwordDetailsResult.passwordDetails
@@ -108,9 +112,7 @@ fun ViewPasswordScreenContent(
                 .padding(bottom = 8.dp)
         ) {
             IconButton(
-                onClick = {
-// TODO: back press
-                },
+                onClick = { onClose() },
                 modifier = Modifier.defaultMinSize(dimensionResource(R.dimen.min_clickable_size))
             ) {
                 Icon(
@@ -247,6 +249,7 @@ fun ViewPasswordScreenContent(
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 @VerticalScreenPreview
 fun ViewPasswordDetailVertical() {
@@ -255,7 +258,8 @@ fun ViewPasswordDetailVertical() {
         vault = Vault.defaultVault(),
         toEditPasswordScreen = {},
         onPasswordVisibilityClick = {},
-        showPassword = false
+        showPassword = false,
+        onClose = {}
     )
 }
 
