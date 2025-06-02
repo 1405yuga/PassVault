@@ -1,5 +1,7 @@
 package com.example.passvault.ui.screens.main.view_password
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -52,6 +54,7 @@ import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.TitleSquare
 import com.example.passvault.utils.extension_functions.HandleScreenState
 import com.example.passvault.utils.extension_functions.toImageVector
+import com.example.passvault.utils.helper.DateTimeHelper
 
 @Composable
 fun ViewPasswordDetailScreen(
@@ -77,6 +80,7 @@ fun ViewPasswordDetailScreen(
     })
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ViewPasswordScreenContent(
     passwordDetailsResult: PasswordDetailResult,
@@ -224,7 +228,7 @@ fun ViewPasswordScreenContent(
             if (passwordDetailsResult.modifiedAt.isNotBlank()) {
                 DetailItem(
                     typeName = R.string.modified,
-                    data = "29th May 2025", //todo: show modified
+                    data = DateTimeHelper.formatSupabaseTimestamp(passwordDetailsResult.modifiedAt), //todo: show modified
                     icon = Icons.Outlined.Edit
                 )
                 showAny = true
@@ -233,7 +237,7 @@ fun ViewPasswordScreenContent(
                 if (showAny) HorizontalDivider()
                 DetailItem(
                     typeName = R.string.created,
-                    data = "20th May 2025", // todo: show created
+                    data = DateTimeHelper.formatSupabaseTimestamp(passwordDetailsResult.createdAt),
                     icon = Icons.Outlined.Bolt
                 )
             }

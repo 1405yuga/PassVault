@@ -10,8 +10,8 @@ data class EncryptedData(
     @SerialName(EncryptedDataTable.USER_ID) val userId: String? = null, //foreign key - Vault
     @SerialName(EncryptedDataTable.ENCODED_IV) val encodedInitialisationVector: String, //generate
     @SerialName(EncryptedDataTable.ENCODED_ENCRYPTED_DATA) val encodedEncryptedPasswordData: String,
-    val createdAt: String? = null,
-    val updatedAt: String? = null
+    @SerialName(EncryptedDataTable.CREATED_AT) val createdAt: String? = null,
+    @SerialName(EncryptedDataTable.UPDATED_AT) val updatedAt: String? = null
 )
 
 data class PasswordDetails(

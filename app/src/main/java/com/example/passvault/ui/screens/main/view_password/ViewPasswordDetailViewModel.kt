@@ -102,8 +102,8 @@ data class PasswordDetailResult(
         val mockObject = PasswordDetailResult(
             passwordId = 0L,
             passwordDetails = PasswordDetails.mockPasswordDetails,
-            createdAt = "",
-            modifiedAt = ""
+            createdAt = "2025-05-22 05:31:34.535993+00",
+            modifiedAt = "2025-05-22 05:31:34.535993+00"
         )
     }
 }
