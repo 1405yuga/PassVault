@@ -61,10 +61,10 @@ import com.example.passvault.utils.extension_functions.toImageVector
 import com.example.passvault.utils.state.ScreenState
 
 @Composable
-fun AddPasswordScreen(
+fun UpsertPasswordDetailScreen(
     onClose: () -> Unit,
     selectedVault: Vault?,
-    viewModel: AddPasswordViewModel,
+    viewModel: UpsertPasswordDetailViewModel,
     passwordDetailResult: PasswordDetailResult?,
     modifier: Modifier = Modifier
 ) {
@@ -73,7 +73,7 @@ fun AddPasswordScreen(
         viewModel.loadInitialData(passwordDetails = passwordDetailResult?.passwordDetails)
     }
     HandleScreenState(state = vaultsState, onLoaded = {
-        AddPasswordDetailsScreen(
+        UpsertScreen(
             onClose = onClose,
             viewModel = viewModel,
             selectedVault = selectedVault,
@@ -86,9 +86,9 @@ fun AddPasswordScreen(
 }
 
 @Composable
-fun AddPasswordDetailsScreen(
+fun UpsertScreen(
     onClose: () -> Unit,
-    viewModel: AddPasswordViewModel,
+    viewModel: UpsertPasswordDetailViewModel,
     selectedVault: Vault?,
     vaults: List<Vault>,
     storeButtonLable: String,
@@ -279,9 +279,9 @@ private fun AddPasswordScreenPreview() {
             createdAt = ""
         )
     }
-    AddPasswordDetailsScreen(
+    UpsertScreen(
         onClose = {},
-        viewModel = AddPasswordViewModel(
+        viewModel = UpsertPasswordDetailViewModel(
             vaultRepository = VaultRepository(SupabaseModule.mockClient),
             masterCredentialsRepository = MasterCredentialsRepository(
                 encryptedPrefs = EncryptedPrefsModule.mockSharedPreference
@@ -307,9 +307,9 @@ private fun AddPasswordScreenHorizontalPreview() {
             createdAt = ""
         )
     }
-    AddPasswordDetailsScreen(
+    UpsertScreen(
         onClose = {},
-        viewModel = AddPasswordViewModel(
+        viewModel = UpsertPasswordDetailViewModel(
             vaultRepository = VaultRepository(SupabaseModule.mockClient),
             masterCredentialsRepository = MasterCredentialsRepository(
                 encryptedPrefs = EncryptedPrefsModule.mockSharedPreference

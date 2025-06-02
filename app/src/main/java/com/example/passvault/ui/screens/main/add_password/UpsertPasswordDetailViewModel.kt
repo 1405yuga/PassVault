@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AddPasswordViewModel @Inject constructor(
+class UpsertPasswordDetailViewModel @Inject constructor(
     private val vaultRepository: VaultRepository,
     private val masterCredentialsRepository: MasterCredentialsRepository,
     private val encryptedDataRepository: EncryptedDataRepository

@@ -11,7 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.VaultRepository
-import com.example.passvault.ui.screens.main.add_password.AddPasswordScreen
+import com.example.passvault.ui.screens.main.add_password.UpsertPasswordDetailScreen
 import com.example.passvault.ui.screens.main.nav_drawer.NavMenusScreen
 import com.example.passvault.ui.screens.main.nav_drawer.profile.ProfileScreen
 import com.example.passvault.ui.screens.main.view_password.PasswordDetailResult
@@ -57,7 +57,7 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
                     e.printStackTrace()
                     null
                 }
-            AddPasswordScreen(
+            UpsertPasswordDetailScreen(
                 onClose = { navController.popBackStack() },
                 selectedVault = mainScreenViewModel.lastVaultMenu?.toVault(),
                 passwordDetailResult = passwordDetailResult,
