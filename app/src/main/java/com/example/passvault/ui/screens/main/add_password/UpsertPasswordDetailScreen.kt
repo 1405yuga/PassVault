@@ -64,7 +64,7 @@ import com.example.passvault.utils.state.ScreenState
 fun UpsertPasswordDetailScreen(
     onClose: () -> Unit,
     selectedVault: Vault?,
-    onUpdateSelectedVault:(Vault)-> Unit,
+    onUpdateSelectedVault: (Vault) -> Unit,
     viewModel: UpsertPasswordDetailViewModel,
     passwordDetailResult: PasswordDetailResult?,
     modifier: Modifier = Modifier
@@ -78,7 +78,7 @@ fun UpsertPasswordDetailScreen(
             onClose = onClose,
             viewModel = viewModel,
             selectedVault = selectedVault,
-            onUpdateSelectedVault={onUpdateSelectedVault(it)},
+            onUpdateSelectedVault = { onUpdateSelectedVault(it) },
             storeButtonLable = if (passwordDetailResult == null) "Create" else "Update",
             modifier = modifier,
             vaults = it,
@@ -92,7 +92,7 @@ fun UpsertScreen(
     onClose: () -> Unit,
     viewModel: UpsertPasswordDetailViewModel,
     selectedVault: Vault?,
-    onUpdateSelectedVault:(Vault)-> Unit,
+    onUpdateSelectedVault: (Vault) -> Unit,
     vaults: List<Vault>,
     storeButtonLable: String,
     passwordId: Long?,
