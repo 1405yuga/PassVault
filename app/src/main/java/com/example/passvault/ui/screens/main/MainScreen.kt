@@ -24,7 +24,6 @@ import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.extension_functions.toVault
 import com.google.gson.Gson
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(mainScreenViewModel: MainScreenViewModel) {

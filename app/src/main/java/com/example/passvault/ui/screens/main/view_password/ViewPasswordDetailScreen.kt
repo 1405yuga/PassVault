@@ -1,7 +1,5 @@
 package com.example.passvault.ui.screens.main.view_password
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -56,7 +54,6 @@ import com.example.passvault.utils.extension_functions.HandleScreenState
 import com.example.passvault.utils.extension_functions.toImageVector
 import com.example.passvault.utils.helper.DateTimeHelper
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ViewPasswordDetailScreen(
     passwordId: Long?,
@@ -83,7 +80,6 @@ fun ViewPasswordDetailScreen(
     })
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ViewPasswordScreenContent(
     passwordDetailsResult: PasswordDetailResult,
@@ -249,7 +245,6 @@ fun ViewPasswordScreenContent(
 
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 @VerticalScreenPreview
 fun ViewPasswordDetailVertical() {
