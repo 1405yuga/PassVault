@@ -1,7 +1,5 @@
 package com.example.passvault.ui.screens.main
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,13 +9,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.passvault.data.PasswordDetailResult
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.ui.screens.main.add_password.UpsertPasswordDetailScreen
 import com.example.passvault.ui.screens.main.nav_drawer.NavDrawerMenus
 import com.example.passvault.ui.screens.main.nav_drawer.NavMenusScreen
 import com.example.passvault.ui.screens.main.nav_drawer.profile.ProfileScreen
-import com.example.passvault.ui.screens.main.view_password.PasswordDetailResult
 import com.example.passvault.ui.screens.main.view_password.ViewPasswordDetailScreen
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
@@ -34,8 +32,19 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
                 viewModel = hiltViewModel(),
                 toProfileScreen = { navController.navigate(MainScreens.Profile.route) },
                 toAddPasswordScreen = { navController.navigate(MainScreens.AddPassword.route) },
-                toViewPasswordScreen = { id ->
-                    navController.navigate(MainScreens.ViewPassword.createRoute(id = id))
+                toViewPasswordScreen = { passwordDetailResult ->
+                    navController.navigate(
+                        MainScreens.ViewPassword.createRoute(
+                            passwordDetailsResultString = Gson().toJson(passwordDetailResult)
+                        )
+                    )
+                },
+                toEditPasswordScreen = { passwordDetailResult ->
+                    navController.navigate(
+                        MainScreens.AddPassword.createRoute(
+                            passwordDetailsResultString = Gson().toJson(passwordDetailResult)
+                        )
+                    )
                 },
                 mainScreenViewModel = mainScreenViewModel
             )
@@ -43,7 +52,7 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
         composable(
             route = MainScreens.AddPassword.route, arguments = listOf(
                 navArgument(
-                    MainScreens.AddPassword.initialPasswordData
+                    MainScreens.AddPassword.ARGUMENT
                 ) {
                     type = NavType.StringType
                     nullable = true
@@ -53,7 +62,7 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
             val passwordDetailResult: PasswordDetailResult? =
                 try {
                     Gson().fromJson<PasswordDetailResult?>(
-                        backStackEntry.arguments?.getString(MainScreens.AddPassword.initialPasswordData),
+                        backStackEntry.arguments?.getString(MainScreens.AddPassword.ARGUMENT),
                         PasswordDetailResult::class.java
                     )
                 } catch (e: Exception) {
@@ -78,17 +87,24 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
         }
         composable(
             route = MainScreens.ViewPassword.route,
-            arguments = listOf(navArgument(MainScreens.ViewPassword.argumentName) {
-                type = NavType.LongType
+            arguments = listOf(navArgument(MainScreens.ViewPassword.ARGUMENT) {
+                type = NavType.StringType
             })
         ) { backStackEntry ->
-            val passwordId: Long? =
-                backStackEntry.arguments?.getLong(MainScreens.ViewPassword.argumentName) ?: -1
+            val passwordDetailResult: PasswordDetailResult? =
+                try {
+                    Gson().fromJson<PasswordDetailResult?>(
+                        backStackEntry.arguments?.getString(MainScreens.ViewPassword.ARGUMENT),
+                        PasswordDetailResult::class.java
+                    )
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null
+                }
             ViewPasswordDetailScreen(
-                passwordId = passwordId,
                 viewModel = hiltViewModel(),
                 vault = mainScreenViewModel.lastVaultMenu?.toVault()!!,
-                toEditPasswordScreen = { passwordDetailResult ->
+                toEditPasswordScreen = {
                     // TODO: pass and load data 
                     navController.navigate(
                         MainScreens.AddPassword.createRoute(
@@ -97,13 +113,13 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
                     )
                 },
                 onClose = { navController.popBackStack() },
+                passwordDetailsResult = passwordDetailResult!!
             )
         }
     }
 }
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 @VerticalScreenPreview
 private fun MainScreenPreview() {
@@ -114,7 +130,6 @@ private fun MainScreenPreview() {
     )
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 @HorizontalScreenPreview
 private fun MainScreenHorizontalPreview() {

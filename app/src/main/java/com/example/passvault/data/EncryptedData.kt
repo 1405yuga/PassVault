@@ -41,6 +41,22 @@ data class PasswordDetailsWithId(val passwordId: Long, val passwordDetails: Pass
     }
 }
 
+data class PasswordDetailResult(
+    val passwordId: Long,
+    val passwordDetails: PasswordDetails,
+    val createdAt: String,
+    val modifiedAt: String? = null
+) {
+    companion object {
+        val mockObject = PasswordDetailResult(
+            passwordId = 0L,
+            passwordDetails = PasswordDetails.mockPasswordDetails,
+            createdAt = "2025-05-22 05:31:34.535993+00",
+            modifiedAt = "2025-05-22 05:31:34.535993+00"
+        )
+    }
+}
+
 object EncryptedDataTable {
     const val TABLE_NAME = "encrypted_data"
     const val PASSWORD_ID = "password_id"

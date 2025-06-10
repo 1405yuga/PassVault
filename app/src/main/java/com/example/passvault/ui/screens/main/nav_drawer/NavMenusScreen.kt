@@ -38,15 +38,10 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.passvault.R
-import com.example.passvault.di.shared_reference.EncryptedPrefsModule
-import com.example.passvault.di.shared_reference.MasterCredentialsRepository
-import com.example.passvault.di.supabase.SupabaseModule
-import com.example.passvault.network.supabase.EncryptedDataRepository
-import com.example.passvault.network.supabase.VaultRepository
+import com.example.passvault.data.PasswordDetailResult
 import com.example.passvault.ui.screens.main.MainScreenViewModel
 import com.example.passvault.ui.screens.main.nav_drawer.add_vault.AddVaultDialog
 import com.example.passvault.ui.screens.main.nav_drawer.list.PasswordsListScreen
-import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ConfirmationAlertDialog
 import com.example.passvault.utils.extension_functions.HandleScreenState
@@ -60,7 +55,8 @@ import kotlinx.coroutines.launch
 fun NavMenusScreen(
     toProfileScreen: () -> Unit,
     toAddPasswordScreen: () -> Unit,
-    toViewPasswordScreen: (passwordId: Long?) -> Unit,
+    toViewPasswordScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
+    toEditPasswordScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
     viewModel: VaultHomeViewModel,
     mainScreenViewModel: MainScreenViewModel
 ) {
@@ -239,9 +235,13 @@ fun NavMenusScreen(
                             state = passwordsScreenState,
                             onLoaded = {
                                 PasswordsListScreen(
-                                    passwordDetailsWithIdList = it,
+                                    passwordDetailResultList = it,
                                     onAddClick = { toAddPasswordScreen() },
-                                    onItemClick = { toViewPasswordScreen(it) }
+                                    toViewScreen = { toViewPasswordScreen(it) },
+                                    toEditScreen = {
+                                        // TODO: go to upsert screen
+                                        toEditPasswordScreen(it)
+                                    },
                                 )
                             }
                         )
@@ -291,41 +291,41 @@ fun NavMenusScreen(
     }
 }
 
-@Composable
-@VerticalScreenPreview
-fun NavMenusScreenPreview() {
-    NavMenusScreen(
-        viewModel = VaultHomeViewModel(
-            vaultRepository = VaultRepository(SupabaseModule.mockClient),
-            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
-            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference),
-        ),
-        toProfileScreen = {},
-        toAddPasswordScreen = {},
-        toViewPasswordScreen = {},
-        mainScreenViewModel = MainScreenViewModel(
-            vaultRepository = VaultRepository(SupabaseModule.mockClient)
-        ),
-    )
-}
-
-@Composable
-@HorizontalScreenPreview
-fun NavMenusScreenHorizontalPreview() {
-    NavMenusScreen(
-        viewModel = VaultHomeViewModel(
-            vaultRepository = VaultRepository(SupabaseModule.mockClient),
-            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
-            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference)
-        ),
-        toProfileScreen = {},
-        toAddPasswordScreen = {},
-        toViewPasswordScreen = {},
-        mainScreenViewModel = MainScreenViewModel(
-            vaultRepository = VaultRepository(SupabaseModule.mockClient)
-        ),
-    )
-}
+//@Composable
+//@VerticalScreenPreview
+//fun NavMenusScreenPreview() {
+//    NavMenusScreen(
+//        viewModel = VaultHomeViewModel(
+//            vaultRepository = VaultRepository(SupabaseModule.mockClient),
+//            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
+//            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference),
+//        ),
+//        toProfileScreen = {},
+//        toAddPasswordScreen = {},
+//        toViewPasswordScreen = {},
+//        mainScreenViewModel = MainScreenViewModel(
+//            vaultRepository = VaultRepository(SupabaseModule.mockClient)
+//        ),
+//    )
+//}
+//
+//@Composable
+//@HorizontalScreenPreview
+//fun NavMenusScreenHorizontalPreview() {
+//    NavMenusScreen(
+//        viewModel = VaultHomeViewModel(
+//            vaultRepository = VaultRepository(SupabaseModule.mockClient),
+//            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
+//            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference)
+//        ),
+//        toProfileScreen = {},
+//        toAddPasswordScreen = {},
+//        toViewPasswordScreen = {},
+//        mainScreenViewModel = MainScreenViewModel(
+//            vaultRepository = VaultRepository(SupabaseModule.mockClient)
+//        ),
+//    )
+//}
 
 @Composable
 @VerticalScreenPreview

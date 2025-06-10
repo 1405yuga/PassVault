@@ -3,56 +3,71 @@ package com.example.passvault.ui.screens.main.nav_drawer.list
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.example.passvault.data.PasswordDetailsWithId
-import com.example.passvault.utils.annotations.HorizontalScreenPreview
+import com.example.passvault.data.PasswordDetailResult
+import com.example.passvault.data.PasswordDetails
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.TitleSquare
+import kotlinx.coroutines.launch
 
 @Composable
 fun PasswordsListScreen(
-    passwordDetailsWithIdList: List<PasswordDetailsWithId>,
+    passwordDetailResultList: List<PasswordDetailResult>,
     onAddClick: () -> Unit,
-    onItemClick: (passWordId: Long?) -> Unit
+    toViewScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
+    toEditScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
 ) {
+
     Box(modifier = Modifier.fillMaxSize()) {
-        if (passwordDetailsWithIdList.isEmpty()) {
+        if (passwordDetailResultList.isEmpty()) {
             // TODO: create ui to display empty list 
             Text(text = "No passwords stored in this Vault!")
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(passwordDetailsWithIdList) { passwordDetail ->
+                items(passwordDetailResultList) { passwordDetailResult ->
                     PasswordItem(
-                        passwordDetailsWithId = passwordDetail,
-                        onItemClick = { onItemClick(it) },
-                        onMoreClick = {
-                            // TODO: open bottom modal
-                        }
+                        passwordDetails = passwordDetailResult.passwordDetails,
+                        onViewClick = { toViewScreen(passwordDetailResult) },
+                        onEditClick = { toEditScreen(passwordDetailResult) }
                     )
                 }
             }
@@ -69,15 +84,38 @@ fun PasswordsListScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordItem(
-    passwordDetailsWithId: PasswordDetailsWithId,
-    onItemClick: (passWordId: Long?) -> Unit,
-    onMoreClick: () -> Unit
+    passwordDetails: PasswordDetails,
+    onViewClick: () -> Unit,
+    onEditClick: () -> Unit
 ) {
-    val passwordDetails = passwordDetailsWithId.passwordDetails
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
+
+    if (sheetState.isVisible) {
+        ModalBottomSheet(onDismissRequest = { scope.launch { sheetState.hide() } }) {
+            // TODO: pass functions
+            MoreOptionsBottomSheetContent(
+                passwordDetails = passwordDetails,
+                onViewClick = {
+                    scope.launch { sheetState.hide() }
+                    onViewClick()
+                },
+                onEditClick = {
+                    scope.launch { sheetState.hide() }
+                    onEditClick()
+                },
+                onDeleteClick = {
+                    scope.launch { sheetState.hide() }
+// TODO: add delete confirmation & delete the password 
+                },
+            )
+        }
+    }
     Card(
-        onClick = { onItemClick(passwordDetailsWithId.passwordId) },
+        onClick = { onViewClick() },
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -105,7 +143,7 @@ fun PasswordItem(
                 }, modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.bodyMedium
             )
-            IconButton(onClick = { onMoreClick() }) {
+            IconButton(onClick = { scope.launch { sheetState.show() } }) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
                     contentDescription = "More"
@@ -116,41 +154,134 @@ fun PasswordItem(
 }
 
 @Composable
+fun MoreOptionsBottomSheetContent(
+    passwordDetails: PasswordDetails,
+    onViewClick: () -> Unit,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    val items = listOf(
+        MoreOption(
+            title = "View",
+            imageVector = Icons.Outlined.Visibility,
+            onClick = onViewClick
+        ),
+        MoreOption(
+            title = "Edit",
+            imageVector = Icons.Outlined.Edit,
+            onClick = onEditClick
+        ),
+        MoreOption(
+            title = "Delete",
+            imageVector = Icons.Outlined.Delete,
+            onClick = onDeleteClick
+        )
+    )
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 18.dp, vertical = 12.dp)
+    ) {
+        Text(text = buildAnnotatedString {
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append(text = passwordDetails.title) }
+            append(text = "\n")
+            if (passwordDetails.email.isNotBlank()) append(text = passwordDetails.email)
+            else if (passwordDetails.website.isNotBlank()) append(text = passwordDetails.website)
+        })
+        Spacer(modifier = Modifier.size(12.dp))
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(end = 12.dp)
+        ) {
+            items(items = items) { item ->
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Card(
+                        onClick = item.onClick,
+                        shape = CircleShape,
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        ),
+                        modifier = Modifier.size(65.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = item.imageVector,
+                                contentDescription = "Button for ${item.title}"
+                            )
+                        }
+                    }
+                    Text(
+                        text = item.title,
+                        style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    )
+                }
+            }
+        }
+
+    }
+}
+
+data class MoreOption(
+    val title: String,
+    val imageVector: ImageVector,
+    val onClick: () -> Unit
+)
+
+@Composable
 @VerticalScreenPreview
-fun PasswordItemVertical() {
-    PasswordItem(
-        passwordDetailsWithId = PasswordDetailsWithId.mockObject,
-        onItemClick = {},
-        onMoreClick = {},
-    )
+fun MoreOptionsBottomSheetPreview() {
+    MoreOptionsBottomSheetContent(
+        passwordDetails = PasswordDetails.mockPasswordDetails,
+        onViewClick = {},
+        onEditClick = {}
+    ) { }
 }
 
-@Composable
-@HorizontalScreenPreview
-fun PasswordItemHorizontal() {
-    PasswordItem(
-        passwordDetailsWithId = PasswordDetailsWithId.mockObject,
-        onItemClick = {},
-        onMoreClick = {},
-    )
-}
-
-@Composable
-@VerticalScreenPreview
-fun PasswordListScreenVertical() {
-    PasswordsListScreen(
-        onAddClick = {},
-        passwordDetailsWithIdList = List(10) { PasswordDetailsWithId.mockObject },
-        onItemClick = {}
-    )
-}
-
-@Composable
-@HorizontalScreenPreview
-fun PasswordListScreenHorizontal() {
-    PasswordsListScreen(
-        onAddClick = {},
-        passwordDetailsWithIdList = List(10) { PasswordDetailsWithId.mockObject },
-        onItemClick = {}
-    )
-}
+//@Composable
+//@VerticalScreenPreview
+//fun PasswordItemVertical() {
+//    PasswordItem(
+//        passwordDetailsWithId = PasswordDetailsWithId.mockObject,
+//        onViewClick = {},
+//        onEditClick = {},
+//    )
+//}
+//
+//@Composable
+//@HorizontalScreenPreview
+//fun PasswordItemHorizontal() {
+//    PasswordItem(
+//        passwordDetailsWithId = PasswordDetailsWithId.mockObject,
+//        onViewClick = {},
+//        onEditClick = {},
+//    )
+//}
+//
+//@Composable
+//@VerticalScreenPreview
+//fun PasswordListScreenVertical() {
+//    PasswordsListScreen(
+//        onAddClick = {},
+//        passwordDetailResultList = List(10) { PasswordDetailsWithId.mockObject },
+//        toViewScreen = {},
+//        toEditScreen = {},
+//    )
+//}
+//
+//@Composable
+//@HorizontalScreenPreview
+//fun PasswordListScreenHorizontal() {
+//    PasswordsListScreen(
+//        onAddClick = {},
+//        passwordDetailResultList = List(10) { PasswordDetailsWithId.mockObject },
+//        toViewScreen = {},
+//        toEditScreen = { },
+//    )
+//}

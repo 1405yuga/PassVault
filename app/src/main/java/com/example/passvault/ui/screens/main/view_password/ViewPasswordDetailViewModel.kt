@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passvault.data.CipherEncodedBundle
 import com.example.passvault.data.MasterCredentials
+import com.example.passvault.data.PasswordDetailResult
 import com.example.passvault.data.PasswordDetails
 import com.example.passvault.di.shared_reference.MasterCredentialsRepository
 import com.example.passvault.network.supabase.EncryptedDataRepository
@@ -29,9 +30,9 @@ class ViewPasswordDetailViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-    private val _screenState =
-        MutableStateFlow<ScreenState<PasswordDetailResult>>(ScreenState.PreLoad())
-    val screenState: StateFlow<ScreenState<PasswordDetailResult>> = _screenState
+//    private val _screenState =
+//        MutableStateFlow<ScreenState<PasswordDetailResult>>(ScreenState.PreLoad())
+//    val screenState: StateFlow<ScreenState<PasswordDetailResult>> = _screenState
 
     var showPassword by mutableStateOf(false)
         private set
@@ -40,70 +41,54 @@ class ViewPasswordDetailViewModel @Inject constructor(
         showPassword = !showPassword
     }
 
-    fun loadPasswordDetails(passwordId: Long?) {
-        if (passwordId == null) {
-            _screenState.value = ScreenState.Error("Password Details Not found!")
-        } else {
-            _screenState.value = ScreenState.Loading()
-            viewModelScope.launch {
-                _screenState.value = try {
-                    val encryptedData =
-                        encryptedDataRepository.getEncryptedDataById(id = passwordId)
-                    if (encryptedData == null) {
-                        ScreenState.Error("PasswordDetails Not Found")
-                    } else {
-                        //get masterCredentials
-                        val masterCredentialsJson =
-                            masterCredentialsRepository.getLocallyStoredMasterCredentialsJson()
-                        if (masterCredentialsJson == null) {
-                            ScreenState.Error(message = "Something went wrong. Login again!")
-                        } else {
-                            val masterCredentials: MasterCredentials =
-                                masterCredentialsJson.fromJsonString()
-                            val passwordDetails: PasswordDetails =
-                                withContext(Dispatchers.Default) {
-                                    val decryptedData: String = EncryptionHelper.performDecryption(
-                                        masterKey = masterCredentials.masterKey,
-                                        cipherEncodedBundle = CipherEncodedBundle(
-                                            encodedSalt = masterCredentials.encodedSalt,
-                                            encodedInitialisationVector = encryptedData.encodedInitialisationVector,
-                                            encodedEncryptedText = encryptedData.encodedEncryptedPasswordData
-                                        )
-                                    )
-                                    Gson().fromJson(decryptedData, PasswordDetails::class.java)
-                                }
-                            ScreenState.Loaded(
-                                result = PasswordDetailResult(
-                                    passwordId = passwordId,
-                                    passwordDetails = passwordDetails,
-                                    createdAt = encryptedData.createdAt ?: "",
-                                    modifiedAt = encryptedData.updatedAt ?: ""
-                                )
-                            )
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    ScreenState.Error("Unable to load password details")
-                }
-            }
-        }
-
-    }
-}
-
-data class PasswordDetailResult(
-    val passwordId: Long,
-    val passwordDetails: PasswordDetails,
-    val createdAt: String,
-    val modifiedAt: String
-) {
-    companion object {
-        val mockObject = PasswordDetailResult(
-            passwordId = 0L,
-            passwordDetails = PasswordDetails.mockPasswordDetails,
-            createdAt = "2025-05-22 05:31:34.535993+00",
-            modifiedAt = "2025-05-22 05:31:34.535993+00"
-        )
-    }
+//    fun loadPasswordDetails(passwordId: Long?) {
+//        if (passwordId == null) {
+//            _screenState.value = ScreenState.Error("Password Details Not found!")
+//        } else {
+//            _screenState.value = ScreenState.Loading()
+//            viewModelScope.launch {
+//                _screenState.value = try {
+//                    val encryptedData =
+//                        encryptedDataRepository.getEncryptedDataById(id = passwordId)
+//                    if (encryptedData == null) {
+//                        ScreenState.Error("PasswordDetails Not Found")
+//                    } else {
+//                        //get masterCredentials
+//                        val masterCredentialsJson =
+//                            masterCredentialsRepository.getLocallyStoredMasterCredentialsJson()
+//                        if (masterCredentialsJson == null) {
+//                            ScreenState.Error(message = "Something went wrong. Login again!")
+//                        } else {
+//                            val masterCredentials: MasterCredentials =
+//                                masterCredentialsJson.fromJsonString()
+//                            val passwordDetails: PasswordDetails =
+//                                withContext(Dispatchers.Default) {
+//                                    val decryptedData: String = EncryptionHelper.performDecryption(
+//                                        masterKey = masterCredentials.masterKey,
+//                                        cipherEncodedBundle = CipherEncodedBundle(
+//                                            encodedSalt = masterCredentials.encodedSalt,
+//                                            encodedInitialisationVector = encryptedData.encodedInitialisationVector,
+//                                            encodedEncryptedText = encryptedData.encodedEncryptedPasswordData
+//                                        )
+//                                    )
+//                                    Gson().fromJson(decryptedData, PasswordDetails::class.java)
+//                                }
+//                            ScreenState.Loaded(
+//                                result = PasswordDetailResult(
+//                                    passwordId = passwordId,
+//                                    passwordDetails = passwordDetails,
+//                                    createdAt = encryptedData.createdAt ?: "",
+//                                    modifiedAt = encryptedData.updatedAt ?: ""
+//                                )
+//                            )
+//                        }
+//                    }
+//                } catch (e: Exception) {
+//                    e.printStackTrace()
+//                    ScreenState.Error("Unable to load password details")
+//                }
+//            }
+//        }
+//
+//    }
 }

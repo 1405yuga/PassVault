@@ -12,8 +12,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passvault.data.CipherEncodedBundle
 import com.example.passvault.data.MasterCredentials
+import com.example.passvault.data.PasswordDetailResult
 import com.example.passvault.data.PasswordDetails
-import com.example.passvault.data.PasswordDetailsWithId
 import com.example.passvault.data.Vault
 import com.example.passvault.di.shared_reference.MasterCredentialsRepository
 import com.example.passvault.network.supabase.EncryptedDataRepository
@@ -42,9 +42,9 @@ class VaultHomeViewModel @Inject constructor(
 
     //List Screen-------------------------------------------------------------------------
     private val _passwordListScreenState =
-        MutableStateFlow<ScreenState<List<PasswordDetailsWithId>>>(ScreenState.PreLoad())
+        MutableStateFlow<ScreenState<List<PasswordDetailResult>>>(ScreenState.PreLoad())
 
-    val passwordListScreenState: StateFlow<ScreenState<List<PasswordDetailsWithId>>> =
+    val passwordListScreenState: StateFlow<ScreenState<List<PasswordDetailResult>>> =
         _passwordListScreenState
 
     fun getPasswordsList(vaultId: Long?) {
@@ -69,7 +69,7 @@ class VaultHomeViewModel @Inject constructor(
                                 masterCredentialsJson.fromJsonString()
                             val gson = Gson()
                             //decrypt
-                            val decryptedList: List<PasswordDetailsWithId> =
+                            val decryptedList: List<PasswordDetailResult> =
                                 withContext(Dispatchers.Default) {
                                     result.map { encryptedData ->
                                         val decryptedData = EncryptionHelper.performDecryption(
@@ -80,12 +80,18 @@ class VaultHomeViewModel @Inject constructor(
                                                 encodedEncryptedText = encryptedData.encodedEncryptedPasswordData
                                             )
                                         )
-                                        PasswordDetailsWithId(
+                                        Log.d(
+                                            this@VaultHomeViewModel.javaClass.simpleName,
+                                            "Encrypted data : $encryptedData"
+                                        )
+                                        PasswordDetailResult(
                                             passwordId = encryptedData.passwordId!!,
                                             passwordDetails = gson.fromJson(
                                                 decryptedData,
                                                 PasswordDetails::class.java
-                                            )
+                                            ),
+                                            createdAt = encryptedData.createdAt!!,
+                                            modifiedAt = encryptedData.updatedAt,
                                         )
                                     }
                                 }

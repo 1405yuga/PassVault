@@ -34,9 +34,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -47,44 +44,41 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.passvault.R
+import com.example.passvault.data.PasswordDetailResult
 import com.example.passvault.data.Vault
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.TitleSquare
-import com.example.passvault.utils.extension_functions.HandleScreenState
 import com.example.passvault.utils.extension_functions.toImageVector
 import com.example.passvault.utils.helper.DateTimeHelper
 
 @Composable
 fun ViewPasswordDetailScreen(
-    passwordId: Long?,
+    passwordDetailsResult: PasswordDetailResult,
     viewModel: ViewPasswordDetailViewModel,
     vault: Vault,
-    toEditPasswordScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
+    toEditPasswordScreen: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val screenState by viewModel.screenState.collectAsState()
-    LaunchedEffect(Unit) {
-        viewModel.loadPasswordDetails(passwordId = passwordId)
-    }
-    HandleScreenState(state = screenState, onLoaded = { passwordDetailsResult ->
-        ViewPasswordScreenContent(
-            passwordDetailsResult = passwordDetailsResult,
-            vault = vault,
-            showPassword = viewModel.showPassword,
-            onPasswordVisibilityClick = { viewModel.togglePasswordVisibility() },
-            toEditPasswordScreen = { toEditPasswordScreen(it) },
-            onClose = onClose,
-            modifier = modifier
-        )
-    })
+//    val screenState by viewModel.screenState.collectAsState()
+
+    ViewPasswordScreenContent(
+        passwordDetailsResult = passwordDetailsResult,
+        vault = vault,
+        showPassword = viewModel.showPassword,
+        onPasswordVisibilityClick = { viewModel.togglePasswordVisibility() },
+        toEditPasswordScreen = { toEditPasswordScreen() },
+        onClose = onClose,
+        modifier = modifier
+    )
+
 }
 
 @Composable
 fun ViewPasswordScreenContent(
     passwordDetailsResult: PasswordDetailResult,
     vault: Vault,
-    toEditPasswordScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
+    toEditPasswordScreen: () -> Unit,
     modifier: Modifier = Modifier,
     onPasswordVisibilityClick: () -> Unit,
     onClose: () -> Unit,
@@ -118,7 +112,7 @@ fun ViewPasswordScreenContent(
             }
             Spacer(modifier = Modifier.weight(1f))
             Button(
-                onClick = { toEditPasswordScreen(passwordDetailsResult) },
+                onClick = { toEditPasswordScreen() },
                 modifier = Modifier.defaultMinSize(dimensionResource(R.dimen.min_clickable_size))
             ) {
                 Icon(Icons.Outlined.Edit, contentDescription = null)
@@ -223,7 +217,7 @@ fun ViewPasswordScreenContent(
             )
         ) {
             var showAny = false
-            if (passwordDetailsResult.modifiedAt.isNotBlank()) {
+            if (passwordDetailsResult.modifiedAt?.isNotBlank() == true) {
                 DetailItem(
                     typeName = R.string.modified,
                     data = DateTimeHelper.formatSupabaseTimestamp(passwordDetailsResult.modifiedAt), //todo: show modified
