@@ -6,6 +6,7 @@ import com.example.passvault.data.EncryptedDataTable
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
+import java.util.Objects.isNull
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,14 +17,22 @@ class EncryptedDataRepository @Inject constructor(private val supabaseClient: Su
         supabaseClient.postgrest[EncryptedDataTable.TABLE_NAME].upsert(encryptedData)
     }
 
-    suspend fun getAllEncryptedDataByVaultId(vaultId: Long): List<EncryptedData>? {
+    suspend fun getAllEncryptedDataByVaultId(vaultId: Long?): List<EncryptedData>? {
         Log.d(this.javaClass.simpleName, "Vault id recieved : $vaultId")
         return try {
-            supabaseClient.from(EncryptedDataTable.TABLE_NAME).select {
-                filter {
-                    eq(EncryptedDataTable.VAULT_ID, vaultId)
-                }
-            }.decodeList<EncryptedData>()
+            if (vaultId != null) {
+                supabaseClient.from(EncryptedDataTable.TABLE_NAME).select {
+                    filter {
+                        eq(EncryptedDataTable.VAULT_ID, vaultId)
+                    }
+                }.decodeList<EncryptedData>()
+            } else {
+                supabaseClient.from(EncryptedDataTable.TABLE_NAME).select {
+                    filter {
+                        isNull(EncryptedDataTable.VAULT_ID)
+                    }
+                }.decodeList<EncryptedData>()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             null

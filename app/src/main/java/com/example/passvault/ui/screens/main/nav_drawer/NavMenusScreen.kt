@@ -57,7 +57,7 @@ fun NavMenusScreen(
     toAddPasswordScreen: () -> Unit,
     toViewPasswordScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
     toEditPasswordScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
-    viewModel: VaultHomeViewModel,
+    viewModel: NavMenusViewModel,
     mainScreenViewModel: MainScreenViewModel
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
@@ -295,7 +295,7 @@ fun NavMenusScreen(
 //@VerticalScreenPreview
 //fun NavMenusScreenPreview() {
 //    NavMenusScreen(
-//        viewModel = VaultHomeViewModel(
+//        viewModel = NavMenusViewModel(
 //            vaultRepository = VaultRepository(SupabaseModule.mockClient),
 //            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
 //            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference),
@@ -313,7 +313,7 @@ fun NavMenusScreen(
 //@HorizontalScreenPreview
 //fun NavMenusScreenHorizontalPreview() {
 //    NavMenusScreen(
-//        viewModel = VaultHomeViewModel(
+//        viewModel = NavMenusViewModel(
 //            vaultRepository = VaultRepository(SupabaseModule.mockClient),
 //            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
 //            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference)

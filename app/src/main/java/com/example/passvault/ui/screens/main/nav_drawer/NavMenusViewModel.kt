@@ -33,7 +33,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class VaultHomeViewModel @Inject constructor(
+class NavMenusViewModel @Inject constructor(
     private val vaultRepository: VaultRepository,
     private val encryptedDataRepository: EncryptedDataRepository,
     private val masterCredentialsRepository: MasterCredentialsRepository
@@ -51,57 +51,48 @@ class VaultHomeViewModel @Inject constructor(
         _passwordListScreenState.value = ScreenState.Loading()
         viewModelScope.launch {
             _passwordListScreenState.value = try {
-                if (vaultId != null) {
-                    val result =
-                        encryptedDataRepository.getAllEncryptedDataByVaultId(vaultId = vaultId)
-                    if (result == null) {
-                        ScreenState.Error("Unable to load Passwords list")
-                    } else if (result.isEmpty()) {
-                        ScreenState.Loaded(emptyList())
-                    } else {
-                        //get masterCredentials
-                        val masterCredentialsJson =
-                            masterCredentialsRepository.getLocallyStoredMasterCredentialsJson()
-                        if (masterCredentialsJson == null) {
-                            ScreenState.Error(message = "Something went wrong. Login again!")
-                        } else {
-                            val masterCredentials: MasterCredentials =
-                                masterCredentialsJson.fromJsonString()
-                            val gson = Gson()
-                            //decrypt
-                            val decryptedList: List<PasswordDetailResult> =
-                                withContext(Dispatchers.Default) {
-                                    result.map { encryptedData ->
-                                        val decryptedData = EncryptionHelper.performDecryption(
-                                            masterKey = masterCredentials.masterKey,
-                                            cipherEncodedBundle = CipherEncodedBundle(
-                                                encodedSalt = masterCredentials.encodedSalt,
-                                                encodedInitialisationVector = encryptedData.encodedInitialisationVector,
-                                                encodedEncryptedText = encryptedData.encodedEncryptedPasswordData
-                                            )
-                                        )
-                                        Log.d(
-                                            this@VaultHomeViewModel.javaClass.simpleName,
-                                            "Encrypted data : $encryptedData"
-                                        )
-                                        PasswordDetailResult(
-                                            passwordId = encryptedData.passwordId!!,
-                                            passwordDetails = gson.fromJson(
-                                                decryptedData,
-                                                PasswordDetails::class.java
-                                            ),
-                                            createdAt = encryptedData.createdAt!!,
-                                            modifiedAt = encryptedData.updatedAt,
-                                        )
-                                    }
-                                }
-                            ScreenState.Loaded(decryptedList)
-                        }
-                    }
+                val result =
+                    encryptedDataRepository.getAllEncryptedDataByVaultId(vaultId = vaultId)
+                if (result == null) {
+                    ScreenState.Error("Unable to load Passwords list")
+                } else if (result.isEmpty()) {
+                    ScreenState.Loaded(emptyList())
                 } else {
-                    ScreenState.Error("Vault Not found")
+                    //get masterCredentials
+                    val masterCredentialsJson =
+                        masterCredentialsRepository.getLocallyStoredMasterCredentialsJson()
+                    if (masterCredentialsJson == null) {
+                        ScreenState.Error(message = "Something went wrong. Login again!")
+                    } else {
+                        val masterCredentials: MasterCredentials =
+                            masterCredentialsJson.fromJsonString()
+                        val gson = Gson()
+                        //decrypt
+                        val decryptedList: List<PasswordDetailResult> =
+                            withContext(Dispatchers.Default) {
+                                result.map { encryptedData ->
+                                    val decryptedData = EncryptionHelper.performDecryption(
+                                        masterKey = masterCredentials.masterKey,
+                                        cipherEncodedBundle = CipherEncodedBundle(
+                                            encodedSalt = masterCredentials.encodedSalt,
+                                            encodedInitialisationVector = encryptedData.encodedInitialisationVector,
+                                            encodedEncryptedText = encryptedData.encodedEncryptedPasswordData
+                                        )
+                                    )
+                                    PasswordDetailResult(
+                                        passwordId = encryptedData.passwordId!!,
+                                        passwordDetails = gson.fromJson(
+                                            decryptedData,
+                                            PasswordDetails::class.java
+                                        ),
+                                        createdAt = encryptedData.createdAt!!,
+                                        modifiedAt = encryptedData.updatedAt,
+                                    )
+                                }
+                            }
+                        ScreenState.Loaded(decryptedList)
+                    }
                 }
-
             } catch (e: Exception) {
                 e.printStackTrace()
                 ScreenState.Error("Unable to load Passwords list")
@@ -109,7 +100,7 @@ class VaultHomeViewModel @Inject constructor(
         }
     }
 
-    //Add Vault-------------------------------------------------------------------------------
+//Add Vault-------------------------------------------------------------------------------
 
     private val _addDialogScreenState = MutableStateFlow<ScreenState<Vault>>(ScreenState.PreLoad())
     val addDialogScreenState: StateFlow<ScreenState<Vault>> = _addDialogScreenState
@@ -159,8 +150,8 @@ class VaultHomeViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val resultVault = Vault(
-                    vaultName = this@VaultHomeViewModel.vaultName,
-                    iconKey = this@VaultHomeViewModel.iconSelected?.name
+                    vaultName = this@NavMenusViewModel.vaultName,
+                    iconKey = this@NavMenusViewModel.iconSelected?.name
                         ?: VaultIconsList.getIconsList()[0].name
                 )
 
@@ -173,7 +164,7 @@ class VaultHomeViewModel @Inject constructor(
         }
     }
 
-    //Remove Vault----------------------------------------------------------------
+//Remove Vault----------------------------------------------------------------
 
     var openRemoveVaultConfirmationDialog by mutableStateOf(false)
         private set
@@ -202,7 +193,7 @@ class VaultHomeViewModel @Inject constructor(
                 viewModelScope.launch {
                     val result = vaultRepository.deleteVault(vaultId = vaultToBeRemoved!!.vaultId)
                     result.onSuccess {
-                        Log.d(this@VaultHomeViewModel.javaClass.simpleName, "Vault deleted")
+                        Log.d(this@NavMenusViewModel.javaClass.simpleName, "Vault deleted")
                         _removeVaultScreenState.value = ScreenState.Loaded(vaultToBeRemoved!!)
                     }.onFailure { exception ->
                         exception.printStackTrace()

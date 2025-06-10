@@ -1,6 +1,8 @@
 package com.example.passvault.ui.screens.main
 
 import android.util.Log
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -61,7 +63,14 @@ class MainScreenViewModel @Inject constructor(private val vaultRepository: Vault
         _vaultListScreenState.value = ScreenState.Loading()
         try {
             viewModelScope.launch {
-                val result = vaultRepository.getAllVaults()
+                val result = mutableListOf<Vault>(
+                    Vault(
+                        vaultId = null,
+                        vaultName = "All Passwords",
+                        iconKey = Icons.Default.Language.name
+                    )
+                )
+                result += vaultRepository.getAllVaults()
                 Log.d(this@MainScreenViewModel.javaClass.simpleName, "Vaults : ${result.size}")
                 _vaultList.value = result
                 if (result.isNotEmpty()) {

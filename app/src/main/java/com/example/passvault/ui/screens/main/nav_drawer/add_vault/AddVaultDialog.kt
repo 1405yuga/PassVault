@@ -54,7 +54,7 @@ import com.example.passvault.di.shared_reference.MasterCredentialsRepository
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.EncryptedDataRepository
 import com.example.passvault.network.supabase.VaultRepository
-import com.example.passvault.ui.screens.main.nav_drawer.VaultHomeViewModel
+import com.example.passvault.ui.screens.main.nav_drawer.NavMenusViewModel
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.TextFieldWithErrorText
@@ -64,7 +64,7 @@ import com.example.passvault.utils.state.ScreenState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddVaultDialog(
-    vaultViewModel: VaultHomeViewModel,
+    vaultViewModel: NavMenusViewModel,
     onVaultNameChange: (String) -> Unit,
     onIconSelected: (ImageVector) -> Unit,
     insertNewVault: () -> Unit,
@@ -200,7 +200,7 @@ fun IconSelector(
 @VerticalScreenPreview
 fun AddVaultDialogPreview() {
     AddVaultDialog(
-        vaultViewModel = VaultHomeViewModel(
+        vaultViewModel = NavMenusViewModel(
             vaultRepository = VaultRepository(
                 supabaseClient = SupabaseModule.mockClient
             ),
@@ -219,7 +219,7 @@ fun AddVaultDialogPreview() {
 @HorizontalScreenPreview
 fun AddVaultDialogHorizontalPreview() {
     AddVaultDialog(
-        vaultViewModel = VaultHomeViewModel(
+        vaultViewModel = NavMenusViewModel(
             vaultRepository = VaultRepository(
                 supabaseClient = SupabaseModule.mockClient
             ),
