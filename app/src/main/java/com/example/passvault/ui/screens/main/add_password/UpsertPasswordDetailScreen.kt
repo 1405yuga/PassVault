@@ -1,10 +1,12 @@
 package com.example.passvault.ui.screens.main.add_password
 
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,11 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBox
-import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Home
@@ -26,22 +28,27 @@ import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Password
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.passvault.R
@@ -59,6 +66,7 @@ import com.example.passvault.utils.custom_composables.TextFieldWithErrorText
 import com.example.passvault.utils.extension_functions.HandleScreenState
 import com.example.passvault.utils.extension_functions.toImageVector
 import com.example.passvault.utils.state.ScreenState
+import kotlinx.coroutines.launch
 
 @Composable
 fun UpsertPasswordDetailScreen(
@@ -87,6 +95,7 @@ fun UpsertPasswordDetailScreen(
     })
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpsertScreen(
     onClose: () -> Unit,
@@ -101,7 +110,29 @@ fun UpsertScreen(
     LaunchedEffect(Unit) { if (selectedVault != null) viewModel.onSelectedVaultChange(selectedVault) }
     val screenState by viewModel.screenState.collectAsState()
     val context = LocalContext.current
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
 
+    if (sheetState.isVisible) {
+        ModalBottomSheet(
+            onDismissRequest = { scope.launch { sheetState.hide() } },
+            sheetState = sheetState,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            VaultsBottomSheetContent(
+                vaults = vaults,
+                onVaultClick = {
+                    // TODO: get vault
+                    onUpdateSelectedVault(it)
+                    viewModel.onSelectedVaultChange(it)
+                    scope.launch { sheetState.hide() }
+                },
+                selectedVault = viewModel.selectedVault
+
+            )
+        }
+
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -146,8 +177,7 @@ fun UpsertScreen(
             Box {
                 Button(
                     onClick = {
-                        // TODO: get vault list
-                        viewModel.toggleVaultMenuExpantion()
+                        scope.launch { sheetState.show() }
                     },
                     modifier = Modifier.height(dimensionResource(R.dimen.min_clickable_size)),
                     colors = ButtonDefaults.buttonColors(
@@ -164,18 +194,6 @@ fun UpsertScreen(
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(Icons.Outlined.KeyboardArrowDown, contentDescription = "Get vault")
                 }
-                VaultDropDownMenu(
-                    vaults = vaults,
-                    vaultDropDownExpanded = viewModel.vaultMenuExpanded,
-                    onMenuDismiss = { viewModel.toggleVaultMenuExpantion() },
-                    onVaultClick = {
-                        // TODO: get vault
-                        onUpdateSelectedVault(it)
-                        viewModel.onSelectedVaultChange(it)
-                        viewModel.toggleVaultMenuExpantion()
-                    },
-                    selectedVault = viewModel.selectedVault
-                )
             }
             Spacer(modifier = Modifier.padding(4.dp))
             Button(
@@ -233,40 +251,47 @@ fun UpsertScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VaultDropDownMenu(
+fun VaultsBottomSheetContent(
     vaults: List<Vault>,
-    vaultDropDownExpanded: Boolean,
-    onMenuDismiss: () -> Unit,
     onVaultClick: (vault: Vault) -> Unit,
-    selectedVault: Vault,
-    modifier: Modifier = Modifier
+    selectedVault: Vault
 ) {
-    DropdownMenu(
-        expanded = vaultDropDownExpanded,
-        onDismissRequest = onMenuDismiss,
-        modifier = modifier.padding(horizontal = 4.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text(
+            "Select Vault",
+            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold)
+        )
         vaults.forEach { option ->
-            DropdownMenuItem(
-                text = { Text(option.vaultName) },
-                leadingIcon = {
-                    Icon(
-                        imageVector = option.iconKey.toImageVector(),
-                        contentDescription = null
-                    )
-                },
-                onClick = {
-                    // TODO:
-                    onVaultClick(option)
-                },
-                trailingIcon = {
-                    if (selectedVault == option) {
-                        Icon(Icons.Outlined.Check, contentDescription = "Selected vault")
-                    } else {
-                        null
-                    }
-                })
+            Card(
+                shape = RoundedCornerShape(6.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor =
+                        if (selectedVault == option) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surface
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
+                    .clickable { onVaultClick(option) }
+                    .defaultMinSize(minHeight = 48.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(imageVector = option.iconKey.toImageVector(), contentDescription = null)
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(text = option.vaultName, modifier = Modifier.weight(1f))
+                }
+            }
         }
     }
 }
@@ -325,5 +350,24 @@ private fun AddPasswordScreenHorizontalPreview() {
         storeButtonLable = "Create",
         passwordId = 0L,
         onUpdateSelectedVault = {}
+    )
+}
+
+@Composable
+@VerticalScreenPreview
+private fun VaultsBttomSheetContentPreview() {
+    val vaults = List(3) {
+        Vault(
+            vaultId = it.toLong(),
+            userId = "someUser",
+            vaultName = "Vault name",
+            iconKey = Icons.Outlined.Home.name,
+            createdAt = ""
+        )
+    }
+    VaultsBottomSheetContent(
+        vaults = vaults,
+        onVaultClick = {},
+        selectedVault = vaults.first()
     )
 }

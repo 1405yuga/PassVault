@@ -70,8 +70,6 @@ class UpsertPasswordDetailViewModel @Inject constructor(
         private set
     var notes by mutableStateOf("") //optional
         private set
-    var vaultMenuExpanded by mutableStateOf(false)
-        private set
     var selectedVault by mutableStateOf(Vault.defaultVault())
         private set
 
@@ -97,10 +95,6 @@ class UpsertPasswordDetailViewModel @Inject constructor(
 
     fun onNotesChange(notes: String) {
         this.notes = notes
-    }
-
-    fun toggleVaultMenuExpantion() {
-        this.vaultMenuExpanded = !this.vaultMenuExpanded
     }
 
     fun onSelectedVaultChange(vault: Vault) {
