@@ -149,7 +149,6 @@ class UpsertPasswordDetailViewModel @Inject constructor(
                     val encryptedData = EncryptedData(
                         passwordId = passwordId,
                         vaultId = selectedVault.vaultId,
-                        userId = selectedVault.userId,
                         encodedInitialisationVector = cipherEncodedBundle.encodedInitialisationVector,
                         encodedEncryptedPasswordData = cipherEncodedBundle.encodedEncryptedText
                     )

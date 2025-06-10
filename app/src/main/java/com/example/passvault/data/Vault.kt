@@ -1,7 +1,7 @@
 package com.example.passvault.data
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.filled.Language
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -15,11 +15,9 @@ data class Vault(
 ) {
     companion object {
         fun defaultVault(): Vault = Vault(
-            vaultId = 0L,
-            userId = "",
-            vaultName = "Personal",
-            iconKey = Icons.Outlined.Home.name,
-            createdAt = ""
+            vaultId = null,
+            vaultName = "All Passwords",
+            iconKey = Icons.Default.Language.name
         )
     }
 }
@@ -31,5 +29,4 @@ object VaultTable {
     const val VAULT_NAME = "vault_name"
     const val ICON_KEY = "icon_key"
     const val CREATED_AT = "created_at"
-    const val VAULT_JSON_ARGUMENT_NAME = "argument"
 }
