@@ -1,5 +1,6 @@
 package com.example.passvault.network.supabase
 
+import android.util.Log
 import com.example.passvault.data.Vault
 import com.example.passvault.data.VaultTable
 import io.github.jan.supabase.SupabaseClient
@@ -11,8 +12,10 @@ import javax.inject.Singleton
 @Singleton
 class VaultRepository @Inject constructor(private val supabaseClient: SupabaseClient) {
 
-    suspend fun insertVault(vault: Vault) {
-        supabaseClient.postgrest[VaultTable.TABLE_NAME].insert(vault)
+    suspend fun upsertVault(vault: Vault) {
+        supabaseClient.postgrest[VaultTable.TABLE_NAME].upsert(vault) {
+            onConflict = VaultTable.VAULT_ID
+        }
     }
 
     suspend fun getAllVaults(): List<Vault> {

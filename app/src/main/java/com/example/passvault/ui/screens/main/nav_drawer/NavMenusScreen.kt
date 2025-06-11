@@ -40,7 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.example.passvault.R
 import com.example.passvault.data.PasswordDetailResult
 import com.example.passvault.ui.screens.main.MainScreenViewModel
-import com.example.passvault.ui.screens.main.nav_drawer.add_vault.AddVaultDialog
+import com.example.passvault.ui.screens.main.nav_drawer.upsert_vault.UpsertVaultDialog
 import com.example.passvault.ui.screens.main.nav_drawer.list.PasswordsListScreen
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ConfirmationAlertDialog
@@ -248,7 +248,7 @@ fun NavMenusScreen(
                     // loadDialogs
                     when {
                         viewModel.openAddVaultDialog -> {
-                            AddVaultDialog(
+                            UpsertVaultDialog(
                                 isEditable = viewModel.isVaultEditable,
                                 onSuccess = { mainScreenViewModel.addVaultToList(vault = it) },
                                 viewModel = viewModel

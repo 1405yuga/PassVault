@@ -124,6 +124,7 @@ class NavMenusViewModel @Inject constructor(
 
     var iconSelected by mutableStateOf<ImageVector?>(null)
         private set
+    private var vaultId by mutableStateOf<Long?>(null)
 
     fun onVaultNameChange(vaultName: String) {
         this.vaultName = vaultName
@@ -145,10 +146,12 @@ class NavMenusViewModel @Inject constructor(
         onIconSelected(null)
         this.vaultError = ""
         this.isVaultEditable = false
+        this.vaultId = null
         this._addDialogScreenState.value = ScreenState.PreLoad()
     }
 
     private fun setEditableVaultDialogState(vault: Vault) {
+        this.vaultId = vault.vaultId
         this.isVaultEditable = true
         this.vaultName = vault.vaultName
         this.iconSelected = vault.iconKey.toImageVector()
@@ -160,12 +163,13 @@ class NavMenusViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val resultVault = Vault(
+                    vaultId = this@NavMenusViewModel.vaultId,
                     vaultName = this@NavMenusViewModel.vaultName,
                     iconKey = this@NavMenusViewModel.iconSelected?.name
                         ?: VaultIconsList.getIconsList()[0].name
                 )
 
-                vaultRepository.insertVault(vault = resultVault)
+                vaultRepository.upsertVault(vault = resultVault)
                 _addDialogScreenState.value = ScreenState.Loaded(resultVault)
             } catch (e: Exception) {
                 e.printStackTrace()

@@ -1,4 +1,4 @@
-package com.example.passvault.ui.screens.main.nav_drawer.add_vault
+package com.example.passvault.ui.screens.main.nav_drawer.upsert_vault
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -57,7 +57,7 @@ import com.example.passvault.utils.state.ScreenState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddVaultDialog(
+fun UpsertVaultDialog(
     isEditable: Boolean,
     viewModel: NavMenusViewModel,
     onSuccess: (Vault) -> Unit,
@@ -222,7 +222,7 @@ fun IconSelector(
 @Composable
 @VerticalScreenPreview
 fun AddVaultDialogPreview() {
-    AddVaultDialog(
+    UpsertVaultDialog(
         viewModel = NavMenusViewModel(
             vaultRepository = VaultRepository(
                 supabaseClient = SupabaseModule.mockClient
@@ -238,7 +238,7 @@ fun AddVaultDialogPreview() {
 @Composable
 @HorizontalScreenPreview
 fun AddVaultDialogHorizontalPreview() {
-    AddVaultDialog(
+    UpsertVaultDialog(
         viewModel = NavMenusViewModel(
             vaultRepository = VaultRepository(
                 supabaseClient = SupabaseModule.mockClient
