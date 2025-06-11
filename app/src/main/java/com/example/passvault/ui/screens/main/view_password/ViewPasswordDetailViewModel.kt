@@ -5,22 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.passvault.data.CipherEncodedBundle
-import com.example.passvault.data.MasterCredentials
-import com.example.passvault.data.PasswordDetailResult
-import com.example.passvault.data.PasswordDetails
 import com.example.passvault.di.shared_reference.MasterCredentialsRepository
 import com.example.passvault.network.supabase.EncryptedDataRepository
-import com.example.passvault.utils.extension_functions.fromJsonString
-import com.example.passvault.utils.helper.EncryptionHelper
 import com.example.passvault.utils.state.ScreenState
-import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,6 +32,36 @@ class ViewPasswordDetailViewModel @Inject constructor(
         showPassword = !showPassword
     }
 
+    //Delete password------------------------------------------------------------------------
+    var deletePasswordConfirmationDialog by mutableStateOf(false)
+        private set
+
+    fun showDeletePasswordConfirmation() {
+        this.deletePasswordConfirmationDialog = true
+    }
+
+    fun hideDeletePasswordConfirmation() {
+        this.deletePasswordConfirmationDialog = false
+    }
+
+    private val _deletePasswordScreenState =
+        MutableStateFlow<ScreenState<Long>>(ScreenState.PreLoad())
+    val deletePasswordScreenState: StateFlow<ScreenState<Long>> = _deletePasswordScreenState
+
+    fun deletePassword(passwordId: Long) {
+        _deletePasswordScreenState.value = ScreenState.Loading()
+        viewModelScope.launch {
+            _deletePasswordScreenState.value = try {
+                val result =
+                    encryptedDataRepository.deleteEncryptedDataById(passwordId = passwordId)
+                if (result.isSuccess) ScreenState.Loaded(passwordId)
+                else ScreenState.Error("Something went wrong")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                ScreenState.Error("Unable to delete")
+            }
+        }
+    }
 //    fun loadPasswordDetails(passwordId: Long?) {
 //        if (passwordId == null) {
 //            _screenState.value = ScreenState.Error("Password Details Not found!")

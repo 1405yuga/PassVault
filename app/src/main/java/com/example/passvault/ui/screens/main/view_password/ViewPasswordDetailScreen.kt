@@ -1,5 +1,6 @@
 package com.example.passvault.ui.screens.main.view_password
 
+import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -17,10 +18,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.AccountBox
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.Bolt
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Language
@@ -28,15 +29,20 @@ import androidx.compose.material.icons.outlined.Password
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
@@ -47,9 +53,11 @@ import com.example.passvault.R
 import com.example.passvault.data.PasswordDetailResult
 import com.example.passvault.data.Vault
 import com.example.passvault.utils.annotations.VerticalScreenPreview
+import com.example.passvault.utils.custom_composables.DeleteConfirmationDialog
 import com.example.passvault.utils.custom_composables.TitleSquare
 import com.example.passvault.utils.extension_functions.toImageVector
 import com.example.passvault.utils.helper.DateTimeHelper
+import com.example.passvault.utils.state.ScreenState
 
 @Composable
 fun ViewPasswordDetailScreen(
@@ -62,6 +70,31 @@ fun ViewPasswordDetailScreen(
 ) {
 //    val screenState by viewModel.screenState.collectAsState()
 
+    val deletePasswordScreenState by viewModel.deletePasswordScreenState.collectAsState()
+    val currentContext = LocalContext.current
+
+    LaunchedEffect(deletePasswordScreenState) {
+        when (val state = deletePasswordScreenState) {
+            is ScreenState.Error -> {
+                Toast.makeText(currentContext, state.message, Toast.LENGTH_SHORT).show()
+            }
+
+            is ScreenState.Loaded -> {
+//                Toast.makeText(currentContext, "Password deleted!", Toast.LENGTH_SHORT).show()
+                viewModel.hideDeletePasswordConfirmation()
+                onClose()
+            }
+
+            else -> {}
+        }
+    }
+    if (viewModel.deletePasswordConfirmationDialog) {
+        DeleteConfirmationDialog(
+            title = passwordDetailsResult.passwordDetails.title,
+            onDismissRequest = { viewModel.hideDeletePasswordConfirmation() },
+            onConfirmation = { viewModel.deletePassword(passwordId = passwordDetailsResult.passwordId) },
+        )
+    }
     ViewPasswordScreenContent(
         passwordDetailsResult = passwordDetailsResult,
         vault = vault,
@@ -69,7 +102,8 @@ fun ViewPasswordDetailScreen(
         onPasswordVisibilityClick = { viewModel.togglePasswordVisibility() },
         toEditPasswordScreen = { toEditPasswordScreen() },
         onClose = onClose,
-        modifier = modifier
+        modifier = modifier,
+        onDeleteClick = { viewModel.showDeletePasswordConfirmation() }
     )
 
 }
@@ -82,7 +116,8 @@ fun ViewPasswordScreenContent(
     modifier: Modifier = Modifier,
     onPasswordVisibilityClick: () -> Unit,
     onClose: () -> Unit,
-    showPassword: Boolean
+    showPassword: Boolean,
+    onDeleteClick: () -> Unit
 ) {
     val passwordDetail = passwordDetailsResult.passwordDetails
     Column(
@@ -118,11 +153,6 @@ fun ViewPasswordScreenContent(
                 Icon(Icons.Outlined.Edit, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = "Edit")
-            }
-            IconButton(onClick = {
-// TODO: open bottom modal screen n display options
-            }, modifier = Modifier.defaultMinSize(dimensionResource(R.dimen.min_clickable_size))) {
-                Icon(Icons.Default.MoreVert, contentDescription = "More")
             }
         }
 
@@ -210,11 +240,13 @@ fun ViewPasswordScreenContent(
             }
         }
         Column(
-            modifier = Modifier.border(
-                width = 0.2.dp,
-                color = MaterialTheme.colorScheme.secondary,
-                shape = RoundedCornerShape(6.dp)
-            )
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .border(
+                    width = 0.2.dp,
+                    color = MaterialTheme.colorScheme.secondary,
+                    shape = RoundedCornerShape(6.dp)
+                )
         ) {
             var showAny = false
             if (passwordDetailsResult.modifiedAt?.isNotBlank() == true) {
@@ -235,6 +267,20 @@ fun ViewPasswordScreenContent(
             }
         }
 
+        Button(
+            onClick = onDeleteClick,
+            colors = ButtonDefaults.buttonColors(
+                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                containerColor = MaterialTheme.colorScheme.errorContainer
+            ),
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.defaultMinSize(dimensionResource(R.dimen.min_clickable_size))
+        ) {
+            Icon(Icons.Outlined.Delete, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = "Delete")
+        }
+
     }
 
 }
@@ -248,7 +294,8 @@ fun ViewPasswordDetailVertical() {
         toEditPasswordScreen = {},
         onPasswordVisibilityClick = {},
         showPassword = false,
-        onClose = {}
+        onClose = {},
+        onDeleteClick = {},
     )
 }
 

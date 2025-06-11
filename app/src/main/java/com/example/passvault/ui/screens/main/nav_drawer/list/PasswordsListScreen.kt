@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.Card
@@ -55,8 +54,7 @@ fun PasswordsListScreen(
     passwordDetailResultList: List<PasswordDetailResult>,
     onAddClick: () -> Unit,
     toViewScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
-    toEditScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
-    onDeleteClick: (passwordId: Long?) -> Unit
+    toEditScreen: (passwordDetailResult: PasswordDetailResult) -> Unit
 ) {
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -69,8 +67,7 @@ fun PasswordsListScreen(
                     PasswordItem(
                         passwordDetails = passwordDetailResult.passwordDetails,
                         onViewClick = { toViewScreen(passwordDetailResult) },
-                        onEditClick = { toEditScreen(passwordDetailResult) },
-                        onDeleteClick = { onDeleteClick(passwordDetailResult.passwordId) }
+                        onEditClick = { toEditScreen(passwordDetailResult) }
                     )
                 }
             }
@@ -92,8 +89,7 @@ fun PasswordsListScreen(
 fun PasswordItem(
     passwordDetails: PasswordDetails,
     onViewClick: () -> Unit,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onEditClick: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
@@ -109,11 +105,7 @@ fun PasswordItem(
                 onEditClick = {
                     scope.launch { sheetState.hide() }
                     onEditClick()
-                },
-                onDeleteClick = {
-                    scope.launch { sheetState.hide() }
-                    onDeleteClick()
-                },
+                }
             )
         }
     }
@@ -160,8 +152,7 @@ fun PasswordItem(
 fun MoreOptionsBottomSheetContent(
     passwordDetails: PasswordDetails,
     onViewClick: () -> Unit,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onEditClick: () -> Unit
 ) {
     val items = listOf(
         MoreOption(
@@ -173,11 +164,6 @@ fun MoreOptionsBottomSheetContent(
             title = "Edit",
             imageVector = Icons.Outlined.Edit,
             onClick = onEditClick
-        ),
-        MoreOption(
-            title = "Delete",
-            imageVector = Icons.Outlined.Delete,
-            onClick = onDeleteClick
         )
     )
     Column(
@@ -230,11 +216,7 @@ fun MoreOptionsBottomSheetContent(
                     Text(
                         text = item.title,
                         style = MaterialTheme.typography.labelMedium.copy(
-                            color = if (item.title == "Delete") {
-                                MaterialTheme.colorScheme.onErrorContainer
-                            } else {
-                                MaterialTheme.colorScheme.onPrimaryContainer
-                            }
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     )
                 }
@@ -256,8 +238,7 @@ fun MoreOptionsBottomSheetPreview() {
     MoreOptionsBottomSheetContent(
         passwordDetails = PasswordDetails.mockPasswordDetails,
         onViewClick = {},
-        onEditClick = {}
-    ) { }
+        onEditClick = {})
 }
 
 @Composable
@@ -267,18 +248,6 @@ fun PasswordItemVertical() {
         onViewClick = {},
         onEditClick = {},
         passwordDetails = PasswordDetails.mockPasswordDetails,
-        onDeleteClick = {},
-    )
-}
-
-@Composable
-@HorizontalScreenPreview
-fun PasswordItemHorizontal() {
-    PasswordItem(
-        onViewClick = {},
-        onEditClick = {},
-        passwordDetails = PasswordDetails.mockPasswordDetails,
-        onDeleteClick = {},
     )
 }
 
@@ -290,7 +259,6 @@ fun PasswordListScreenVertical() {
         passwordDetailResultList = List(10) { PasswordDetailResult.mockObject },
         toViewScreen = {},
         toEditScreen = {},
-        onDeleteClick = {},
     )
 }
 
@@ -302,6 +270,5 @@ fun PasswordListScreenHorizontal() {
         passwordDetailResultList = List(10) { PasswordDetailResult.mockObject },
         toViewScreen = {},
         toEditScreen = {},
-        onDeleteClick = {},
     )
 }

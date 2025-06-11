@@ -221,43 +221,43 @@ class NavMenusViewModel @Inject constructor(
         }
     }
 
-    //Delete password------------------------------------------------------------------------
-    var deletePasswordConfirmationDialog by mutableStateOf(false)
-        private set
-
-    private var passwordIdToBeRemoved: Long? = null
-
-    fun showDeletePasswordConfirmation(passwordId: Long?) {
-        if (passwordId != null) {
-            this.passwordIdToBeRemoved = passwordId
-            this.deletePasswordConfirmationDialog = true
-        }
-    }
-
-    fun hideDeletePasswordConfirmation() {
-        this.deletePasswordConfirmationDialog = false
-        this.passwordIdToBeRemoved = null
-    }
-
-    private val _deletePasswordScreenState =
-        MutableStateFlow<ScreenState<Long>>(ScreenState.PreLoad())
-    val deletePasswordScreenState: StateFlow<ScreenState<Long>> = _deletePasswordScreenState
-
-    fun deletePassword() {
-        if (this.passwordIdToBeRemoved == null) return
-        _deletePasswordScreenState.value = ScreenState.Loading()
-        viewModelScope.launch {
-            _deletePasswordScreenState.value = try {
-                val result =
-                    encryptedDataRepository.deleteEncryptedDataById(passwordId = this@NavMenusViewModel.passwordIdToBeRemoved!!)
-                if (result.isSuccess) ScreenState.Loaded(passwordIdToBeRemoved!!)
-                else ScreenState.Error("Something went wrong")
-            } catch (e: Exception) {
-                e.printStackTrace()
-                ScreenState.Error("Unable to delete")
-            }
-        }
-    }
+//    //Delete password------------------------------------------------------------------------
+//    var deletePasswordConfirmationDialog by mutableStateOf(false)
+//        private set
+//
+//    private var passwordIdToBeRemoved: Long? = null
+//
+//    fun showDeletePasswordConfirmation(passwordId: Long?) {
+//        if (passwordId != null) {
+//            this.passwordIdToBeRemoved = passwordId
+//            this.deletePasswordConfirmationDialog = true
+//        }
+//    }
+//
+//    fun hideDeletePasswordConfirmation() {
+//        this.deletePasswordConfirmationDialog = false
+//        this.passwordIdToBeRemoved = null
+//    }
+//
+//    private val _deletePasswordScreenState =
+//        MutableStateFlow<ScreenState<Long>>(ScreenState.PreLoad())
+//    val deletePasswordScreenState: StateFlow<ScreenState<Long>> = _deletePasswordScreenState
+//
+//    fun deletePassword() {
+//        if (this.passwordIdToBeRemoved == null) return
+//        _deletePasswordScreenState.value = ScreenState.Loading()
+//        viewModelScope.launch {
+//            _deletePasswordScreenState.value = try {
+//                val result =
+//                    encryptedDataRepository.deleteEncryptedDataById(passwordId = this@NavMenusViewModel.passwordIdToBeRemoved!!)
+//                if (result.isSuccess) ScreenState.Loaded(passwordIdToBeRemoved!!)
+//                else ScreenState.Error("Something went wrong")
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//                ScreenState.Error("Unable to delete")
+//            }
+//        }
+//    }
 }
 
 sealed class NavDrawerMenus(val label: String, val icon: ImageVector) {
