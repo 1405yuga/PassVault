@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.example.passvault.utils.annotations.VerticalScreenPreview
-import java.net.URL
 
 @Composable
 fun TextFieldWithErrorText(
@@ -214,8 +213,9 @@ fun ConfirmationAlertDialog(
 }
 
 @Composable
-fun DeleteConfirmationDialog(
+fun ConfirmationDialog(
     title: String,
+    subTitle: String,
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit
 ) {
@@ -231,11 +231,11 @@ fun DeleteConfirmationDialog(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "Delete $title?",
+                    text = title,
                     style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = "This will delete password permanently and is not recoverable.")
+                Text(text = subTitle)
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     horizontalArrangement = Arrangement.End,
@@ -266,16 +266,17 @@ fun DeleteConfirmationDialog(
 
 @Composable
 @VerticalScreenPreview
-fun DeleteConfirmationDialogPreview() {
-    DeleteConfirmationDialog(
+fun ConfirmationDialogPreview() {
+    ConfirmationDialog(
         title = "Test",
+        subTitle = "Some sub text specifying what can happen n ask for confirmation?",
         onDismissRequest = {}
     ) { }
 }
 
 @VerticalScreenPreview
 @Composable
-fun ConfirmationDialogPreview() {
+fun ConfirmationAlertDialogPreview() {
     ConfirmationAlertDialog(
         onDismissRequest = {},
         onConfirmation = {},

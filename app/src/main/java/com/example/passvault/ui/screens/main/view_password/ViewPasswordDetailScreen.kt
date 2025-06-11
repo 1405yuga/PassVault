@@ -53,7 +53,7 @@ import com.example.passvault.R
 import com.example.passvault.data.PasswordDetailResult
 import com.example.passvault.data.Vault
 import com.example.passvault.utils.annotations.VerticalScreenPreview
-import com.example.passvault.utils.custom_composables.DeleteConfirmationDialog
+import com.example.passvault.utils.custom_composables.ConfirmationDialog
 import com.example.passvault.utils.custom_composables.TitleSquare
 import com.example.passvault.utils.extension_functions.toImageVector
 import com.example.passvault.utils.helper.DateTimeHelper
@@ -88,8 +88,9 @@ fun ViewPasswordDetailScreen(
         }
     }
     if (viewModel.deletePasswordConfirmationDialog) {
-        DeleteConfirmationDialog(
-            title = passwordDetailsResult.passwordDetails.title,
+        ConfirmationDialog(
+            title = "Delete ${passwordDetailsResult.passwordDetails.title}?",
+            subTitle = "This will delete password permanently and is not recoverable.",
             onDismissRequest = { viewModel.hideDeletePasswordConfirmation() },
             onConfirmation = { viewModel.deletePassword(passwordId = passwordDetailsResult.passwordId) },
         )
