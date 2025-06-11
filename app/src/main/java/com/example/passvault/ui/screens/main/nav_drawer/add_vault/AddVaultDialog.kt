@@ -4,11 +4,13 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -17,16 +19,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AttachMoney
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.PermMedia
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -64,17 +58,14 @@ import com.example.passvault.utils.state.ScreenState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddVaultDialog(
-    vaultViewModel: NavMenusViewModel,
-    onVaultNameChange: (String) -> Unit,
-    onIconSelected: (ImageVector) -> Unit,
-    insertNewVault: () -> Unit,
-    setShowDialog: (Boolean) -> Unit,
+    isEditable: Boolean,
+    viewModel: NavMenusViewModel,
     onSuccess: (Vault) -> Unit,
 ) {
     val currentContext = LocalContext.current
-    val screenState by vaultViewModel.addDialogScreenState.collectAsState()
+    val screenState by viewModel.addDialogScreenState.collectAsState()
 
-    Dialog(onDismissRequest = { setShowDialog(false) }) {
+    Dialog(onDismissRequest = { viewModel.toggleCreateVaultDialog(openDialog = false) }) {
         Surface(
             shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius)),
             color = MaterialTheme.colorScheme.surfaceContainerLow,
@@ -87,7 +78,7 @@ fun AddVaultDialog(
                     .height(400.dp)
             ) {
                 Text(
-                    text = "Add Vault",
+                    text = if (isEditable) "Edit Vault" else "Add Vault",
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onBackground
@@ -103,32 +94,64 @@ fun AddVaultDialog(
                 Spacer(modifier = Modifier.size(12.dp))
                 TextFieldWithErrorText(
                     label = "Vault name",
-                    value = vaultViewModel.vaultName,
-                    onTextChange = { onVaultNameChange(it) },
-                    errorMsg = vaultViewModel.vaultError
+                    value = viewModel.vaultName,
+                    onTextChange = { viewModel.onVaultNameChange(it) },
+                    errorMsg = viewModel.vaultError
                 )
                 Spacer(modifier = Modifier.size(12.dp))
                 IconSelector(
                     icons = VaultIconsList.getIconsList(),
-                    onIconSelected = { onIconSelected(it) },
-                    selectedIcon = vaultViewModel.iconSelected
+                    onIconSelected = { viewModel.onIconSelected(it) },
+                    selectedIcon = viewModel.iconSelected
                 )
                 Spacer(modifier = Modifier.size(24.dp))
-                Button(
-                    onClick = {
-                        insertNewVault()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(dimensionResource(R.dimen.min_clickable_size))
-                        .widthIn(min = dimensionResource(R.dimen.min_clickable_size)),
-                    shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius)),
-                    enabled = screenState !is ScreenState.Loading
-                ) {
-                    Text(
-                        text =
-                            if (screenState is ScreenState.Loading) "Loading.." else "Add"
-                    )
+                Row {
+                    if (isEditable) {
+                        Button(
+                            onClick = {
+                                // TODO: delete vault
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(dimensionResource(R.dimen.min_clickable_size))
+                                .widthIn(min = dimensionResource(R.dimen.min_clickable_size))
+                                .weight(1f),
+                            shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius)),
+                            enabled = screenState !is ScreenState.Loading,
+                            colors = ButtonDefaults.buttonColors(
+                                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                                containerColor = MaterialTheme.colorScheme.errorContainer
+                            )
+                        ) {
+                            Text(
+                                text =
+                                    if (screenState is ScreenState.Loading) "Loading.."
+                                    else "Delete"
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(12.dp))
+                    }
+                    Button(
+                        onClick = {
+                            viewModel.addNewVault()
+                            // TODO: check for update
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(dimensionResource(R.dimen.min_clickable_size))
+                            .widthIn(min = dimensionResource(R.dimen.min_clickable_size))
+                            .weight(1f),
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius)),
+                        enabled = screenState !is ScreenState.Loading
+                    ) {
+                        Text(
+                            text =
+                                if (screenState is ScreenState.Loading) "Loading.."
+                                else if (isEditable) "Update"
+                                else "Create"
+                        )
+                    }
                 }
             }
         }
@@ -143,7 +166,7 @@ fun AddVaultDialog(
                         .makeText(currentContext, "Added Vault successfully", Toast.LENGTH_SHORT)
                         .show()
                     onSuccess(state.result)
-                    setShowDialog(false)
+                    viewModel.toggleCreateVaultDialog((false))
                 }
 
                 else -> {}
@@ -200,18 +223,15 @@ fun IconSelector(
 @VerticalScreenPreview
 fun AddVaultDialogPreview() {
     AddVaultDialog(
-        vaultViewModel = NavMenusViewModel(
+        viewModel = NavMenusViewModel(
             vaultRepository = VaultRepository(
                 supabaseClient = SupabaseModule.mockClient
             ),
             encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
             masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference)
         ),
-        onVaultNameChange = {},
-        onIconSelected = {},
-        insertNewVault = {},
-        setShowDialog = {},
-        onSuccess = {}
+        onSuccess = {},
+        isEditable = true,
     )
 }
 
@@ -219,34 +239,22 @@ fun AddVaultDialogPreview() {
 @HorizontalScreenPreview
 fun AddVaultDialogHorizontalPreview() {
     AddVaultDialog(
-        vaultViewModel = NavMenusViewModel(
+        viewModel = NavMenusViewModel(
             vaultRepository = VaultRepository(
                 supabaseClient = SupabaseModule.mockClient
             ),
             encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
             masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference)
         ),
-        onVaultNameChange = {},
-        onIconSelected = {},
-        insertNewVault = {},
-        setShowDialog = {},
-        onSuccess = {}
+        onSuccess = {},
+        isEditable = true,
     )
 }
 
 @Composable
 @VerticalScreenPreview
 fun IconSelectorPreview() {
-    val iconList = listOf(
-        Icons.Default.Home,
-        Icons.Default.Person,
-        Icons.Default.Language,
-        Icons.Default.Work,
-        Icons.Default.Lock,
-        Icons.Default.AttachMoney,
-        Icons.Default.Favorite,
-        Icons.Default.PermMedia,
-    )
+    val iconList = VaultIconsList.getIconsList()
 
     IconSelector(
         icons = iconList,

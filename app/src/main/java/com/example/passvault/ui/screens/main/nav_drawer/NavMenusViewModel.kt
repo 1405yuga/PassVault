@@ -107,8 +107,11 @@ class NavMenusViewModel @Inject constructor(
 
     var openAddVaultDialog by mutableStateOf(false)
         private set
+    var isVaultEditable by mutableStateOf(false)
+        private set
 
-    fun toggleCreateVaultDialog(openDialog: Boolean) {
+    fun toggleCreateVaultDialog(openDialog: Boolean, vault: Vault? = null) {
+        if (vault != null) setEditableVaultDialogState(vault)
         this.openAddVaultDialog = openDialog
         if (openDialog == false) resetDialogState()
     }
@@ -141,7 +144,14 @@ class NavMenusViewModel @Inject constructor(
         onVaultNameChange(vaultName = "")
         onIconSelected(null)
         this.vaultError = ""
+        this.isVaultEditable = false
         this._addDialogScreenState.value = ScreenState.PreLoad()
+    }
+
+    private fun setEditableVaultDialogState(vault: Vault) {
+        this.isVaultEditable = true
+        this.vaultName = vault.vaultName
+        this.iconSelected = vault.iconKey.toImageVector()
     }
 
     fun addNewVault() {
