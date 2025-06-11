@@ -45,6 +45,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.passvault.data.PasswordDetailResult
 import com.example.passvault.data.PasswordDetails
+import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.TitleSquare
 import kotlinx.coroutines.launch
@@ -55,6 +56,7 @@ fun PasswordsListScreen(
     onAddClick: () -> Unit,
     toViewScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
     toEditScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
+    onDeleteClick: (passwordId: Long?) -> Unit
 ) {
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -67,7 +69,8 @@ fun PasswordsListScreen(
                     PasswordItem(
                         passwordDetails = passwordDetailResult.passwordDetails,
                         onViewClick = { toViewScreen(passwordDetailResult) },
-                        onEditClick = { toEditScreen(passwordDetailResult) }
+                        onEditClick = { toEditScreen(passwordDetailResult) },
+                        onDeleteClick = { onDeleteClick(passwordDetailResult.passwordId) }
                     )
                 }
             }
@@ -89,14 +92,14 @@ fun PasswordsListScreen(
 fun PasswordItem(
     passwordDetails: PasswordDetails,
     onViewClick: () -> Unit,
-    onEditClick: () -> Unit
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
 
     if (sheetState.isVisible) {
         ModalBottomSheet(onDismissRequest = { scope.launch { sheetState.hide() } }) {
-            // TODO: pass functions
             MoreOptionsBottomSheetContent(
                 passwordDetails = passwordDetails,
                 onViewClick = {
@@ -109,7 +112,7 @@ fun PasswordItem(
                 },
                 onDeleteClick = {
                     scope.launch { sheetState.hide() }
-// TODO: add delete confirmation & delete the password 
+                    onDeleteClick()
                 },
             )
         }
@@ -201,10 +204,17 @@ fun MoreOptionsBottomSheetContent(
                     Card(
                         onClick = item.onClick,
                         shape = CircleShape,
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                        ),
+                        colors = if (item.title == "Delete") {
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        } else {
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        },
                         modifier = Modifier.size(65.dp)
                     ) {
                         Box(
@@ -219,7 +229,13 @@ fun MoreOptionsBottomSheetContent(
                     }
                     Text(
                         text = item.title,
-                        style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            color = if (item.title == "Delete") {
+                                MaterialTheme.colorScheme.onErrorContainer
+                            } else {
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                            }
+                        )
                     )
                 }
             }
@@ -244,44 +260,48 @@ fun MoreOptionsBottomSheetPreview() {
     ) { }
 }
 
-//@Composable
-//@VerticalScreenPreview
-//fun PasswordItemVertical() {
-//    PasswordItem(
-//        passwordDetailsWithId = PasswordDetailsWithId.mockObject,
-//        onViewClick = {},
-//        onEditClick = {},
-//    )
-//}
-//
-//@Composable
-//@HorizontalScreenPreview
-//fun PasswordItemHorizontal() {
-//    PasswordItem(
-//        passwordDetailsWithId = PasswordDetailsWithId.mockObject,
-//        onViewClick = {},
-//        onEditClick = {},
-//    )
-//}
-//
-//@Composable
-//@VerticalScreenPreview
-//fun PasswordListScreenVertical() {
-//    PasswordsListScreen(
-//        onAddClick = {},
-//        passwordDetailResultList = List(10) { PasswordDetailsWithId.mockObject },
-//        toViewScreen = {},
-//        toEditScreen = {},
-//    )
-//}
-//
-//@Composable
-//@HorizontalScreenPreview
-//fun PasswordListScreenHorizontal() {
-//    PasswordsListScreen(
-//        onAddClick = {},
-//        passwordDetailResultList = List(10) { PasswordDetailsWithId.mockObject },
-//        toViewScreen = {},
-//        toEditScreen = { },
-//    )
-//}
+@Composable
+@VerticalScreenPreview
+fun PasswordItemVertical() {
+    PasswordItem(
+        onViewClick = {},
+        onEditClick = {},
+        passwordDetails = PasswordDetails.mockPasswordDetails,
+        onDeleteClick = {},
+    )
+}
+
+@Composable
+@HorizontalScreenPreview
+fun PasswordItemHorizontal() {
+    PasswordItem(
+        onViewClick = {},
+        onEditClick = {},
+        passwordDetails = PasswordDetails.mockPasswordDetails,
+        onDeleteClick = {},
+    )
+}
+
+@Composable
+@VerticalScreenPreview
+fun PasswordListScreenVertical() {
+    PasswordsListScreen(
+        onAddClick = {},
+        passwordDetailResultList = List(10) { PasswordDetailResult.mockObject },
+        toViewScreen = {},
+        toEditScreen = {},
+        onDeleteClick = {},
+    )
+}
+
+@Composable
+@HorizontalScreenPreview
+fun PasswordListScreenHorizontal() {
+    PasswordsListScreen(
+        onAddClick = {},
+        passwordDetailResultList = List(10) { PasswordDetailResult.mockObject },
+        toViewScreen = {},
+        toEditScreen = {},
+        onDeleteClick = {},
+    )
+}

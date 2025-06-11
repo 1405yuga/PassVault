@@ -39,6 +39,18 @@ class EncryptedDataRepository @Inject constructor(private val supabaseClient: Su
         }
     }
 
+    suspend fun deleteEncryptedDataById(passwordId: Long): Result<Unit> {
+        return try {
+            supabaseClient.postgrest[EncryptedDataTable.TABLE_NAME].delete {
+                filter { eq(column = EncryptedDataTable.PASSWORD_ID, value = passwordId) }
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
+
     suspend fun getEncryptedDataById(id: Long): EncryptedData? {
         return try {
             supabaseClient.from(EncryptedDataTable.TABLE_NAME).select {

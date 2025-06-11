@@ -40,10 +40,11 @@ import androidx.compose.ui.text.font.FontWeight
 import com.example.passvault.R
 import com.example.passvault.data.PasswordDetailResult
 import com.example.passvault.ui.screens.main.MainScreenViewModel
-import com.example.passvault.ui.screens.main.nav_drawer.upsert_vault.UpsertVaultDialog
 import com.example.passvault.ui.screens.main.nav_drawer.list.PasswordsListScreen
+import com.example.passvault.ui.screens.main.nav_drawer.upsert_vault.UpsertVaultDialog
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ConfirmationAlertDialog
+import com.example.passvault.utils.custom_composables.DeleteConfirmationDialog
 import com.example.passvault.utils.extension_functions.HandleScreenState
 import com.example.passvault.utils.extension_functions.toImageVector
 import com.example.passvault.utils.extension_functions.toVault
@@ -65,6 +66,7 @@ fun NavMenusScreen(
     val vaultScreenState by mainScreenViewModel.vaultScreenState.collectAsState()
     val vaultList by mainScreenViewModel.vaultList.collectAsState()
     val removeVaultScreenState by viewModel.removeVaultScreenState.collectAsState()
+    val deletePasswordScreenState by viewModel.deletePasswordScreenState.collectAsState()
     val passwordsScreenState by viewModel.passwordListScreenState.collectAsState()
     val currentContext = LocalContext.current
 
@@ -240,6 +242,7 @@ fun NavMenusScreen(
                                     toEditScreen = {
                                         toEditPasswordScreen(it)
                                     },
+                                    onDeleteClick = { viewModel.showDeletePasswordConfirmation(it) },
                                 )
                             }
                         )
@@ -263,6 +266,17 @@ fun NavMenusScreen(
                                 icon = viewModel.vaultToBeRemoved?.iconKey?.toImageVector()
                             )
                         }
+
+                        viewModel.deletePasswordConfirmationDialog -> {
+                            DeleteConfirmationDialog(
+                                title = "Password",
+                                onDismissRequest = { viewModel.hideDeletePasswordConfirmation() },
+                                onConfirmation = {
+                                    viewModel.deletePassword()
+//                                    viewModel.hideDeletePasswordConfirmation()
+                                }
+                            )
+                        }
                     }
 
                     LaunchedEffect(removeVaultScreenState) {
@@ -275,6 +289,24 @@ fun NavMenusScreen(
                             is ScreenState.Loaded -> {
                                 mainScreenViewModel.removeVaultFromListById(vaultId = state.result.vaultId)
                                 viewModel.closeRemoveDialog()
+                            }
+
+                            else -> {}
+                        }
+                    }
+
+                    LaunchedEffect(deletePasswordScreenState) {
+                        when (val state = deletePasswordScreenState) {
+                            is ScreenState.Error -> {
+                                Toast.makeText(currentContext, state.message, Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+
+                            is ScreenState.Loaded -> {
+                                // TODO: load list again
+//                                Toast.makeText(currentContext, "Deleted password", Toast.LENGTH_SHORT)
+//                                    .show()
+                                viewModel.hideDeletePasswordConfirmation()
                             }
 
                             else -> {}
