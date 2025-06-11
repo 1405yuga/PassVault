@@ -162,9 +162,6 @@ fun UpsertVaultDialog(
                 }
 
                 is ScreenState.Loaded -> {
-                    Toast
-                        .makeText(currentContext, "Added Vault successfully", Toast.LENGTH_SHORT)
-                        .show()
                     onSuccess(state.result)
                     viewModel.toggleCreateVaultDialog((false))
                 }

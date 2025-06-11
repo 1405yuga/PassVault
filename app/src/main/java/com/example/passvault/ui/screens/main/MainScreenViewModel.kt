@@ -48,7 +48,14 @@ class MainScreenViewModel @Inject constructor(private val vaultRepository: Vault
     }
 
     fun addVaultToList(vault: Vault) {
-        _vaultList.value = _vaultList.value + vault
+        val updatedList = _vaultList.value.toMutableList()
+        val index = updatedList.indexOfFirst { vault.vaultId == it.vaultId }
+        if (index != -1) {
+            updatedList[index] = vault
+        } else {
+            updatedList.add(vault)
+        }
+        _vaultList.value = updatedList
         onMenuSelected(NavDrawerMenus.VaultItem(vault))
     }
 
