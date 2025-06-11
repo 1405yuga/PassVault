@@ -49,7 +49,6 @@ import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.EncryptedDataRepository
 import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.ui.screens.main.nav_drawer.NavMenusViewModel
-import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.TextFieldWithErrorText
 import com.example.passvault.utils.helper.VaultIconsList
@@ -58,12 +57,14 @@ import com.example.passvault.utils.state.ScreenState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpsertVaultDialog(
-    isEditable: Boolean,
+    openedVault: Vault?,
     viewModel: NavMenusViewModel,
-    onSuccess: (Vault) -> Unit,
+    onUpsertSuccess: (Vault) -> Unit,
+    onDeleteSuccess: (vaultId: Long?) -> Unit
 ) {
     val currentContext = LocalContext.current
     val screenState by viewModel.addDialogScreenState.collectAsState()
+    val deleteScreenState by viewModel.removeVaultScreenState.collectAsState()
 
     Dialog(onDismissRequest = { viewModel.toggleCreateVaultDialog(openDialog = false) }) {
         Surface(
@@ -78,7 +79,7 @@ fun UpsertVaultDialog(
                     .height(400.dp)
             ) {
                 Text(
-                    text = if (isEditable) "Edit Vault" else "Add Vault",
+                    text = if (openedVault != null) "Edit Vault" else "Add Vault",
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onBackground
@@ -106,10 +107,11 @@ fun UpsertVaultDialog(
                 )
                 Spacer(modifier = Modifier.size(24.dp))
                 Row {
-                    if (isEditable) {
+                    if (openedVault != null) {
                         Button(
                             onClick = {
                                 // TODO: delete vault
+                                viewModel.removeVault()
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -148,7 +150,7 @@ fun UpsertVaultDialog(
                         Text(
                             text =
                                 if (screenState is ScreenState.Loading) "Loading.."
-                                else if (isEditable) "Update"
+                                else if (openedVault != null) "Update"
                                 else "Create"
                         )
                     }
@@ -162,8 +164,24 @@ fun UpsertVaultDialog(
                 }
 
                 is ScreenState.Loaded -> {
-                    onSuccess(state.result)
+                    onUpsertSuccess(state.result)
                     viewModel.toggleCreateVaultDialog((false))
+                }
+
+                else -> {}
+            }
+        }
+        LaunchedEffect(deleteScreenState) {
+            when (val state = deleteScreenState) {
+                is ScreenState.Error -> {
+                    Toast.makeText(currentContext, state.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is ScreenState.Loaded -> {
+                    onDeleteSuccess(state.result)
+                    viewModel.toggleCreateVaultDialog((false))
+                    Toast.makeText(currentContext, "Vault deleted successfully", Toast.LENGTH_SHORT)
+                        .show()
                 }
 
                 else -> {}
@@ -227,26 +245,27 @@ fun AddVaultDialogPreview() {
             encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
             masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference)
         ),
-        onSuccess = {},
-        isEditable = true,
+        onUpsertSuccess = {},
+        openedVault = Vault.defaultVault(),
+        onDeleteSuccess = {}
     )
 }
 
-@Composable
-@HorizontalScreenPreview
-fun AddVaultDialogHorizontalPreview() {
-    UpsertVaultDialog(
-        viewModel = NavMenusViewModel(
-            vaultRepository = VaultRepository(
-                supabaseClient = SupabaseModule.mockClient
-            ),
-            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
-            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference)
-        ),
-        onSuccess = {},
-        isEditable = true,
-    )
-}
+//@Composable
+//@HorizontalScreenPreview
+//fun AddVaultDialogHorizontalPreview() {
+//    UpsertVaultDialog(
+//        viewModel = NavMenusViewModel(
+//            vaultRepository = VaultRepository(
+//                supabaseClient = SupabaseModule.mockClient
+//            ),
+//            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
+//            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference)
+//        ),
+//        onUpsertSuccess = {},
+//        openedVault = true,
+//    )
+//}
 
 @Composable
 @VerticalScreenPreview

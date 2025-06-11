@@ -80,7 +80,8 @@ class NavMenusViewModel @Inject constructor(
                                             encodedEncryptedText = encryptedData.encodedEncryptedPasswordData
                                         )
                                     )
-                                    val vault: Vault? = vaultRepository.getVaultById(vaultId = encryptedData.vaultId)
+                                    val vault: Vault? =
+                                        vaultRepository.getVaultById(vaultId = encryptedData.vaultId)
                                     PasswordDetailResult(
                                         passwordId = encryptedData.passwordId!!,
                                         passwordDetails = gson.fromJson(
@@ -110,13 +111,19 @@ class NavMenusViewModel @Inject constructor(
 
     var openAddVaultDialog by mutableStateOf(false)
         private set
-    var isVaultEditable by mutableStateOf(false)
+
+    var openedVault by mutableStateOf<Vault?>(null)
         private set
 
     fun toggleCreateVaultDialog(openDialog: Boolean, vault: Vault? = null) {
-        if (vault != null) setEditableVaultDialogState(vault)
-        this.openAddVaultDialog = openDialog
-        if (openDialog == false) resetDialogState()
+        if (!openDialog) {
+            resetDialogState()
+            openAddVaultDialog = false
+        } else {
+            resetDialogState() // force re-init state on every open
+            setEditableVaultDialogState(vault)
+            openAddVaultDialog = true
+        }
     }
 
     var vaultName by mutableStateOf<String>("")
@@ -148,16 +155,19 @@ class NavMenusViewModel @Inject constructor(
         onVaultNameChange(vaultName = "")
         onIconSelected(null)
         this.vaultError = ""
-        this.isVaultEditable = false
+        this.openedVault = null
         this.vaultId = null
         this._addDialogScreenState.value = ScreenState.PreLoad()
+        this._removeVaultScreenState.value = ScreenState.PreLoad()
     }
 
-    private fun setEditableVaultDialogState(vault: Vault) {
-        this.vaultId = vault.vaultId
-        this.isVaultEditable = true
-        this.vaultName = vault.vaultName
-        this.iconSelected = vault.iconKey.toImageVector()
+    private fun setEditableVaultDialogState(vault: Vault?) {
+        this.openedVault = vault
+        vault?.let {
+            this.vaultId = vault.vaultId
+            this.vaultName = vault.vaultName
+            this.iconSelected = vault.iconKey.toImageVector()
+        }
     }
 
     fun addNewVault() {
@@ -183,35 +193,35 @@ class NavMenusViewModel @Inject constructor(
 
 //Remove Vault----------------------------------------------------------------
 
-    var openRemoveVaultConfirmationDialog by mutableStateOf(false)
-        private set
+//    var openRemoveVaultConfirmationDialog by mutableStateOf(false)
+//        private set
+//
+//    var vaultToBeRemoved: Vault? by mutableStateOf(null)
+//        private set
 
-    var vaultToBeRemoved: Vault? by mutableStateOf(null)
-        private set
-
-    fun showRemoveConfirmation(vault: Vault) {
-        this.vaultToBeRemoved = vault
-        this.openRemoveVaultConfirmationDialog = true
-    }
-
-    fun closeRemoveDialog() {
-        this.vaultToBeRemoved = null
-        this.openRemoveVaultConfirmationDialog = false
-    }
+//    fun showRemoveConfirmation(vault: Vault) {
+//        this.vaultToBeRemoved = vault
+//        this.openRemoveVaultConfirmationDialog = true
+//    }
+//
+//    fun closeRemoveDialog() {
+//        this.vaultToBeRemoved = null
+//        this.openRemoveVaultConfirmationDialog = false
+//    }
 
     private val _removeVaultScreenState =
-        MutableStateFlow<ScreenState<Vault>>(ScreenState.PreLoad())
-    val removeVaultScreenState: StateFlow<ScreenState<Vault>> = _removeVaultScreenState
+        MutableStateFlow<ScreenState<Long>>(ScreenState.PreLoad())
+    val removeVaultScreenState: StateFlow<ScreenState<Long>> = _removeVaultScreenState
 
     fun removeVault() {
         _removeVaultScreenState.value = ScreenState.Loading()
         try {
-            if (vaultToBeRemoved != null) {
+            if (openedVault != null) {
                 viewModelScope.launch {
-                    val result = vaultRepository.deleteVault(vaultId = vaultToBeRemoved!!.vaultId)
+                    val result = vaultRepository.deleteVault(vaultId = openedVault!!.vaultId)
                     result.onSuccess {
                         Log.d(this@NavMenusViewModel.javaClass.simpleName, "Vault deleted")
-                        _removeVaultScreenState.value = ScreenState.Loaded(vaultToBeRemoved!!)
+                        _removeVaultScreenState.value = ScreenState.Loaded(openedVault!!.vaultId!!)
                     }.onFailure { exception ->
                         exception.printStackTrace()
                         _removeVaultScreenState.value = ScreenState.Error("Unable to delete Vault")

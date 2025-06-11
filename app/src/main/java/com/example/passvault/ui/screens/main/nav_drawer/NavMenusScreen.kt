@@ -1,7 +1,6 @@
 package com.example.passvault.ui.screens.main.nav_drawer
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,11 +42,8 @@ import com.example.passvault.ui.screens.main.MainScreenViewModel
 import com.example.passvault.ui.screens.main.nav_drawer.list.PasswordsListScreen
 import com.example.passvault.ui.screens.main.nav_drawer.upsert_vault.UpsertVaultDialog
 import com.example.passvault.utils.annotations.VerticalScreenPreview
-import com.example.passvault.utils.custom_composables.ConfirmationAlertDialog
 import com.example.passvault.utils.extension_functions.HandleScreenState
-import com.example.passvault.utils.extension_functions.toImageVector
 import com.example.passvault.utils.extension_functions.toVault
-import com.example.passvault.utils.state.ScreenState
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -249,37 +245,38 @@ fun NavMenusScreen(
                     when {
                         viewModel.openAddVaultDialog -> {
                             UpsertVaultDialog(
-                                isEditable = viewModel.isVaultEditable,
-                                onSuccess = { mainScreenViewModel.addVaultToList(vault = it) },
+                                openedVault = viewModel.openedVault,
+                                onUpsertSuccess = { mainScreenViewModel.addVaultToList(vault = it) },
+                                onDeleteSuccess = {mainScreenViewModel.removeVaultFromListById(vaultId = it)},
                                 viewModel = viewModel
                             )
                         }
 
-                        viewModel.openRemoveVaultConfirmationDialog -> {
-                            ConfirmationAlertDialog(
-                                onDismissRequest = { viewModel.closeRemoveDialog() },
-                                onConfirmation = { viewModel.removeVault() },
-                                vaultName = viewModel.vaultToBeRemoved?.vaultName.toString(),
-                                icon = viewModel.vaultToBeRemoved?.iconKey?.toImageVector()
-                            )
-                        }
+//                        viewModel.openRemoveVaultConfirmationDialog -> {
+//                            ConfirmationAlertDialog(
+//                                onDismissRequest = { viewModel.closeRemoveDialog() },
+//                                onConfirmation = { viewModel.removeVault() },
+//                                vaultName = viewModel.vaultToBeRemoved?.vaultName.toString(),
+//                                icon = viewModel.vaultToBeRemoved?.iconKey?.toImageVector()
+//                            )
+//                        }
                     }
 
-                    LaunchedEffect(removeVaultScreenState) {
-                        when (val state = removeVaultScreenState) {
-                            is ScreenState.Error -> {
-                                Toast.makeText(currentContext, state.message, Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-
-                            is ScreenState.Loaded -> {
-                                mainScreenViewModel.removeVaultFromListById(vaultId = state.result.vaultId)
-                                viewModel.closeRemoveDialog()
-                            }
-
-                            else -> {}
-                        }
-                    }
+//                    LaunchedEffect(removeVaultScreenState) {
+//                        when (val state = removeVaultScreenState) {
+//                            is ScreenState.Error -> {
+//                                Toast.makeText(currentContext, state.message, Toast.LENGTH_SHORT)
+//                                    .show()
+//                            }
+//
+//                            is ScreenState.Loaded -> {
+//                                mainScreenViewModel.removeVaultFromListById(vaultId = state.result.vaultId)
+//                                viewModel.closeRemoveDialog()
+//                            }
+//
+//                            else -> {}
+//                        }
+//                    }
                 }
             }
         )
