@@ -44,6 +44,7 @@ data class PasswordDetailsWithId(val passwordId: Long, val passwordDetails: Pass
 data class PasswordDetailResult(
     val passwordId: Long,
     val passwordDetails: PasswordDetails,
+    val vault: Vault?,
     val createdAt: String,
     val modifiedAt: String? = null
 ) {
@@ -51,6 +52,7 @@ data class PasswordDetailResult(
         val mockObject = PasswordDetailResult(
             passwordId = 0L,
             passwordDetails = PasswordDetails.mockPasswordDetails,
+            vault = Vault.defaultVault(),
             createdAt = "2025-05-22 05:31:34.535993+00",
             modifiedAt = "2025-05-22 05:31:34.535993+00"
         )

@@ -19,7 +19,6 @@ import com.example.passvault.ui.screens.main.nav_drawer.profile.ProfileScreen
 import com.example.passvault.ui.screens.main.view_password.ViewPasswordDetailScreen
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
-import com.example.passvault.utils.extension_functions.toVault
 import com.google.gson.Gson
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,7 +70,6 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
                 }
             UpsertPasswordDetailScreen(
                 onClose = { navController.popBackStack() },
-                selectedVault = mainScreenViewModel.lastVaultMenu?.toVault(),
                 onUpdateSelectedVault = { vault ->
                     mainScreenViewModel.onMenuSelected(
                         navDrawerMenus = NavDrawerMenus.VaultItem(vault = vault)
@@ -103,7 +101,6 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
                 }
             ViewPasswordDetailScreen(
                 viewModel = hiltViewModel(),
-                vault = mainScreenViewModel.lastVaultMenu?.toVault()!!,
                 toEditPasswordScreen = {
                     // TODO: pass and load data 
                     navController.navigate(

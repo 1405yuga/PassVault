@@ -63,7 +63,6 @@ import com.example.passvault.utils.state.ScreenState
 fun ViewPasswordDetailScreen(
     passwordDetailsResult: PasswordDetailResult,
     viewModel: ViewPasswordDetailViewModel,
-    vault: Vault,
     toEditPasswordScreen: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier
@@ -97,7 +96,6 @@ fun ViewPasswordDetailScreen(
     }
     ViewPasswordScreenContent(
         passwordDetailsResult = passwordDetailsResult,
-        vault = vault,
         showPassword = viewModel.showPassword,
         onPasswordVisibilityClick = { viewModel.togglePasswordVisibility() },
         toEditPasswordScreen = { toEditPasswordScreen() },
@@ -111,7 +109,6 @@ fun ViewPasswordDetailScreen(
 @Composable
 fun ViewPasswordScreenContent(
     passwordDetailsResult: PasswordDetailResult,
-    vault: Vault,
     toEditPasswordScreen: () -> Unit,
     modifier: Modifier = Modifier,
     onPasswordVisibilityClick: () -> Unit,
@@ -120,6 +117,7 @@ fun ViewPasswordScreenContent(
     onDeleteClick: () -> Unit
 ) {
     val passwordDetail = passwordDetailsResult.passwordDetails
+    val vault = passwordDetailsResult.vault ?: Vault.defaultVault()
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -290,7 +288,6 @@ fun ViewPasswordScreenContent(
 fun ViewPasswordDetailVertical() {
     ViewPasswordScreenContent(
         passwordDetailsResult = PasswordDetailResult.mockObject,
-        vault = Vault.defaultVault(),
         toEditPasswordScreen = {},
         onPasswordVisibilityClick = {},
         showPassword = false,

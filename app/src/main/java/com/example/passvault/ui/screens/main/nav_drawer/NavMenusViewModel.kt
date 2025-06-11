@@ -67,6 +67,7 @@ class NavMenusViewModel @Inject constructor(
                         val masterCredentials: MasterCredentials =
                             masterCredentialsJson.fromJsonString()
                         val gson = Gson()
+
                         //decrypt
                         val decryptedList: List<PasswordDetailResult> =
                             withContext(Dispatchers.Default) {
@@ -79,12 +80,14 @@ class NavMenusViewModel @Inject constructor(
                                             encodedEncryptedText = encryptedData.encodedEncryptedPasswordData
                                         )
                                     )
+                                    val vault: Vault? = vaultRepository.getVaultById(vaultId = encryptedData.vaultId)
                                     PasswordDetailResult(
                                         passwordId = encryptedData.passwordId!!,
                                         passwordDetails = gson.fromJson(
                                             decryptedData,
                                             PasswordDetails::class.java
                                         ),
+                                        vault = vault ?: Vault.defaultVault(),
                                         createdAt = encryptedData.createdAt!!,
                                         modifiedAt = encryptedData.updatedAt,
                                     )

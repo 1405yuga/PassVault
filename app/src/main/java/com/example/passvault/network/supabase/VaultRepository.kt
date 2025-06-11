@@ -1,6 +1,5 @@
 package com.example.passvault.network.supabase
 
-import android.util.Log
 import com.example.passvault.data.Vault
 import com.example.passvault.data.VaultTable
 import io.github.jan.supabase.SupabaseClient
@@ -23,6 +22,22 @@ class VaultRepository @Inject constructor(private val supabaseClient: SupabaseCl
             .postgrest[VaultTable.TABLE_NAME]
             .select(columns = Columns.ALL)
             .decodeList()
+    }
+
+    suspend fun getVaultById(vaultId: Long?): Vault? {
+        return try {
+            vaultId?.let {
+                supabaseClient.postgrest[VaultTable.TABLE_NAME]
+                    .select {
+                        filter {
+                            eq(column = VaultTable.VAULT_ID, vaultId)
+                        }
+                    }.decodeSingleOrNull()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
     suspend fun deleteVault(vaultId: Long?): Result<Unit> {

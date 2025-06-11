@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.passvault.data.CipherEncodedBundle
 import com.example.passvault.data.EncryptedData
 import com.example.passvault.data.MasterCredentials
+import com.example.passvault.data.PasswordDetailResult
 import com.example.passvault.data.PasswordDetails
 import com.example.passvault.data.Vault
 import com.example.passvault.di.shared_reference.MasterCredentialsRepository
@@ -37,15 +38,15 @@ class UpsertPasswordDetailViewModel @Inject constructor(
         MutableStateFlow<ScreenState<List<Vault>>>(ScreenState.PreLoad())
     val vaultListScreenState: StateFlow<ScreenState<List<Vault>>> = _vaultListScreenState
 
-    suspend fun loadInitialData(passwordDetails: PasswordDetails?) {
+    suspend fun loadInitialData(passwordDetailResult: PasswordDetailResult?) {
         _vaultListScreenState.value = ScreenState.Loading()
         //load fields--------------------------------------
-        passwordDetails?.let {
-            title = passwordDetails.title
-            username = passwordDetails.email
-            password = passwordDetails.password
-            website = passwordDetails.website
-            notes = passwordDetails.notes
+        passwordDetailResult?.passwordDetails?.let {
+            title = it.title
+            username = it.email
+            password = it.password
+            website = it.website
+            notes = it.notes
         }
         //load vault-----------------------------------------
         try {

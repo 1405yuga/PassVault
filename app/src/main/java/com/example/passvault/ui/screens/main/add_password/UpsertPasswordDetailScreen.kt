@@ -71,7 +71,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun UpsertPasswordDetailScreen(
     onClose: () -> Unit,
-    selectedVault: Vault?,
     onUpdateSelectedVault: (Vault) -> Unit,
     viewModel: UpsertPasswordDetailViewModel,
     passwordDetailResult: PasswordDetailResult?,
@@ -79,13 +78,13 @@ fun UpsertPasswordDetailScreen(
 ) {
     val vaultsState by viewModel.vaultListScreenState.collectAsState()
     LaunchedEffect(Unit) {
-        viewModel.loadInitialData(passwordDetails = passwordDetailResult?.passwordDetails)
+        viewModel.loadInitialData(passwordDetailResult = passwordDetailResult)
     }
     HandleScreenState(state = vaultsState, onLoaded = {
         UpsertScreen(
             onClose = onClose,
             viewModel = viewModel,
-            selectedVault = selectedVault,
+            selectedVault = passwordDetailResult?.vault,
             onUpdateSelectedVault = { onUpdateSelectedVault(it) },
             storeButtonLable = if (passwordDetailResult == null) "Create" else "Update",
             modifier = modifier,
