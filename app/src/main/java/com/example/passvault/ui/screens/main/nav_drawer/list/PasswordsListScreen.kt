@@ -124,7 +124,7 @@ fun PasswordItem(
                 .padding(horizontal = 4.dp, vertical = 6.dp)
                 .background(color = MaterialTheme.colorScheme.surface)
         ) {
-            TitleSquare(title = passwordDetails.title)
+            TitleSquare(title = if (passwordDetails.website.isNotEmpty()) passwordDetails.website else passwordDetails.title)
             Text(
                 text = buildAnnotatedString {
                     withStyle(

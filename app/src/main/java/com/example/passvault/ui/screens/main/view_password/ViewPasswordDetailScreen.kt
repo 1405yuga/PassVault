@@ -161,7 +161,7 @@ fun ViewPasswordScreenContent(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(bottom = 16.dp)
         ) {
-            TitleSquare(title = passwordDetail.title)
+            TitleSquare(title = if (passwordDetail.website.isNotEmpty()) passwordDetail.website else passwordDetail.title)
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
                     text = passwordDetail.title,

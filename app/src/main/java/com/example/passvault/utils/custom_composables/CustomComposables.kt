@@ -46,7 +46,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import coil.compose.AsyncImage
 import com.example.passvault.utils.annotations.VerticalScreenPreview
+import java.net.URL
 
 @Composable
 fun TextFieldWithErrorText(
@@ -284,6 +286,9 @@ fun ConfirmationDialogPreview() {
 
 @Composable
 fun TitleSquare(title: String) {
+    val domainRegex = Regex("^[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
+    val isDomain = domainRegex.matches(title.trim())
+
     Box(
         modifier = Modifier
             .size(55.dp)
@@ -291,12 +296,20 @@ fun TitleSquare(title: String) {
             .background(MaterialTheme.colorScheme.secondaryContainer),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = title.take(2).uppercase(),
-            color = MaterialTheme.colorScheme.onSecondaryContainer,
-            fontSize = 22.sp,
-            modifier = Modifier.padding(6.dp)
-        )
+        if (isDomain) {
+            AsyncImage(
+                model = "https://www.google.com/s2/favicons?sz=64&domain_url=https://$title",
+                contentDescription = "Favicon",
+                modifier = Modifier.size(30.dp)
+            )
+        } else {
+            Text(
+                text = title.take(2).uppercase(),
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                fontSize = 22.sp,
+                modifier = Modifier.padding(6.dp)
+            )
+        }
     }
 }
 

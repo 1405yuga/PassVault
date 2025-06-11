@@ -99,4 +99,7 @@ dependencies {
 
     //encrypted shared preference
     implementation("androidx.security:security-crypto:1.1.0-alpha05")
+
+    //coil----------------------------------------------------------
+    implementation("io.coil-kt:coil-compose:2.4.0")
 }
