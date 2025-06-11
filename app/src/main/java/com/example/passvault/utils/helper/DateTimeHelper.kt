@@ -18,9 +18,9 @@ object DateTimeHelper {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun formatSupabaseTimestamp(input: String): String {
-        val dateTime = OffsetDateTime.parse(input)
+        val correctedTimestamp = input.replace(" ", "T")
+        val dateTime = OffsetDateTime.parse(correctedTimestamp)
         val istZone = ZoneId.of("Asia/Kolkata")
         val istTime = dateTime.atZoneSameInstant(istZone)
 
