@@ -256,7 +256,7 @@ fun ConfirmationDialog(
                             contentColor = MaterialTheme.colorScheme.onErrorContainer
                         )
                     ) {
-                        Text("Delete")
+                        Text("Confirm")
                     }
                 }
             }

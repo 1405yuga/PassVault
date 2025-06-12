@@ -46,6 +46,7 @@ import com.example.passvault.data.Vault
 import com.example.passvault.di.shared_reference.EncryptedPrefsModule
 import com.example.passvault.di.shared_reference.MasterCredentialsRepository
 import com.example.passvault.di.supabase.SupabaseModule
+import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.network.supabase.EncryptedDataRepository
 import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.ui.screens.main.nav_drawer.NavMenusViewModel
@@ -243,7 +244,8 @@ fun AddVaultDialogPreview() {
                 supabaseClient = SupabaseModule.mockClient
             ),
             encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
-            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference)
+            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference),
+            authRepository = AuthRepository(SupabaseModule.mockClient)
         ),
         onUpsertSuccess = {},
         openedVault = Vault.defaultVault(),

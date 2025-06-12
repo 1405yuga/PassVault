@@ -1,6 +1,7 @@
 package com.example.passvault.ui.screens.main.nav_drawer
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -23,6 +25,7 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
@@ -42,8 +45,10 @@ import com.example.passvault.ui.screens.main.MainScreenViewModel
 import com.example.passvault.ui.screens.main.nav_drawer.list.PasswordsListScreen
 import com.example.passvault.ui.screens.main.nav_drawer.upsert_vault.UpsertVaultDialog
 import com.example.passvault.utils.annotations.VerticalScreenPreview
+import com.example.passvault.utils.custom_composables.ConfirmationDialog
 import com.example.passvault.utils.extension_functions.HandleScreenState
 import com.example.passvault.utils.extension_functions.toVault
+import com.example.passvault.utils.state.ScreenState
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,6 +58,7 @@ fun NavMenusScreen(
     toAddPasswordScreen: () -> Unit,
     toViewPasswordScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
     toEditPasswordScreen: (passwordDetailResult: PasswordDetailResult) -> Unit,
+    toLoaderScreen: () -> Unit,
     viewModel: NavMenusViewModel,
     mainScreenViewModel: MainScreenViewModel
 ) {
@@ -60,8 +66,8 @@ fun NavMenusScreen(
     val scope = rememberCoroutineScope()
     val vaultScreenState by mainScreenViewModel.vaultScreenState.collectAsState()
     val vaultList by mainScreenViewModel.vaultList.collectAsState()
-    val removeVaultScreenState by viewModel.removeVaultScreenState.collectAsState()
     val passwordsScreenState by viewModel.passwordListScreenState.collectAsState()
+    val signOutScreenState by viewModel.signOutState.collectAsState()
     val currentContext = LocalContext.current
 
     ModalNavigationDrawer(
@@ -112,7 +118,6 @@ fun NavMenusScreen(
                                                 }
                                                 if (vault.vaultId != null) {
                                                     IconButton(onClick = {
-                                                        // TODO: open editable dialog
                                                         viewModel.toggleCreateVaultDialog(
                                                             openDialog = true,
                                                             vault = vault
@@ -183,11 +188,27 @@ fun NavMenusScreen(
                         },
                         icon = { Icon(NavDrawerMenus.Profile.icon, contentDescription = null) },
                         modifier = Modifier.padding(
-                            start = dimensionResource(R.dimen.medium_padding),
-                            end = dimensionResource(R.dimen.medium_padding),
-                            bottom = dimensionResource(R.dimen.medium_padding),
-                            top = dimensionResource(R.dimen.medium_padding)
+                            horizontal = dimensionResource(R.dimen.medium_padding),
+                            vertical = dimensionResource(R.dimen.small_padding)
                         ),
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius))
+                    )
+                    NavigationDrawerItem(
+                        label = {
+                            Text(
+                                text = NavDrawerMenus.LogOut.label,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        },
+                        selected = false,
+                        onClick = {
+//                            mainScreenViewModel.onMenuSelected(NavDrawerMenus.LogOut)
+//                            scope.launch { drawerState.close() }
+// TODO: show logout dialog
+                            viewModel.showSignOutConfirmation()
+                        },
+                        icon = { Icon(NavDrawerMenus.LogOut.icon, contentDescription = null) },
+                        modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.medium_padding)),
                         shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius))
                     )
                 }
@@ -247,9 +268,31 @@ fun NavMenusScreen(
                             UpsertVaultDialog(
                                 openedVault = viewModel.openedVault,
                                 onUpsertSuccess = { mainScreenViewModel.addVaultToList(vault = it) },
-                                onDeleteSuccess = {mainScreenViewModel.removeVaultFromListById(vaultId = it)},
+                                onDeleteSuccess = {
+                                    mainScreenViewModel.removeVaultFromListById(
+                                        vaultId = it
+                                    )
+                                },
                                 viewModel = viewModel
                             )
+                        }
+
+                        viewModel.isVisibleSignOutConfirmationDialog -> {
+                            if (signOutScreenState is ScreenState.Loading) {
+                                Surface {
+                                    CircularProgressIndicator()
+                                }
+                            } else {
+                                ConfirmationDialog(
+                                    title = "Log out",
+                                    subTitle = "Logging out won't delete your passwords.",
+                                    onDismissRequest = { viewModel.hideSignOutConfirmation() },
+                                    onConfirmation = {
+                                        // TODO: perform sign out
+                                        viewModel.performSignOut()
+                                    },
+                                )
+                            }
                         }
 
 //                        viewModel.openRemoveVaultConfirmationDialog -> {
@@ -261,7 +304,24 @@ fun NavMenusScreen(
 //                            )
 //                        }
                     }
+                    LaunchedEffect(signOutScreenState) {
+                        when (val state = signOutScreenState) {
+                            is ScreenState.Error -> {
+                                Toast.makeText(currentContext, state.message, Toast.LENGTH_SHORT)
+                                    .show()
+                            }
 
+                            is ScreenState.Loaded -> {
+                                Toast.makeText(currentContext, state.result, Toast.LENGTH_SHORT)
+                                    .show()
+                                // TODO: clear all back stack & go to loader screen
+                                toLoaderScreen()
+                            }
+
+                            else -> {}
+                        }
+                    }
+                }
 //                    LaunchedEffect(removeVaultScreenState) {
 //                        when (val state = removeVaultScreenState) {
 //                            is ScreenState.Error -> {
@@ -277,7 +337,7 @@ fun NavMenusScreen(
 //                            else -> {}
 //                        }
 //                    }
-                }
+
             }
         )
     }

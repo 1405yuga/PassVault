@@ -23,7 +23,7 @@ import com.google.gson.Gson
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
+fun MainScreen(mainScreenViewModel: MainScreenViewModel, goToLoaderScreen: () -> Unit) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = MainScreens.VaultHome.route) {
         composable(route = MainScreens.VaultHome.route) {
@@ -45,6 +45,7 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
                         )
                     )
                 },
+                toLoaderScreen = {goToLoaderScreen()},
                 mainScreenViewModel = mainScreenViewModel
             )
         }
@@ -102,7 +103,7 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel) {
             ViewPasswordDetailScreen(
                 viewModel = hiltViewModel(),
                 toEditPasswordScreen = {
-                    // TODO: pass and load data 
+                    //  pass and load data
                     navController.navigate(
                         MainScreens.AddPassword.createRoute(
                             passwordDetailsResultString = Gson().toJson(passwordDetailResult)
@@ -124,7 +125,7 @@ private fun MainScreenPreview() {
         mainScreenViewModel = MainScreenViewModel(
             vaultRepository = VaultRepository(SupabaseModule.mockClient)
         )
-    )
+    ) {}
 }
 
 @Composable
@@ -134,5 +135,5 @@ private fun MainScreenHorizontalPreview() {
         mainScreenViewModel = MainScreenViewModel(
             vaultRepository = VaultRepository(SupabaseModule.mockClient)
         )
-    )
+    ) {}
 }

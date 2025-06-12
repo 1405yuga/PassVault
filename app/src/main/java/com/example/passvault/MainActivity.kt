@@ -80,7 +80,11 @@ fun PassVaultApp(
                 onUnlocked = { navController.navigateAndClearPrevious(Screen.MainScreen.name) })
         }
         composable(Screen.MainScreen.name) {
-            MainScreen(mainScreenViewModel = hiltViewModel())
+            MainScreen(
+                mainScreenViewModel = hiltViewModel(),
+                goToLoaderScreen = {
+                    navController.navigateAndClearPrevious(Screen.Loader.name)
+                })
         }
     }
 }

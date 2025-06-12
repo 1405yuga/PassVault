@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.PowerSettingsNew
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,6 +17,7 @@ import com.example.passvault.data.PasswordDetailResult
 import com.example.passvault.data.PasswordDetails
 import com.example.passvault.data.Vault
 import com.example.passvault.di.shared_reference.MasterCredentialsRepository
+import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.network.supabase.EncryptedDataRepository
 import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.utils.extension_functions.fromJsonString
@@ -36,11 +38,43 @@ import javax.inject.Inject
 class NavMenusViewModel @Inject constructor(
     private val vaultRepository: VaultRepository,
     private val encryptedDataRepository: EncryptedDataRepository,
-    private val masterCredentialsRepository: MasterCredentialsRepository
+    private val masterCredentialsRepository: MasterCredentialsRepository,
+    private val authRepository: AuthRepository
 ) :
     ViewModel() {
 
-    //List Screen-------------------------------------------------------------------------
+    //    SignOut-------------------------------------------------------------------------
+    var isVisibleSignOutConfirmationDialog by mutableStateOf(false)
+        private set
+
+    fun showSignOutConfirmation() {
+        this.isVisibleSignOutConfirmationDialog = true
+    }
+
+    fun hideSignOutConfirmation() {
+        this.isVisibleSignOutConfirmationDialog = false
+    }
+
+    private val _signOutState = MutableStateFlow<ScreenState<String>>(ScreenState.PreLoad())
+    val signOutState: StateFlow<ScreenState<String>> = _signOutState
+
+    //remove locally stored master-credentials
+    //sign-out
+    fun performSignOut() {
+        _signOutState.value = ScreenState.Loading()
+        viewModelScope.launch {
+            _signOutState.value = try {
+                masterCredentialsRepository.saveMasterCredentialsJsonLocally(masterCredentionsJson = null)
+                authRepository.signOut()
+                ScreenState.Loaded("Signed out! Bye!")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                ScreenState.Error("Unable to Sign-Out")
+            }
+        }
+    }
+
+    //    List Screen-------------------------------------------------------------------------
     private val _passwordListScreenState =
         MutableStateFlow<ScreenState<List<PasswordDetailResult>>>(ScreenState.PreLoad())
 
@@ -279,4 +313,5 @@ sealed class NavDrawerMenus(val label: String, val icon: ImageVector) {
 
     object AddVault : NavDrawerMenus(label = "Add Vault", icon = Icons.Outlined.Add)
     object Profile : NavDrawerMenus(label = "Profile", icon = Icons.Filled.Person)
+    object LogOut : NavDrawerMenus(label = "Log Out", icon = Icons.Outlined.PowerSettingsNew)
 }
