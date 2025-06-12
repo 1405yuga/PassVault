@@ -45,7 +45,7 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel, goToLoaderScreen: () ->
                         )
                     )
                 },
-                toLoaderScreen = {goToLoaderScreen()},
+                toLoaderScreen = { goToLoaderScreen() },
                 mainScreenViewModel = mainScreenViewModel
             )
         }
