@@ -129,6 +129,7 @@ fun LoginScreen(
         OutlinedButton(
             onClick = {
                 // TODO: google login
+                viewModel.signInWithGoogle(context = currentContext)
             }, modifier = Modifier
                 .padding(4.dp)
                 .fillMaxWidth()

@@ -2,7 +2,9 @@ package com.example.passvault.network.supabase
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -39,5 +41,19 @@ class AuthRepository @Inject constructor(private val supabaseClient: SupabaseCli
 
     suspend fun signOut() {
         supabaseClient.auth.signOut()
+    }
+
+    suspend fun googleLogin(googleIdToken: String, rawNonce: String): Result<Unit> {
+        return try {
+            supabaseClient.auth.signInWith(IDToken) {
+                idToken = googleIdToken
+                provider = Google
+                nonce = rawNonce
+            }
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }
