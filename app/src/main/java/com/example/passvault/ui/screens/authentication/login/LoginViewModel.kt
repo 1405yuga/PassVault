@@ -7,6 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.passvault.BuildConfig
@@ -15,7 +17,9 @@ import com.example.passvault.utils.input_validations.AuthInputValidators
 import com.example.passvault.utils.state.ScreenState
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jan.supabase.exceptions.RestException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -108,10 +112,24 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
                 val googleIdToken = googleIdTokenCredential.idToken
                 authRepository.googleLogin(googleIdToken = googleIdToken, rawNonce = rawNonce)
                 ScreenState.Loaded("Login successfully")
+            } catch (e: GetCredentialCancellationException) {
+                Log.d(this@LoginViewModel.javaClass.name, "Sign-in cancelled by user.")
+                e.printStackTrace()
+                ScreenState.PreLoad()
+            } catch (e: GetCredentialException) {
+                e.printStackTrace()
+                ScreenState.Error("Credential error occurred.")
+            } catch (e: GoogleIdTokenParsingException) {
+                e.printStackTrace()
+                ScreenState.Error("Failed to parse Google ID Token.")
+            } catch (e: RestException) {
+                e.printStackTrace()
+                ScreenState.Error("Supabase auth failed.")
             } catch (e: Exception) {
                 e.printStackTrace()
                 ScreenState.Error("Unable to Login. Something went wrong!")
             }
+
         }
     }
 }

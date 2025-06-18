@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -107,12 +108,15 @@ fun LoginScreen(
                 contentColor = MaterialTheme.colorScheme.onPrimary
             )
         ) {
-            Text(
-                text = when (screenState) {
-                    is ScreenState.Loading -> "Loading.."
-                    else -> "Get started"
+            when (screenState) {
+                is ScreenState.Loading -> {
+                    CircularProgressIndicator()
                 }
-            )
+
+                else -> {
+                    Text(text = "Get Started")
+                }
+            }
         }
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.large_spacer_height)))
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -128,21 +132,30 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.medium_spacer_height)))
         OutlinedButton(
             onClick = {
-                // TODO: google login
+                // google login
                 viewModel.signInWithGoogle(context = currentContext)
             }, modifier = Modifier
                 .padding(4.dp)
                 .fillMaxWidth()
                 .defaultMinSize(minHeight = dimensionResource(R.dimen.min_clickable_size)),
-            shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius))
+            shape = RoundedCornerShape(dimensionResource(R.dimen.button_radius)),
+            enabled = screenState !is ScreenState.Loading
         ) {
-            Icon(
-                painter = painterResource(R.drawable.google),
-                contentDescription = null,
-                tint = Color.Unspecified
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(text = "Log in with Google")
+            when (screenState) {
+                is ScreenState.Loading -> {
+                    CircularProgressIndicator()
+                }
+
+                else -> {
+                    Icon(
+                        painter = painterResource(R.drawable.google),
+                        contentDescription = null,
+                        tint = Color.Unspecified
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = "Log in with Google")
+                }
+            }
         }
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.medium_spacer_height)))
         Row(verticalAlignment = Alignment.CenterVertically) {
