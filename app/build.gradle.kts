@@ -36,6 +36,7 @@ android {
         }
         addStringFields(name = "SUPABASE_URL")
         addStringFields(name = "SUPABASE_KEY")
+        addStringFields(name = "WEB_CLIENT")
     }
 
     buildTypes {
@@ -85,6 +86,10 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:auth-kt")
     implementation("io.github.jan-tennert.supabase:realtime-kt")
     implementation("io.ktor:ktor-client-android:3.1.1")
+//    google credenetials--------------------------------------------------------
+    implementation("androidx.credentials:credentials:1.5.0")
+//    google id------------------------------------------------------------------
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 
     //hilt----------------------------------------------------------
     implementation("com.google.dagger:hilt-android:2.51.1")
