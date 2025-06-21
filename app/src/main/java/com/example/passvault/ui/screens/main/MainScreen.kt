@@ -21,6 +21,7 @@ import com.example.passvault.ui.screens.main.nav_drawer.profile.ProfileScreen
 import com.example.passvault.ui.screens.main.view_password.ViewPasswordDetailScreen
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
+import com.example.passvault.utils.extension_functions.toVault
 import com.google.gson.Gson
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,6 +82,7 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel, goToLoaderScreen: () ->
                     )
                 },
                 vaults = vaultList,
+                initialSelectedVault = mainScreenViewModel.lastVaultMenu?.toVault(),
                 passwordDetailResult = passwordDetailResult,
                 viewModel = hiltViewModel(),
                 modifier = Modifier

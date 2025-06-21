@@ -73,7 +73,8 @@ fun UpsertPasswordDetailScreen(
     vaults: List<Vault>,
     viewModel: UpsertPasswordDetailViewModel,
     passwordDetailResult: PasswordDetailResult?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    initialSelectedVault: Vault?
 ) {
     LaunchedEffect(Unit) {
         viewModel.loadInitialData(passwordDetailResult = passwordDetailResult)
@@ -82,7 +83,7 @@ fun UpsertPasswordDetailScreen(
     UpsertScreen(
         onClose = onClose,
         viewModel = viewModel,
-        selectedVault = passwordDetailResult?.vault,
+        selectedVault = passwordDetailResult?.vault ?: initialSelectedVault,
         onUpdateSelectedVault = { onUpdateSelectedVault(it) },
         storeButtonLable = if (passwordDetailResult == null) "Create" else "Update",
         modifier = modifier,

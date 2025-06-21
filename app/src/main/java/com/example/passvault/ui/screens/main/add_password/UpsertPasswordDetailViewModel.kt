@@ -1,5 +1,6 @@
 package com.example.passvault.ui.screens.main.add_password
 
+import android.R.attr.password
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,17 +33,6 @@ class UpsertPasswordDetailViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-    fun loadInitialData(passwordDetailResult: PasswordDetailResult?) {
-        //load fields--------------------------------------
-        passwordDetailResult?.passwordDetails?.let {
-            title = it.title
-            username = it.email
-            password = it.password
-            website = it.website
-            notes = it.notes
-        }
-    }
-
     var title by mutableStateOf("")
         private set
     var username by mutableStateOf("") //optional
@@ -57,6 +47,17 @@ class UpsertPasswordDetailViewModel @Inject constructor(
         private set
     var selectedVault by mutableStateOf(Vault.defaultVault())
         private set
+
+    fun loadInitialData(passwordDetailResult: PasswordDetailResult?) {
+        //load fields--------------------------------------
+        passwordDetailResult?.passwordDetails?.let {
+            title = it.title
+            username = it.email
+            password = it.password
+            website = it.website
+            notes = it.notes
+        }
+    }
 
     fun onTitleChange(title: String) {
         this.title = title
