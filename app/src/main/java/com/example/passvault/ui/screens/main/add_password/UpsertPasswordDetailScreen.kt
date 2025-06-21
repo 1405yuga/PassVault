@@ -58,12 +58,10 @@ import com.example.passvault.di.shared_reference.EncryptedPrefsModule
 import com.example.passvault.di.shared_reference.MasterCredentialsRepository
 import com.example.passvault.di.supabase.SupabaseModule
 import com.example.passvault.network.supabase.EncryptedDataRepository
-import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ShowAndHidePasswordTextField
 import com.example.passvault.utils.custom_composables.TextFieldWithErrorText
-import com.example.passvault.utils.extension_functions.HandleScreenState
 import com.example.passvault.utils.extension_functions.toImageVector
 import com.example.passvault.utils.state.ScreenState
 import kotlinx.coroutines.launch
@@ -72,26 +70,25 @@ import kotlinx.coroutines.launch
 fun UpsertPasswordDetailScreen(
     onClose: () -> Unit,
     onUpdateSelectedVault: (Vault) -> Unit,
+    vaults: List<Vault>,
     viewModel: UpsertPasswordDetailViewModel,
     passwordDetailResult: PasswordDetailResult?,
     modifier: Modifier = Modifier
 ) {
-    val vaultsState by viewModel.vaultListScreenState.collectAsState()
     LaunchedEffect(Unit) {
         viewModel.loadInitialData(passwordDetailResult = passwordDetailResult)
     }
-    HandleScreenState(state = vaultsState, onLoaded = {
-        UpsertScreen(
-            onClose = onClose,
-            viewModel = viewModel,
-            selectedVault = passwordDetailResult?.vault,
-            onUpdateSelectedVault = { onUpdateSelectedVault(it) },
-            storeButtonLable = if (passwordDetailResult == null) "Create" else "Update",
-            modifier = modifier,
-            vaults = it,
-            passwordId = passwordDetailResult?.passwordId
-        )
-    })
+
+    UpsertScreen(
+        onClose = onClose,
+        viewModel = viewModel,
+        selectedVault = passwordDetailResult?.vault,
+        onUpdateSelectedVault = { onUpdateSelectedVault(it) },
+        storeButtonLable = if (passwordDetailResult == null) "Create" else "Update",
+        modifier = modifier,
+        vaults = vaults,
+        passwordId = passwordDetailResult?.passwordId
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -310,7 +307,6 @@ private fun AddPasswordScreenPreview() {
     UpsertScreen(
         onClose = {},
         viewModel = UpsertPasswordDetailViewModel(
-            vaultRepository = VaultRepository(SupabaseModule.mockClient),
             masterCredentialsRepository = MasterCredentialsRepository(
                 encryptedPrefs = EncryptedPrefsModule.mockSharedPreference
             ),
@@ -339,7 +335,6 @@ private fun AddPasswordScreenHorizontalPreview() {
     UpsertScreen(
         onClose = {},
         viewModel = UpsertPasswordDetailViewModel(
-            vaultRepository = VaultRepository(SupabaseModule.mockClient),
             masterCredentialsRepository = MasterCredentialsRepository(
                 encryptedPrefs = EncryptedPrefsModule.mockSharedPreference
             ), encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient)

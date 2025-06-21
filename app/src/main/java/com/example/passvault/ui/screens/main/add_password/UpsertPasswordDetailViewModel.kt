@@ -14,7 +14,6 @@ import com.example.passvault.data.PasswordDetails
 import com.example.passvault.data.Vault
 import com.example.passvault.di.shared_reference.MasterCredentialsRepository
 import com.example.passvault.network.supabase.EncryptedDataRepository
-import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.utils.extension_functions.fromBase64
 import com.example.passvault.utils.extension_functions.fromJsonString
 import com.example.passvault.utils.extension_functions.toJsonString
@@ -28,18 +27,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UpsertPasswordDetailViewModel @Inject constructor(
-    private val vaultRepository: VaultRepository,
     private val masterCredentialsRepository: MasterCredentialsRepository,
     private val encryptedDataRepository: EncryptedDataRepository
 ) :
     ViewModel() {
 
-    private var _vaultListScreenState =
-        MutableStateFlow<ScreenState<List<Vault>>>(ScreenState.PreLoad())
-    val vaultListScreenState: StateFlow<ScreenState<List<Vault>>> = _vaultListScreenState
-
-    suspend fun loadInitialData(passwordDetailResult: PasswordDetailResult?) {
-        _vaultListScreenState.value = ScreenState.Loading()
+    fun loadInitialData(passwordDetailResult: PasswordDetailResult?) {
         //load fields--------------------------------------
         passwordDetailResult?.passwordDetails?.let {
             title = it.title
@@ -47,15 +40,6 @@ class UpsertPasswordDetailViewModel @Inject constructor(
             password = it.password
             website = it.website
             notes = it.notes
-        }
-        //load vault-----------------------------------------
-        try {
-            val result = vaultRepository.getAllVaults()
-            _vaultListScreenState.value = ScreenState.Loaded(result = result)
-            onSelectedVaultChange(vault = result.first())
-        } catch (e: Exception) {
-            e.printStackTrace()
-            _vaultListScreenState.value = ScreenState.Error(message = "Unable to load Vaults")
         }
     }
 

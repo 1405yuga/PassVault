@@ -2,6 +2,8 @@ package com.example.passvault.ui.screens.main
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
@@ -25,6 +27,8 @@ import com.google.gson.Gson
 @Composable
 fun MainScreen(mainScreenViewModel: MainScreenViewModel, goToLoaderScreen: () -> Unit) {
     val navController = rememberNavController()
+    val vaultList by mainScreenViewModel.vaultList.collectAsState()
+
     NavHost(navController = navController, startDestination = MainScreens.VaultHome.route) {
         composable(route = MainScreens.VaultHome.route) {
             NavMenusScreen(
@@ -76,6 +80,7 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel, goToLoaderScreen: () ->
                         navDrawerMenus = NavDrawerMenus.VaultItem(vault = vault)
                     )
                 },
+                vaults = vaultList,
                 passwordDetailResult = passwordDetailResult,
                 viewModel = hiltViewModel(),
                 modifier = Modifier
