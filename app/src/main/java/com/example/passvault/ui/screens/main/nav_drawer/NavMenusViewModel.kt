@@ -209,15 +209,19 @@ class NavMenusViewModel @Inject constructor(
         _addDialogScreenState.value = ScreenState.Loading()
         viewModelScope.launch {
             try {
-                val resultVault = Vault(
+                var resultVault: Vault? = Vault(
                     vaultId = this@NavMenusViewModel.vaultId,
                     vaultName = this@NavMenusViewModel.vaultName,
                     iconKey = this@NavMenusViewModel.iconSelected?.name
                         ?: VaultIconsList.getIconsList()[0].name
                 )
 
-                vaultRepository.upsertVault(vault = resultVault)
-                _addDialogScreenState.value = ScreenState.Loaded(resultVault)
+                resultVault = vaultRepository.upsertVault(vault = resultVault!!)
+                if (resultVault != null) {
+                    _addDialogScreenState.value = ScreenState.Loaded(resultVault)
+                } else {
+                    _addDialogScreenState.value = ScreenState.Error(message = "Unable to add vault")
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 _addDialogScreenState.value = ScreenState.Error(message = "Unable to add vault")

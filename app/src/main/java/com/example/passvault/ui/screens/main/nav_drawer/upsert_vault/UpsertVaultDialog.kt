@@ -111,7 +111,7 @@ fun UpsertVaultDialog(
                     if (openedVault != null) {
                         Button(
                             onClick = {
-                                // TODO: delete vault
+                                //  delete vault
                                 viewModel.removeVault()
                             },
                             modifier = Modifier

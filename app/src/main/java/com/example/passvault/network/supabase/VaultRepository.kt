@@ -11,10 +11,11 @@ import javax.inject.Singleton
 @Singleton
 class VaultRepository @Inject constructor(private val supabaseClient: SupabaseClient) {
 
-    suspend fun upsertVault(vault: Vault) {
-        supabaseClient.postgrest[VaultTable.TABLE_NAME].upsert(vault) {
+    suspend fun upsertVault(vault: Vault): Vault? {
+        return supabaseClient.postgrest[VaultTable.TABLE_NAME].upsert(value = vault) {
             onConflict = VaultTable.VAULT_ID
-        }
+            select()
+        }.decodeSingleOrNull<Vault>()
     }
 
     suspend fun getAllVaults(): List<Vault> {
