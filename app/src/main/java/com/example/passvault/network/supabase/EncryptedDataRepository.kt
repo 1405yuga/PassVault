@@ -51,6 +51,20 @@ class EncryptedDataRepository @Inject constructor(private val supabaseClient: Su
         }
     }
 
+    suspend fun getAllEncryptedData(): List<EncryptedData>? {
+        return try {
+            supabaseClient.from(EncryptedDataTable.TABLE_NAME).select {
+                filter {
+                    isNull(EncryptedDataTable.VAULT_ID)
+                }
+            }.decodeList<EncryptedData>()
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
     suspend fun getEncryptedDataById(id: Long): EncryptedData? {
         return try {
             supabaseClient.from(EncryptedDataTable.TABLE_NAME).select {

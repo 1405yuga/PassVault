@@ -8,18 +8,33 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.passvault.data.CipherEncodedBundle
+import com.example.passvault.data.MasterCredentials
+import com.example.passvault.data.PasswordDetailResult
+import com.example.passvault.data.PasswordDetails
 import com.example.passvault.data.Vault
+import com.example.passvault.di.shared_reference.MasterCredentialsRepository
+import com.example.passvault.network.supabase.EncryptedDataRepository
 import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.ui.screens.main.nav_drawer.NavDrawerMenus
+import com.example.passvault.utils.extension_functions.fromJsonString
+import com.example.passvault.utils.helper.EncryptionHelper
 import com.example.passvault.utils.state.ScreenState
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class MainScreenViewModel @Inject constructor(private val vaultRepository: VaultRepository) :
+class MainScreenViewModel @Inject constructor(
+    private val vaultRepository: VaultRepository,
+    private val encryptedDataRepository: EncryptedDataRepository,
+    private val masterCredentialsRepository: MasterCredentialsRepository
+) :
     ViewModel() {
 
     private var _vaultListScreenState =
@@ -41,10 +56,6 @@ class MainScreenViewModel @Inject constructor(private val vaultRepository: Vault
             lastVaultMenu = navDrawerMenus
         }
         currentSelectedMenu = navDrawerMenus
-    }
-
-    init {
-        getVaults(isInitialLoad = true)
     }
 
     fun addVaultToList(vault: Vault) {
@@ -105,6 +116,92 @@ class MainScreenViewModel @Inject constructor(private val vaultRepository: Vault
             e.printStackTrace()
             _vaultListScreenState.value = ScreenState.Error(message = "Unable to load Vaults")
         }
+    }
+
+    private val _passwordsScreenState = MutableStateFlow<ScreenState<List<PasswordDetailResult>>>(
+        ScreenState.PreLoad()
+    )
+
+    val passwordsScreenState: StateFlow<ScreenState<List<PasswordDetailResult>>> =
+        _passwordsScreenState
+
+    private val _passwordsList = MutableStateFlow<List<PasswordDetailResult>>(emptyList())
+    val passwordList: StateFlow<List<PasswordDetailResult>> = _passwordsList
+
+    fun loadPasswords() {
+        viewModelScope.launch {
+            _passwordsScreenState.value = ScreenState.Loading()
+            try {
+                val result = encryptedDataRepository.getAllEncryptedData()
+                if (result == null) {
+                    _passwordsScreenState.value = ScreenState.Error("Unable to load Passwords list")
+                } else if (result.isEmpty()) {
+                    _passwordsList.value = emptyList()
+                    _passwordsScreenState.value = ScreenState.Loaded(emptyList())
+                } else {
+                    val masterCredentialsJson =
+                        masterCredentialsRepository.getLocallyStoredMasterCredentialsJson()
+
+                    if (masterCredentialsJson == null) {
+                        _passwordsScreenState.value =
+                            ScreenState.Error("Something went wrong. Login again!")
+                    } else {
+                        val masterCredentials: MasterCredentials =
+                            masterCredentialsJson.fromJsonString()
+                        val gson = Gson()
+
+                        val decryptedList: List<PasswordDetailResult> =
+                            withContext(Dispatchers.Default) {
+                                result.map { encryptedData ->
+                                    val decryptedData = EncryptionHelper.performDecryption(
+                                        masterKey = masterCredentials.masterKey,
+                                        cipherEncodedBundle = CipherEncodedBundle(
+                                            encodedSalt = masterCredentials.encodedSalt,
+                                            encodedInitialisationVector = encryptedData.encodedInitialisationVector,
+                                            encodedEncryptedText = encryptedData.encodedEncryptedPasswordData
+                                        )
+                                    )
+
+                                    val vault = vaultRepository.getVaultById(encryptedData.vaultId)
+
+                                    PasswordDetailResult(
+                                        passwordId = encryptedData.passwordId!!,
+                                        passwordDetails = gson.fromJson(
+                                            decryptedData,
+                                            PasswordDetails::class.java
+                                        ),
+                                        vault = vault ?: Vault.defaultVault(),
+                                        createdAt = encryptedData.createdAt!!,
+                                        modifiedAt = encryptedData.updatedAt
+                                    )
+                                }
+                            }
+
+                        _passwordsList.value = decryptedList
+                        _passwordsScreenState.value = ScreenState.Loaded(decryptedList)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _passwordsScreenState.value = ScreenState.Error("Unable to load Passwords list")
+            }
+        }
+    }
+
+    fun addPasswordToList(passwordDetailResult: PasswordDetailResult) {
+        val updatedList = _passwordsList.value.toMutableList()
+        val index = updatedList.indexOfFirst { passwordDetailResult.passwordId == it.passwordId }
+        if (index != -1) {
+            updatedList[index] = passwordDetailResult
+        } else {
+            updatedList.add(passwordDetailResult)
+        }
+        _passwordsList.value = updatedList
+    }
+
+    init {
+        getVaults(isInitialLoad = true)
+        loadPasswords()
     }
 }
 

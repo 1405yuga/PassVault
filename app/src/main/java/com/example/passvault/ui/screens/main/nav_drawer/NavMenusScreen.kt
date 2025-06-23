@@ -47,7 +47,6 @@ import com.example.passvault.ui.screens.main.nav_drawer.upsert_vault.UpsertVault
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ConfirmationDialog
 import com.example.passvault.utils.extension_functions.HandleScreenState
-import com.example.passvault.utils.extension_functions.toVault
 import com.example.passvault.utils.state.ScreenState
 import kotlinx.coroutines.launch
 
@@ -66,7 +65,7 @@ fun NavMenusScreen(
     val scope = rememberCoroutineScope()
     val vaultScreenState by mainScreenViewModel.vaultScreenState.collectAsState()
     val vaultList by mainScreenViewModel.vaultList.collectAsState()
-    val passwordsScreenState by viewModel.passwordListScreenState.collectAsState()
+    val passwordsScreenState by mainScreenViewModel.passwordsScreenState.collectAsState()
     val signOutScreenState by viewModel.signOutState.collectAsState()
     val currentContext = LocalContext.current
 
@@ -246,7 +245,8 @@ fun NavMenusScreen(
                     //  load screen when vault menu clicked
                     mainScreenViewModel.lastVaultMenu?.let { vaultMenu ->
                         Log.d("NavMenuScreen", "Vault updated : $vaultMenu")
-                        LaunchedEffect(key1 = vaultMenu) { viewModel.getPasswordsList(vaultId = vaultMenu.toVault()?.vaultId) }
+                        // TODO: display selected vault list
+//                        LaunchedEffect(key1 = vaultMenu) { viewModel.getPasswordsList(vaultId = vaultMenu.toVault()?.vaultId) }
                         HandleScreenState(
                             state = passwordsScreenState,
                             onLoaded = {
@@ -287,10 +287,7 @@ fun NavMenusScreen(
                                     title = "Log out",
                                     subTitle = "Logging out won't delete your passwords.",
                                     onDismissRequest = { viewModel.hideSignOutConfirmation() },
-                                    onConfirmation = {
-                                        // TODO: perform sign out
-                                        viewModel.performSignOut()
-                                    },
+                                    onConfirmation = { viewModel.performSignOut() },
                                 )
                             }
                         }
