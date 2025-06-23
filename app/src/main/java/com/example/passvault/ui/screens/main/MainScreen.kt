@@ -79,6 +79,11 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel, goToLoaderScreen: () ->
                 }
             UpsertPasswordDetailScreen(
                 onClose = { navController.popBackStack() },
+                onSuccess = { passwordDetailResult ->
+                    mainScreenViewModel.upsertPasswordToList(
+                        passwordDetailResult = passwordDetailResult
+                    )
+                },
                 onUpdateSelectedVault = { vault ->
                     mainScreenViewModel.onMenuSelected(
                         navDrawerMenus = NavDrawerMenus.VaultItem(vault = vault)

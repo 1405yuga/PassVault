@@ -188,7 +188,7 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 
-    fun addPasswordToList(passwordDetailResult: PasswordDetailResult) {
+    fun upsertPasswordToList(passwordDetailResult: PasswordDetailResult) {
         val updatedList = _passwordsList.value.toMutableList()
         val index = updatedList.indexOfFirst { passwordDetailResult.passwordId == it.passwordId }
         if (index != -1) {

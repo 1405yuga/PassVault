@@ -13,8 +13,11 @@ import javax.inject.Singleton
 @Singleton
 class EncryptedDataRepository @Inject constructor(private val supabaseClient: SupabaseClient) {
 
-    suspend fun storeEncryptedData(encryptedData: EncryptedData) {
-        supabaseClient.postgrest[EncryptedDataTable.TABLE_NAME].upsert(encryptedData)
+    suspend fun storeEncryptedData(encryptedData: EncryptedData): EncryptedData? {
+        return supabaseClient.postgrest[EncryptedDataTable.TABLE_NAME].upsert(encryptedData) {
+            onConflict = EncryptedDataTable.PASSWORD_ID
+            select()
+        }.decodeSingleOrNull()
     }
 
     suspend fun getAllEncryptedDataByVaultId(vaultId: Long?): List<EncryptedData>? {

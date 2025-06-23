@@ -1,7 +1,5 @@
 package com.example.passvault.ui.screens.main.add_password
 
-import android.R.attr.password
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -99,8 +97,9 @@ class UpsertPasswordDetailViewModel @Inject constructor(
         return titleError.isBlank() && passwordError.isBlank()
     }
 
-    private val _screenState = MutableStateFlow<ScreenState<String>>(ScreenState.PreLoad())
-    val screenState: StateFlow<ScreenState<String>> = _screenState
+    private val _screenState =
+        MutableStateFlow<ScreenState<PasswordDetailResult>>(ScreenState.PreLoad())
+    val screenState: StateFlow<ScreenState<PasswordDetailResult>> = _screenState
 
     //get master-credentials
     //create passwordDetailJsonString
@@ -118,13 +117,14 @@ class UpsertPasswordDetailViewModel @Inject constructor(
                 } else {
                     val masterCredentials: MasterCredentials =
                         masterCredentialsJson.fromJsonString()
-                    val passwordDetailJsonString: String = PasswordDetails(
+                    val passwordDetails = PasswordDetails(
                         title = title.trim(),
                         email = username.trim(),
                         password = password.trim(),
                         website = website.trim(),
                         notes = notes.trim()
-                    ).toJsonString()
+                    )
+                    val passwordDetailJsonString: String = passwordDetails.toJsonString()
                     val cipherEncodedBundle: CipherEncodedBundle =
                         EncryptionHelper.performEncryption(
                             plainText = passwordDetailJsonString,
@@ -138,13 +138,21 @@ class UpsertPasswordDetailViewModel @Inject constructor(
                         encodedInitialisationVector = cipherEncodedBundle.encodedInitialisationVector,
                         encodedEncryptedPasswordData = cipherEncodedBundle.encodedEncryptedText
                     )
-                    encryptedDataRepository.storeEncryptedData(encryptedData = encryptedData)
-                    Log.d(
-                        this.javaClass.simpleName,
-                        "$masterCredentials\n$passwordDetailJsonString\n$cipherEncodedBundle"
-                    )
-                    _screenState.value =
-                        ScreenState.Loaded(result = "Added password details successfully!")
+                    val resultEncryptedData =
+                        encryptedDataRepository.storeEncryptedData(encryptedData = encryptedData)
+                    _screenState.value = if (resultEncryptedData == null) {
+                        ScreenState.Error("Something went wrong")
+                    } else {
+                        ScreenState.Loaded(
+                            result = PasswordDetailResult(
+                                passwordId = resultEncryptedData.passwordId!!,
+                                passwordDetails = passwordDetails,
+                                vault = selectedVault,
+                                createdAt = resultEncryptedData.createdAt!!,
+                                modifiedAt = resultEncryptedData.updatedAt
+                            )
+                        )
+                    }
                 }
             }
         } catch (e: Exception) {

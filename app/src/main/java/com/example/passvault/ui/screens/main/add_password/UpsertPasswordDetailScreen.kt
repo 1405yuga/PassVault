@@ -69,6 +69,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun UpsertPasswordDetailScreen(
     onClose: () -> Unit,
+    onSuccess: (passwordDetailResult: PasswordDetailResult) -> Unit,
     onUpdateSelectedVault: (Vault) -> Unit,
     vaults: List<Vault>,
     viewModel: UpsertPasswordDetailViewModel,
@@ -82,6 +83,7 @@ fun UpsertPasswordDetailScreen(
 
     UpsertScreen(
         onClose = onClose,
+        onSuccess = { onSuccess(it) },
         viewModel = viewModel,
         selectedVault = passwordDetailResult?.vault ?: initialSelectedVault,
         onUpdateSelectedVault = { onUpdateSelectedVault(it) },
@@ -96,6 +98,7 @@ fun UpsertPasswordDetailScreen(
 @Composable
 fun UpsertScreen(
     onClose: () -> Unit,
+    onSuccess: (passwordDetailResult: PasswordDetailResult) -> Unit,
     viewModel: UpsertPasswordDetailViewModel,
     selectedVault: Vault?,
     onUpdateSelectedVault: (Vault) -> Unit,
@@ -147,6 +150,7 @@ fun UpsertScreen(
                 }
 
                 is ScreenState.Loaded -> {
+                    onSuccess(state.result)
                     onClose()
                 }
 
@@ -307,6 +311,7 @@ private fun AddPasswordScreenPreview() {
     }
     UpsertScreen(
         onClose = {},
+        onSuccess = {},
         viewModel = UpsertPasswordDetailViewModel(
             masterCredentialsRepository = MasterCredentialsRepository(
                 encryptedPrefs = EncryptedPrefsModule.mockSharedPreference
@@ -335,6 +340,7 @@ private fun AddPasswordScreenHorizontalPreview() {
     }
     UpsertScreen(
         onClose = {},
+        onSuccess = {},
         viewModel = UpsertPasswordDetailViewModel(
             masterCredentialsRepository = MasterCredentialsRepository(
                 encryptedPrefs = EncryptedPrefsModule.mockSharedPreference
