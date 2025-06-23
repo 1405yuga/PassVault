@@ -32,6 +32,7 @@ import com.google.gson.Gson
 fun MainScreen(mainScreenViewModel: MainScreenViewModel, goToLoaderScreen: () -> Unit) {
     val navController = rememberNavController()
     val vaultList by mainScreenViewModel.vaultList.collectAsState()
+    val passwordList by mainScreenViewModel.passwordList.collectAsState()
 
     NavHost(navController = navController, startDestination = MainScreens.VaultHome.route) {
         composable(route = MainScreens.VaultHome.route) {
@@ -91,7 +92,7 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel, goToLoaderScreen: () ->
                 },
                 vaults = vaultList,
                 initialSelectedVault = mainScreenViewModel.lastVaultMenu?.toVault(),
-                passwordDetailResult = passwordDetailResult,
+                passwordDetailResult = passwordList.first { it.passwordId == passwordDetailResult!!.passwordId },
                 viewModel = hiltViewModel(),
                 modifier = Modifier
             )
@@ -126,7 +127,7 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel, goToLoaderScreen: () ->
                     )
                 },
                 onClose = { navController.popBackStack() },
-                passwordDetailsResult = passwordDetailResult!!
+                passwordDetailsResult = passwordList.first { it.passwordId == passwordDetailResult!!.passwordId }
             )
         }
     }

@@ -11,27 +11,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.passvault.data.CipherEncodedBundle
-import com.example.passvault.data.MasterCredentials
-import com.example.passvault.data.PasswordDetailResult
-import com.example.passvault.data.PasswordDetails
 import com.example.passvault.data.Vault
 import com.example.passvault.di.shared_reference.MasterCredentialsRepository
 import com.example.passvault.network.supabase.AuthRepository
 import com.example.passvault.network.supabase.EncryptedDataRepository
 import com.example.passvault.network.supabase.VaultRepository
-import com.example.passvault.utils.extension_functions.fromJsonString
 import com.example.passvault.utils.extension_functions.toImageVector
-import com.example.passvault.utils.helper.EncryptionHelper
 import com.example.passvault.utils.helper.VaultIconsList
 import com.example.passvault.utils.state.ScreenState
-import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
