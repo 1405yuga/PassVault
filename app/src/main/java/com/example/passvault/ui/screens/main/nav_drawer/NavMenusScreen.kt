@@ -41,12 +41,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.passvault.R
 import com.example.passvault.data.PasswordDetailResult
+import com.example.passvault.di.shared_reference.EncryptedPrefsModule
+import com.example.passvault.di.shared_reference.MasterCredentialsRepository
+import com.example.passvault.di.supabase.SupabaseModule
+import com.example.passvault.network.supabase.AuthRepository
+import com.example.passvault.network.supabase.EncryptedDataRepository
+import com.example.passvault.network.supabase.VaultRepository
 import com.example.passvault.ui.screens.main.MainScreenViewModel
 import com.example.passvault.ui.screens.main.nav_drawer.list.PasswordsListScreen
 import com.example.passvault.ui.screens.main.nav_drawer.upsert_vault.UpsertVaultDialog
+import com.example.passvault.utils.annotations.HorizontalScreenPreview
 import com.example.passvault.utils.annotations.VerticalScreenPreview
 import com.example.passvault.utils.custom_composables.ConfirmationDialog
 import com.example.passvault.utils.extension_functions.HandleScreenState
+import com.example.passvault.utils.extension_functions.toVault
 import com.example.passvault.utils.state.ScreenState
 import kotlinx.coroutines.launch
 
@@ -66,6 +74,7 @@ fun NavMenusScreen(
     val vaultScreenState by mainScreenViewModel.vaultScreenState.collectAsState()
     val vaultList by mainScreenViewModel.vaultList.collectAsState()
     val passwordsScreenState by mainScreenViewModel.passwordsScreenState.collectAsState()
+    val passwordsList by mainScreenViewModel.passwordList.collectAsState()
     val signOutScreenState by viewModel.signOutState.collectAsState()
     val currentContext = LocalContext.current
 
@@ -110,7 +119,13 @@ fun NavMenusScreen(
                                                         style = MaterialTheme.typography.bodyLarge
                                                     )
                                                     Text(
-                                                        text = "0 items",
+                                                        text = "${
+                                                            if (vault.vaultId == null) {
+                                                                passwordsList.size // show all passwords
+                                                            } else {
+                                                                passwordsList.filter { it.vault?.vaultId == vault.vaultId }.size
+                                                            }
+                                                        } items",
                                                         style = MaterialTheme.typography.bodySmall,
                                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                                     )
@@ -246,20 +261,33 @@ fun NavMenusScreen(
                     mainScreenViewModel.lastVaultMenu?.let { vaultMenu ->
                         Log.d("NavMenuScreen", "Vault updated : $vaultMenu")
                         // TODO: display selected vault list
-//                        LaunchedEffect(key1 = vaultMenu) { viewModel.getPasswordsList(vaultId = vaultMenu.toVault()?.vaultId) }
-                        HandleScreenState(
-                            state = passwordsScreenState,
-                            onLoaded = {
-                                PasswordsListScreen(
-                                    passwordDetailResultList = it,
-                                    onAddClick = { toAddPasswordScreen() },
-                                    toViewScreen = { toViewPasswordScreen(it) },
-                                    toEditScreen = {
-                                        toEditPasswordScreen(it)
-                                    },
-                                )
-                            }
+                        PasswordsListScreen(
+                            passwordDetailResultList = if (vaultMenu.toVault()?.vaultId == null) {
+                                passwordsList // show all passwords
+                            } else {
+                                passwordsList.filter { it.vault?.vaultId == vaultMenu.toVault()?.vaultId }
+                            },
+                            onAddClick = { toAddPasswordScreen() },
+                            toViewScreen = { toViewPasswordScreen(it) },
+                            toEditScreen = {
+                                toEditPasswordScreen(it)
+                            },
                         )
+
+//                        LaunchedEffect(key1 = vaultMenu) { viewModel.getPasswordsList(vaultId = vaultMenu.toVault()?.vaultId) }
+//                        HandleScreenState(
+//                            state = passwordsScreenState,
+//                            onLoaded = {
+//                                PasswordsListScreen(
+//                                    passwordDetailResultList = it,
+//                                    onAddClick = { toAddPasswordScreen() },
+//                                    toViewScreen = { toViewPasswordScreen(it) },
+//                                    toEditScreen = {
+//                                        toEditPasswordScreen(it)
+//                                    },
+//                                )
+//                            }
+//                        )
                     }
 
                     // loadDialogs
@@ -340,41 +368,51 @@ fun NavMenusScreen(
     }
 }
 
-//@Composable
-//@VerticalScreenPreview
-//fun NavMenusScreenPreview() {
-//    NavMenusScreen(
-//        viewModel = NavMenusViewModel(
-//            vaultRepository = VaultRepository(SupabaseModule.mockClient),
-//            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
-//            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference),
-//        ),
-//        toProfileScreen = {},
-//        toAddPasswordScreen = {},
-//        toViewPasswordScreen = {},
-//        mainScreenViewModel = MainScreenViewModel(
-//            vaultRepository = VaultRepository(SupabaseModule.mockClient)
-//        ),
-//    )
-//}
-//
-//@Composable
-//@HorizontalScreenPreview
-//fun NavMenusScreenHorizontalPreview() {
-//    NavMenusScreen(
-//        viewModel = NavMenusViewModel(
-//            vaultRepository = VaultRepository(SupabaseModule.mockClient),
-//            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
-//            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference)
-//        ),
-//        toProfileScreen = {},
-//        toAddPasswordScreen = {},
-//        toViewPasswordScreen = {},
-//        mainScreenViewModel = MainScreenViewModel(
-//            vaultRepository = VaultRepository(SupabaseModule.mockClient)
-//        ),
-//    )
-//}
+@Composable
+@VerticalScreenPreview
+fun NavMenusScreenPreview() {
+    NavMenusScreen(
+        viewModel = NavMenusViewModel(
+            vaultRepository = VaultRepository(SupabaseModule.mockClient),
+            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
+            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference),
+            authRepository = AuthRepository(SupabaseModule.mockClient),
+        ),
+        toProfileScreen = {},
+        toAddPasswordScreen = {},
+        toViewPasswordScreen = {},
+        mainScreenViewModel = MainScreenViewModel(
+            vaultRepository = VaultRepository(SupabaseModule.mockClient),
+            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
+            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference),
+        ),
+        toEditPasswordScreen = {},
+        toLoaderScreen = {},
+    )
+}
+
+@Composable
+@HorizontalScreenPreview
+fun NavMenusScreenHorizontalPreview() {
+    NavMenusScreen(
+        viewModel = NavMenusViewModel(
+            vaultRepository = VaultRepository(SupabaseModule.mockClient),
+            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
+            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference),
+            authRepository = AuthRepository(SupabaseModule.mockClient),
+        ),
+        toProfileScreen = {},
+        toAddPasswordScreen = {},
+        toViewPasswordScreen = {},
+        mainScreenViewModel = MainScreenViewModel(
+            vaultRepository = VaultRepository(SupabaseModule.mockClient),
+            encryptedDataRepository = EncryptedDataRepository(SupabaseModule.mockClient),
+            masterCredentialsRepository = MasterCredentialsRepository(EncryptedPrefsModule.mockSharedPreference),
+        ),
+        toEditPasswordScreen = {},
+        toLoaderScreen = {},
+    )
+}
 
 @Composable
 @VerticalScreenPreview
