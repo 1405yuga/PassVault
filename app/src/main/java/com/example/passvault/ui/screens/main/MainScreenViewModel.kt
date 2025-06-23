@@ -23,6 +23,7 @@ import com.example.passvault.utils.state.ScreenState
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -36,10 +37,6 @@ class MainScreenViewModel @Inject constructor(
     private val masterCredentialsRepository: MasterCredentialsRepository
 ) :
     ViewModel() {
-
-    private var _vaultListScreenState =
-        MutableStateFlow<ScreenState<List<Vault>>>(ScreenState.PreLoad())
-    val vaultScreenState: StateFlow<ScreenState<List<Vault>>> = _vaultListScreenState
 
     private var _vaultList = MutableStateFlow<List<Vault>>(emptyList())
     var vaultList: StateFlow<List<Vault>> = _vaultList
@@ -77,113 +74,84 @@ class MainScreenViewModel @Inject constructor(
         onMenuSelected(NavDrawerMenus.VaultItem(_vaultList.value.last()))
     }
 
-    fun getVaults(isInitialLoad: Boolean? = null) {
-        _vaultListScreenState.value = ScreenState.Loading()
-        try {
-            viewModelScope.launch {
-                val result = mutableListOf<Vault>(
-                    Vault(
-                        vaultId = null,
-                        vaultName = "All Passwords",
-                        iconKey = Icons.Default.Language.name
-                    )
-                )
-                result += vaultRepository.getAllVaults()
-                Log.d(this@MainScreenViewModel.javaClass.simpleName, "Vaults : ${result.size}")
-                _vaultList.value = result
-                if (result.isNotEmpty()) {
-                    when (isInitialLoad) {
-                        true -> onMenuSelected(
-                            navDrawerMenus = NavDrawerMenus.VaultItem(vault = result.first())
-                        )
-
-                        false -> onMenuSelected(
-                            navDrawerMenus = NavDrawerMenus.VaultItem(vault = result.last())
-                        )
-
-                        null -> {
-                            if (result.size == 1) {
-                                onMenuSelected(
-                                    navDrawerMenus = NavDrawerMenus.VaultItem(vault = result.first())
-                                )
-                            }
-                        }
-                    }
-                }
-                _vaultListScreenState.value = ScreenState.Loaded(result = result)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            _vaultListScreenState.value = ScreenState.Error(message = "Unable to load Vaults")
-        }
-    }
-
-    private val _passwordsScreenState = MutableStateFlow<ScreenState<List<PasswordDetailResult>>>(
-        ScreenState.PreLoad()
-    )
-
-    val passwordsScreenState: StateFlow<ScreenState<List<PasswordDetailResult>>> =
-        _passwordsScreenState
-
     private val _passwordsList = MutableStateFlow<List<PasswordDetailResult>>(emptyList())
     val passwordList: StateFlow<List<PasswordDetailResult>> = _passwordsList
 
-    fun loadPasswords() {
+    private val _vaultsAndPasswordsState =
+        MutableStateFlow<ScreenState<VaultAndPasswordListResult>>(ScreenState.PreLoad())
+    val vaultsAndPasswordsState: StateFlow<ScreenState<VaultAndPasswordListResult>> =
+        _vaultsAndPasswordsState
+
+    private fun loadVaultsAndPasswords() {
+        _vaultsAndPasswordsState.value = ScreenState.Loading()
         viewModelScope.launch {
-            _passwordsScreenState.value = ScreenState.Loading()
             try {
-                val result = encryptedDataRepository.getAllEncryptedData()
-                if (result == null) {
-                    _passwordsScreenState.value = ScreenState.Error("Unable to load Passwords list")
-                } else if (result.isEmpty()) {
-                    _passwordsList.value = emptyList()
-                    _passwordsScreenState.value = ScreenState.Loaded(emptyList())
-                } else {
-                    val masterCredentialsJson =
+                val vaultsDeferred = async {
+                    val result = mutableListOf<Vault>(
+                        Vault(
+                            vaultId = null,
+                            vaultName = "All Passwords",
+                            iconKey = Icons.Default.Language.name
+                        )
+                    )
+                    result += vaultRepository.getAllVaults()
+                    result
+                }
+
+                val passwordsDeferred = async {
+                    val encryptedDataList = encryptedDataRepository.getAllEncryptedData()
+                        ?: return@async emptyList()
+
+                    if (encryptedDataList.isEmpty()) return@async emptyList()
+
+                    val masterJson =
                         masterCredentialsRepository.getLocallyStoredMasterCredentialsJson()
+                            ?: return@async emptyList()
 
-                    if (masterCredentialsJson == null) {
-                        _passwordsScreenState.value =
-                            ScreenState.Error("Something went wrong. Login again!")
-                    } else {
-                        val masterCredentials: MasterCredentials =
-                            masterCredentialsJson.fromJsonString()
-                        val gson = Gson()
+                    val masterCredentials: MasterCredentials = masterJson.fromJsonString()
+                    val gson = Gson()
 
-                        val decryptedList: List<PasswordDetailResult> =
-                            withContext(Dispatchers.Default) {
-                                result.map { encryptedData ->
-                                    val decryptedData = EncryptionHelper.performDecryption(
-                                        masterKey = masterCredentials.masterKey,
-                                        cipherEncodedBundle = CipherEncodedBundle(
-                                            encodedSalt = masterCredentials.encodedSalt,
-                                            encodedInitialisationVector = encryptedData.encodedInitialisationVector,
-                                            encodedEncryptedText = encryptedData.encodedEncryptedPasswordData
-                                        )
-                                    )
+                    withContext(Dispatchers.Default) {
+                        encryptedDataList.map { encryptedData ->
+                            val decryptedData = EncryptionHelper.performDecryption(
+                                masterKey = masterCredentials.masterKey,
+                                cipherEncodedBundle = CipherEncodedBundle(
+                                    encodedSalt = masterCredentials.encodedSalt,
+                                    encodedInitialisationVector = encryptedData.encodedInitialisationVector,
+                                    encodedEncryptedText = encryptedData.encodedEncryptedPasswordData
+                                )
+                            )
 
-                                    val vault = vaultRepository.getVaultById(encryptedData.vaultId)
+                            val vault = vaultRepository.getVaultById(encryptedData.vaultId)
 
-                                    PasswordDetailResult(
-                                        passwordId = encryptedData.passwordId!!,
-                                        passwordDetails = gson.fromJson(
-                                            decryptedData,
-                                            PasswordDetails::class.java
-                                        ),
-                                        vault = vault ?: Vault.defaultVault(),
-                                        createdAt = encryptedData.createdAt!!,
-                                        modifiedAt = encryptedData.updatedAt
-                                    )
-                                }
-                            }
-
-                        _passwordsList.value = decryptedList
-                        _passwordsScreenState.value = ScreenState.Loaded(decryptedList)
+                            PasswordDetailResult(
+                                passwordId = encryptedData.passwordId!!,
+                                passwordDetails = gson.fromJson(
+                                    decryptedData,
+                                    PasswordDetails::class.java
+                                ),
+                                vault = vault ?: Vault.defaultVault(),
+                                createdAt = encryptedData.createdAt!!,
+                                modifiedAt = encryptedData.updatedAt
+                            )
+                        }
                     }
                 }
+
+                val vaults = vaultsDeferred.await()
+                val passwords = passwordsDeferred.await()
+
+                // update individual LiveData/StateFlow if needed
+                _vaultList.value = vaults
+                _passwordsList.value = passwords
+
+                // select vault if needed
+                onMenuSelected(NavDrawerMenus.VaultItem(vault = vaults.first()))
+                _vaultsAndPasswordsState.value =
+                    ScreenState.Loaded(result = VaultAndPasswordListResult(vaults, passwords))
             } catch (e: Exception) {
                 e.printStackTrace()
-                _passwordsScreenState.value = ScreenState.Error("Unable to load Passwords list")
+                _vaultsAndPasswordsState.value = ScreenState.Error("Unable to load")
             }
         }
     }
@@ -200,10 +168,14 @@ class MainScreenViewModel @Inject constructor(
     }
 
     init {
-        getVaults(isInitialLoad = true)
-        loadPasswords()
+        loadVaultsAndPasswords()
     }
 }
+
+data class VaultAndPasswordListResult(
+    private val vaultList: List<Vault> = emptyList(),
+    private val passwordDetailResultList: List<PasswordDetailResult> = emptyList()
+)
 
 sealed class MainScreens(val route: String) {
     object VaultHome : MainScreens(route = "VaultHome")
